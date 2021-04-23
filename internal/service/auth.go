@@ -3,7 +3,9 @@ package service
 import (
 	"errors"
 	"webconsole/global"
+	"webconsole/internal/dao/database"
 	"webconsole/internal/model"
+	apiv1 "webconsole/internal/router/api/v1"
 	"webconsole/pkg/respcode"
 
 	"github.com/gin-gonic/gin"
@@ -32,9 +34,9 @@ func SignUpHandler(c *gin.Context) {
 	}
 
 	// 2. 业务处理
-	if err := logic.SignUp(p); err != nil {
+	if err := apiv1.SignUp(p); err != nil {
 		zap.L().Error("注册失败", zap.Error(err))
-		if errors.Is(err, mysql.ErrorUserExist) {
+		if errors.Is(err, database.ErrorUserExist) {
 			respcode.ResponseError(c, respcode.CodeUserExist)
 		} else {
 			respcode.ResponseError(c, respcode.CodeServerBusy)
@@ -61,18 +63,18 @@ func LoginHandler(c *gin.Context) {
 			return
 		}
 
-		respcode.ResponseErrorWithMsg(c, respcode.CodeInvalidParam, errs.Translate(trans))
+		respcode.ResponseErrorWithMsg(c, respcode.CodeInvalidParam, errs.Translate(global.Trans))
 		return
 	}
 
 	// 2. 业务处理
-	aToken, err := logic.Login(p)
+	aToken, err := apiv1.Login(p)
 	if err != nil {
 		zap.L().Error("登录失败", zap.Error(err))
-		if errors.Is(err, mysql.ErrorUserNotExist) {
+		if errors.Is(err, database.ErrorUserNotExist) {
 			respcode.ResponseError(c, respcode.CodeUserNotExist)
 
-		} else if errors.Is(err, mysql.ErrorInvalidPassword) {
+		} else if errors.Is(err, database.ErrorInvalidPassword) {
 			respcode.ResponseError(c, respcode.CodeInvalidPassword)
 
 		} else {

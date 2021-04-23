@@ -40,14 +40,15 @@ func NewRouter() (r *gin.Engine, err error) {
 	// 注册swagger
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
+	// 注册路由
+	r.POST("/signup", service.SignUpHandler)
+
+	// 登录路由
+	r.POST("/login", service.LoginHandler)
+
 	apiv1 := r.Group("/api/v1")
 	apiv1.Use(middleware.JWTAuthMiddleware())
 	{
-		// 注册路由
-		apiv1.POST("/signup", service.SignUpHandler)
-
-		// 登录路由
-		apiv1.POST("/signup", service.LoginHandler)
 
 		// 缓存路由
 		cacheGroup := apiv1.Group("/cache")

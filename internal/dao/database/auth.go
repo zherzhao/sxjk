@@ -5,7 +5,11 @@ import (
 	"database/sql"
 	"encoding/hex"
 	"errors"
+	"log"
+	"webconsole/global"
 	"webconsole/internal/model"
+
+	_ "github.com/go-sql-driver/mysql"
 )
 
 // 加密salt
@@ -22,8 +26,10 @@ var (
 func CheckUserExist(username string) error {
 	sqlStr := `select count(user_id) from user where username = ?`
 	var count int
-	err := db.Get(&count, sqlStr, username)
+
+	err := global.DB.QueryRow(sqlStr, username).Scan(&count)
 	if err != nil {
+		log.Println(err)
 		return err
 	}
 
@@ -40,9 +46,14 @@ func InsertUser(user *model.User) (err error) {
 
 	// 执行SQL语句入库
 	sqlStr := `insert into user(user_id, username, password) values(?,?,?)`
-	_, err = db.Exec(sqlStr, user.UserID, user.Username, user.Password)
-	return
 
+	_, err = global.DB.Exec(sqlStr, user.UserID, user.Username, user.Password)
+	if err != nil {
+		log.Println(err)
+		return err
+	}
+
+	return
 }
 
 // 加密函数 (md5)
@@ -55,16 +66,17 @@ func encryptPassword(oPassword string) string {
 // 用户登录
 func UserLogin(user *model.User) (err error) {
 	oPassword := user.Password
-	// 执行SQL语句入库
+
 	sqlStr := `select user_id, username, password from user where username=?`
-	err = db.Get(user, sqlStr, user.Username)
+	err = global.DB.QueryRow(sqlStr, user.Username).Scan(&user.UserID, &user.Username, &user.Password)
 	if err == sql.ErrNoRows {
 		return ErrorUserNotExist
 	}
 
 	if err != nil {
 		// 查询失败
-		return
+		log.Println(err)
+		return err
 	}
 
 	// 判断密码是否匹配
@@ -72,5 +84,6 @@ func UserLogin(user *model.User) (err error) {
 	if password != user.Password {
 		return ErrorInvalidPassword
 	}
+
 	return
 }

@@ -1,13 +1,15 @@
 package v1
 
 import (
+	"webconsole/internal/dao/database"
 	"webconsole/internal/model"
 	"webconsole/pkg/jwt"
+	sf "webconsole/pkg/snowflake"
 )
 
 func SignUp(p *model.ParamSignUp) error {
 	// 检查用户是否已经注册
-	err := mysql.CheckUserExist(p.UserName)
+	err := database.CheckUserExist(p.UserName)
 	if err != nil {
 		return err
 	}
@@ -22,20 +24,20 @@ func SignUp(p *model.ParamSignUp) error {
 	}
 
 	// 存入数据库
-	return mysql.InsertUser(user)
+	return database.InsertUser(user)
 
 }
 
 // 处理用户登录以及JWT的发放
-func Login(p *models.ParamLogin) (aoken string, err error) {
+func Login(p *model.ParamLogin) (aoken string, err error) {
 	// 构造一个User实例
-	user := &models.User{
+	user := &model.User{
 		Username: p.UserName,
 		Password: p.Password,
 	}
 
 	// 数据库验证
-	if err = mysql.UserLogin(user); err != nil {
+	if err = database.UserLogin(user); err != nil {
 		return "", err
 	}
 	return jwt.GenToken(user.UserID, user.Username)
