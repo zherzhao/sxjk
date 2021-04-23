@@ -5,8 +5,7 @@ BINARY="webconsole"
 all: gotool build
 
 build:
-	#CGO_ENABLED=1 GOOS=windows GOARCH=amd64 go build  -ldflags "-s -w" -o ${BINARY}
-	CGO_ENABLED=1 GOOS=linux GOARCH=amd64 go build  -ldflags "-s -w" -o ${BINARY}
+	CGO_ENABLE=1 GOOS=linux GOARCH=amd64 go build  -ldflags "-s -w" -o ${BINARY}
 
 run:
 	@go run ./
