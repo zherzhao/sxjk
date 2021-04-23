@@ -6,6 +6,7 @@ import (
 	"webconsole/global"
 	"webconsole/internal/dao/webcache/cache"
 	"webconsole/internal/middleware"
+	"webconsole/internal/service"
 	"webconsole/pkg/logger"
 	"webconsole/pkg/tcp"
 
@@ -40,7 +41,14 @@ func NewRouter() (r *gin.Engine, err error) {
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
 	apiv1 := r.Group("/api/v1")
+	apiv1.Use(middleware.JWTAuthMiddleware())
 	{
+		// 注册路由
+		apiv1.POST("/signup", service.SignUpHandler)
+
+		// 登录路由
+		apiv1.POST("/signup", service.LoginHandler)
+
 		// 缓存路由
 		cacheGroup := apiv1.Group("/cache")
 		{
