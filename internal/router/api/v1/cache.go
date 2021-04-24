@@ -1,7 +1,7 @@
 package v1
 
 import (
-	"io"
+	"io/ioutil"
 	"log"
 	"net/http"
 
@@ -66,7 +66,7 @@ func (s *Server) UpdateHandler(c *gin.Context) {
 
 	m := c.Request.Method
 	if m == http.MethodPut {
-		b, _ := io.ReadAll(c.Request.Body)
+		b, _ := ioutil.ReadAll(c.Request.Body)
 		if len(b) != 0 {
 			e := s.Set(key, b)
 			if e != nil {
