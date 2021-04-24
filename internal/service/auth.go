@@ -2,6 +2,7 @@ package service
 
 import (
 	"errors"
+	"fmt"
 	"webconsole/global"
 	"webconsole/internal/dao/database"
 	"webconsole/internal/model"
@@ -33,6 +34,7 @@ func SignUpHandler(c *gin.Context) {
 		return
 	}
 
+	fmt.Println("test start")
 	// 2. 业务处理
 	if err := apiv1.SignUp(p); err != nil {
 		zap.L().Error("注册失败", zap.Error(err))
@@ -44,6 +46,7 @@ func SignUpHandler(c *gin.Context) {
 		}
 		return
 	}
+	fmt.Println("test end")
 
 	// 3. 返回响应
 	respcode.ResponseSuccess(c, nil)

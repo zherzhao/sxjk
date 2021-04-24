@@ -1,6 +1,8 @@
 package v1
 
 import (
+	"fmt"
+	_ "fmt"
 	"webconsole/internal/dao/database"
 	"webconsole/internal/model"
 	"webconsole/pkg/jwt"
@@ -15,7 +17,10 @@ func SignUp(p *model.ParamSignUp) error {
 	}
 
 	// 生成UID
+	fmt.Println(sf.GenID())
+
 	userID := sf.GenID()
+
 	// 构造一个User实例
 	user := &model.User{
 		UserID:   userID,

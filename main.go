@@ -16,6 +16,7 @@ import (
 	"webconsole/internal/dao/database"
 	"webconsole/internal/router"
 	"webconsole/pkg/logger"
+	sf "webconsole/pkg/snowflake"
 
 	_ "github.com/go-sql-driver/mysql"
 )
@@ -33,6 +34,14 @@ func init() {
 		return
 	}
 
+	// 初始化ID生成器
+	if err := sf.Init(global.ServerSetting.StartTime, global.ServerSetting.MachineID); err != nil {
+		fmt.Println("init logger failed, err: ", err)
+		return
+	}
+
+	zap.L().Debug("ID init success...")
+
 	// 初始化日志
 	err = global.Conf.ReadSection("log", &global.LoggerSetting)
 	if err != nil {
@@ -47,7 +56,7 @@ func init() {
 
 	zap.L().Debug("logger init success...")
 
-	// 初始化缓存
+	// 初始化缓存设置
 	err = global.Conf.ReadSection("cache", &global.CacheSetting)
 	if err != nil {
 		fmt.Println("init cache failed, err: ", err)
@@ -63,6 +72,7 @@ func init() {
 
 	zap.L().Debug("cache init success...")
 
+	// 初始化sql设置
 	err = global.Conf.ReadSection("database", &global.DatabaseSetting)
 	if err != nil {
 		fmt.Println("init database failed, err: ", err)

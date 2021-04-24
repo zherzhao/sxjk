@@ -1,7 +1,7 @@
 server:
   name: webconsole
   version: v0.0.1
-  port: 8080
+  port: 9426
   mode: dev
   start_time: 2021-04-16
   machine_id: 1

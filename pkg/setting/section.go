@@ -11,8 +11,8 @@ type ServerSettingS struct {
 	Locale  string `mapstructure:"locale"`
 	Port    int    `mapstructure:"port"`
 
-	StartTime int   `mapstructure:"starttime"`
-	MachineID int64 `mapstructure:"machine_id"`
+	StartTime string `mapstructure:"start_time"`
+	MachineID int64  `mapstructure:"machine_id"`
 }
 
 type LoggerSettingS struct {

@@ -41,7 +41,7 @@ func NewRouter() (r *gin.Engine, err error) {
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
 	// 注册路由
-	r.POST("/signup", service.SignUpHandler)
+	r.POST("/signup", middleware.Translations(), service.SignUpHandler)
 
 	// 登录路由
 	r.POST("/login", service.LoginHandler)

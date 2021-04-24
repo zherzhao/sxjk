@@ -1,6 +1,8 @@
 package middleware
 
 import (
+	"webconsole/global"
+
 	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/binding"
 	"github.com/go-playground/locales/en"
@@ -11,10 +13,10 @@ import (
 	zhTranslations "github.com/go-playground/validator/v10/translations/zh"
 )
 
-func translations() gin.HandlerFunc {
+func Translations() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		uni := ut.New(en.New(), zh.New())
-		locale := c.GetHeader("locale")
+		locale := global.ServerSetting.Locale
 		trans, _ := uni.GetTranslator(locale)
 		// 修改gin框架中的Validator引擎属性，实现自定制
 		v, ok := binding.Validator.Engine().(*validator.Validate)
@@ -29,7 +31,7 @@ func translations() gin.HandlerFunc {
 			}
 
 			// 注册翻译器
-			c.Set("trans", trans)
+			global.Trans = trans
 		}
 		c.Next()
 	}
