@@ -1,7 +1,6 @@
 package v1
 
 import (
-	"fmt"
 	_ "fmt"
 	"webconsole/internal/dao/database"
 	"webconsole/internal/model"
@@ -17,8 +16,6 @@ func SignUp(p *model.ParamSignUp) error {
 	}
 
 	// 生成UID
-	fmt.Println(sf.GenID())
-
 	userID := sf.GenID()
 
 	// 构造一个User实例
@@ -34,7 +31,7 @@ func SignUp(p *model.ParamSignUp) error {
 }
 
 // 处理用户登录以及JWT的发放
-func Login(p *model.ParamLogin) (aoken string, err error) {
+func Login(p *model.ParamLogin) (userid int64, aToken string, err error) {
 	// 构造一个User实例
 	user := &model.User{
 		Username: p.UserName,
@@ -43,8 +40,10 @@ func Login(p *model.ParamLogin) (aoken string, err error) {
 
 	// 数据库验证
 	if err = database.UserLogin(user); err != nil {
-		return "", err
+		return
 	}
-	return jwt.GenToken(user.UserID, user.Username)
+
+	aToken, err = jwt.GenToken(user.UserID, user.Username)
+	return user.UserID, aToken, err
 
 }

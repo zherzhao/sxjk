@@ -52,41 +52,39 @@ func NewRouter() (r *gin.Engine, err error) {
 
 		// 缓存路由
 		cacheGroup := apiv1.Group("/cache")
-		{
-			// 操作缓存
-			cacheGroup.Use(middleware.PathParse)
-			cacheGroup.GET("/hit/*key", s.CacheCheck, func(c *gin.Context) {
-				miss := c.GetBool("miss") // 检查是否命中缓存
-				if miss {
-					c.Request.URL.Path = "/api/v1/info" + c.Param("key") // 将请求的URL修改
-					r.HandleContext(c)                                   // 继续之后的操作
 
-				}
-			})
+		// 操作缓存
+		cacheGroup.Use(middleware.PathParse)
+		cacheGroup.GET("/hit/*key", s.CacheCheck, func(c *gin.Context) {
+			miss := c.GetBool("miss") // 检查是否命中缓存
+			if miss {
+				c.Request.URL.Path = "/api/v1/info" + c.Param("key") // 将请求的URL修改
+				r.HandleContext(c)                                   // 继续之后的操作
 
-			cacheGroup.PUT("/update/*key", s.UpdateHandler)
-			cacheGroup.DELETE("/delete/*key", s.DeleteHandler)
+			}
+		})
 
-			// 获取缓存状态
-			cacheGroup.GET("/status/", s.StatusHandler)
-		}
+		cacheGroup.PUT("/update/*key", s.UpdateHandler)
+		cacheGroup.DELETE("/delete/*key", s.DeleteHandler)
 
-		// 数据查询路由
-		infoGroup := apiv1.Group("/info")
-		{
-			infoGroup.Use(middleware.PathParse)
-
-			infoGroup.GET("/:infotype/:count",
-				middleware.QueryRouter,
-				info.GetUpdateInfo,
-				func(c *gin.Context) {
-					if c.GetString("type") == "mem" {
-						log.Println("后续执行了")
-						r.HandleContext(c) //继续之后的操作
-					}
-				})
-		}
+		// 获取缓存状态
+		cacheGroup.GET("/status/", s.StatusHandler)
 	}
 
+	// 数据查询路由
+	infoGroup := apiv1.Group("/info")
+	{
+		infoGroup.Use(middleware.PathParse)
+
+		infoGroup.GET("/:infotype/:count",
+			middleware.QueryRouter,
+			info.GetUpdateInfo,
+			func(c *gin.Context) {
+				if c.GetString("type") == "mem" {
+					log.Println("后续执行了")
+					r.HandleContext(c) //继续之后的操作
+				}
+			})
+	}
 	return r, nil
 }

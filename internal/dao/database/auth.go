@@ -53,7 +53,8 @@ func InsertUser(user *model.User) (err error) {
 		return err
 	}
 
-	return
+	// 成功将用户注册后 返回用户的UID
+	return nil
 }
 
 // 加密函数 (md5)

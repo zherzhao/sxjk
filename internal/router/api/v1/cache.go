@@ -4,6 +4,7 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"webconsole/pkg/respcode"
 
 	"github.com/gin-gonic/gin"
 )
@@ -36,7 +37,7 @@ func (s *Server) CacheCheck(c *gin.Context) {
 			return
 		}
 
-		c.JSON(http.StatusOK, string(b))
+		respcode.ResponseSuccess(c, string(b))
 		c.Set("miss", false) // 不需要查数据库
 		return
 	}
