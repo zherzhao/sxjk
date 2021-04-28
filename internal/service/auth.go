@@ -77,7 +77,7 @@ func LoginHandler(c *gin.Context) {
 	p := new(model.ParamLogin)
 
 	if err := c.ShouldBindJSON(&p); err != nil {
-		zap.L().Error("SignUp with invalid param", zap.Error(err))
+		zap.L().Error("Login with invalid param", zap.Error(err))
 		errs, ok := err.(validator.ValidationErrors)
 		if !ok {
 			respcode.ResponseError(c, respcode.CodeInvalidParam)

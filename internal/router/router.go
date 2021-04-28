@@ -2,6 +2,7 @@ package router
 
 import (
 	"log"
+	"net/http"
 	_ "webconsole/docs"
 	"webconsole/global"
 	"webconsole/internal/dao/webcache/cache"
@@ -40,21 +41,28 @@ func NewRouter() (r *gin.Engine, err error) {
 	// 注册swagger
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
+	// api路由组
+	apiv1 := r.Group("/api/v1")
+
+	// Ping 测试路由
+	apiv1.GET("/ping", func(c *gin.Context) {
+		c.JSON(http.StatusOK, gin.H{
+			"msg": "pong",
+		})
+	})
+
 	// 注册路由
-	r.POST("/signup", middleware.Translations(), service.SignUpHandler)
+	apiv1.POST("/signup", middleware.Translations(), service.SignUpHandler)
 
 	// 登录路由
-	r.POST("/login", service.LoginHandler)
+	apiv1.POST("/login", service.LoginHandler)
 
-	apiv1 := r.Group("/api/v1")
-	apiv1.Use(middleware.JWTAuthMiddleware())
+	// 缓存路由
+	cacheGroup := apiv1.Group("/cache")
 	{
-
-		// 缓存路由
-		cacheGroup := apiv1.Group("/cache")
-
 		// 操作缓存
-		cacheGroup.Use(middleware.PathParse)
+		cacheGroup.Use(middleware.JWTAuthMiddleware(), middleware.PathParse)
+
 		cacheGroup.GET("/hit/*key", s.CacheCheck, func(c *gin.Context) {
 			miss := c.GetBool("miss") // 检查是否命中缓存
 			if miss {
@@ -74,7 +82,7 @@ func NewRouter() (r *gin.Engine, err error) {
 	// 数据查询路由
 	infoGroup := apiv1.Group("/info")
 	{
-		infoGroup.Use(middleware.PathParse)
+		infoGroup.Use(middleware.JWTAuthMiddleware(), middleware.PathParse)
 
 		infoGroup.GET("/:infotype/:count",
 			middleware.QueryRouter,
