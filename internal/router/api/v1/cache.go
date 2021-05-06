@@ -25,7 +25,7 @@ func NewServer(c ICache.Cache) *Server {
 // @Tags 缓存相关接口
 // @Accept application/json
 // @Produce application/json
-// @Param Authorization header string false "Bearer 用户令牌"
+// @Param Authorization header string true "Bearer 用户令牌"
 // @Param infotype query string true "查询类型"
 // @Param level query string true "查询等级"
 // @Security ApiKeyAuth

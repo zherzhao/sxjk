@@ -17,6 +17,18 @@ func NewInfo() Info {
 	return Info{}
 }
 
+// GetUpdataInfo 获取数据库原始数据接口 访问后会更新缓存
+// @Summary 更新缓存接口
+// @Description 获取数据库原始数据接口 访问后会更新缓存
+// @Tags 缓存相关接口
+// @Accept application/json
+// @Produce application/json
+// @Param Authorization header string true "Bearer 用户令牌"
+// @Param infotype query string true "查询类型"
+// @Param level query string true "查询等级"
+// @Security ApiKeyAuth
+// @Success 200 {object} respcode.ResponseData{msg=string,data=string}
+// @Router /api/v1/info/{infotype}/{level} [get]
 func (this *Info) GetUpdateInfo(c *gin.Context) {
 	info := c.GetString("info")
 
