@@ -52,7 +52,7 @@ var doc = `{
                     },
                     {
                         "type": "string",
-                        "description": "查询类型 : road(路)  bridge(桥) tunnel(隧道) service(服务区) portal(收费门架) tolla(收费站)",
+                        "description": "查询类型 : road(路)  bridge(桥) tunnel(隧道) service(服务区) portal(收费门架) toll(收费站)",
                         "name": "infotype",
                         "in": "path",
                         "required": true
@@ -170,7 +170,7 @@ var doc = `{
                     },
                     {
                         "type": "string",
-                        "description": "查询类型 : road(路)  bridge(桥) tunnel(隧道) service(服务区) portal(收费门架) tolla(收费站)",
+                        "description": "查询类型 : road(路)  bridge(桥) tunnel(隧道) service(服务区) portal(收费门架) toll(收费站)",
                         "name": "infotype",
                         "in": "path",
                         "required": true

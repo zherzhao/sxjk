@@ -49,7 +49,7 @@ paths:
         required: true
         type: string
       - description: '查询类型 : road(路)  bridge(桥) tunnel(隧道) service(服务区) portal(收费门架)
-          tolla(收费站)'
+          toll(收费站)'
         in: path
         name: infotype
         required: true
@@ -120,7 +120,7 @@ paths:
         required: true
         type: string
       - description: '查询类型 : road(路)  bridge(桥) tunnel(隧道) service(服务区) portal(收费门架)
-          tolla(收费站)'
+          toll(收费站)'
         in: path
         name: infotype
         required: true
