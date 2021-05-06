@@ -27,7 +27,7 @@ func NewServer(c ICache.Cache) *Server {
 // @Produce application/json
 // @Param Authorization header string true "Bearer 用户令牌"
 // @Param infotype path string true "查询类型 : road(路)  bridge(桥) tunnel(隧道) service(服务区) portal(收费门架) tolla(收费站)"
-// @Param level path int true "查询等级" : 0 1 2 3 4 5
+// @Param level path int true "查询等级 : 0(高速) 1(一级) 2(二级) 3(三级) 4(四级) 5(等外)"
 // @Security ApiKeyAuth
 // @Success 200 {object} respcode.ResponseData{msg=string,data=string}
 // @Router /api/v1/cache/hit/{infotype}/{level} [get]
