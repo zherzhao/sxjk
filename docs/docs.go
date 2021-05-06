@@ -52,7 +52,7 @@ var doc = `{
                     },
                     {
                         "type": "string",
-                        "description": "查询类型",
+                        "description": "查询类型 : road(路)  bridge(桥) tunnel(隧道) service(服务区) portal(收费门架) tolla(收费站)",
                         "name": "infotype",
                         "in": "path",
                         "required": true
@@ -62,6 +62,58 @@ var doc = `{
                         "description": "查询等级",
                         "name": "level",
                         "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/respcode.ResponseData"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "string"
+                                        },
+                                        "msg": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/home/menus": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "用于前端渲染用户家目录侧边栏",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "用户相关接口"
+                ],
+                "summary": "获取导航栏数据",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Bearer 用户令牌",
+                        "name": "Authorization",
+                        "in": "header",
                         "required": true
                     }
                 ],
@@ -118,7 +170,7 @@ var doc = `{
                     },
                     {
                         "type": "string",
-                        "description": "查询类型",
+                        "description": "查询类型 : road(路)  bridge(桥) tunnel(隧道) service(服务区) portal(收费门架) tolla(收费站)",
                         "name": "infotype",
                         "in": "path",
                         "required": true
@@ -177,7 +229,7 @@ var doc = `{
                 "parameters": [
                     {
                         "description": "用户登录信息",
-                        "name": "logininfo",
+                        "name": "登录信息",
                         "in": "body",
                         "required": true,
                         "schema": {
@@ -228,6 +280,17 @@ var doc = `{
                     "用户相关api"
                 ],
                 "summary": "处理注册请求",
+                "parameters": [
+                    {
+                        "description": "用户注册信息",
+                        "name": "注册信息",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/model.ParamSignUp"
+                        }
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -263,6 +326,25 @@ var doc = `{
             ],
             "properties": {
                 "password": {
+                    "type": "string"
+                },
+                "username": {
+                    "type": "string"
+                }
+            }
+        },
+        "model.ParamSignUp": {
+            "type": "object",
+            "required": [
+                "password",
+                "repassword",
+                "username"
+            ],
+            "properties": {
+                "password": {
+                    "type": "string"
+                },
+                "repassword": {
                     "type": "string"
                 },
                 "username": {

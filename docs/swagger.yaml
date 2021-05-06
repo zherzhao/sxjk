@@ -9,6 +9,19 @@ definitions:
     - password
     - username
     type: object
+  model.ParamSignUp:
+    properties:
+      password:
+        type: string
+      repassword:
+        type: string
+      username:
+        type: string
+    required:
+    - password
+    - repassword
+    - username
+    type: object
   respcode.ResponseData:
     properties:
       code:
@@ -35,7 +48,8 @@ paths:
         name: Authorization
         required: true
         type: string
-      - description: 查询类型
+      - description: '查询类型 : road(路)  bridge(桥) tunnel(隧道) service(服务区) portal(收费门架)
+          tolla(收费站)'
         in: path
         name: infotype
         required: true
@@ -64,6 +78,36 @@ paths:
       summary: 检查缓存命中接口
       tags:
       - 缓存相关接口
+  /api/v1/home/menus:
+    get:
+      consumes:
+      - application/json
+      description: 用于前端渲染用户家目录侧边栏
+      parameters:
+      - description: Bearer 用户令牌
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/respcode.ResponseData'
+            - properties:
+                data:
+                  type: string
+                msg:
+                  type: string
+              type: object
+      security:
+      - ApiKeyAuth: []
+      summary: 获取导航栏数据
+      tags:
+      - 用户相关接口
   /api/v1/info/{infotype}/{level}:
     get:
       consumes:
@@ -75,7 +119,8 @@ paths:
         name: Authorization
         required: true
         type: string
-      - description: 查询类型
+      - description: '查询类型 : road(路)  bridge(桥) tunnel(隧道) service(服务区) portal(收费门架)
+          tolla(收费站)'
         in: path
         name: infotype
         required: true
@@ -112,7 +157,7 @@ paths:
       parameters:
       - description: 用户登录信息
         in: body
-        name: logininfo
+        name: 登录信息
         required: true
         schema:
           $ref: '#/definitions/model.ParamLogin'
@@ -140,6 +185,13 @@ paths:
       consumes:
       - application/json
       description: 首页注册
+      parameters:
+      - description: 用户注册信息
+        in: body
+        name: 注册信息
+        required: true
+        schema:
+          $ref: '#/definitions/model.ParamSignUp'
       produces:
       - application/json
       responses:
