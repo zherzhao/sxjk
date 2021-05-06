@@ -47,6 +47,14 @@ func NewRouter() (r *gin.Engine, err error) {
 	// 登录路由
 	apiv1.POST("/login", v1.LoginHandler)
 
+	// 用户家目录路由
+	homeGroup := apiv1.Group("/home")
+	{
+		homeGroup.Use(middleware.JWTAuthMiddleware())
+		homeGroup.GET("/menus", v1.MenusHandler)
+
+	}
+
 	// 缓存路由
 	cacheGroup := apiv1.Group("/cache")
 	{

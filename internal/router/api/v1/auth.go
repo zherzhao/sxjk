@@ -24,6 +24,7 @@ const (
 // @Tags 用户相关api
 // @Accept application/json
 // @Produce application/json
+// @Param 注册信息 body model.ParamSignUp true "用户注册信息"
 // @Security ApiKeyAuth
 // @Success 200 {object} respcode.ResponseData{msg=string,data=string}
 // @Router /api/v1/sigin [post]
@@ -66,7 +67,7 @@ func SignUpHandler(c *gin.Context) {
 // @Tags 用户相关api
 // @Accept application/json
 // @Produce application/json
-// @Param logininfo body model.ParamLogin true "用户登录信息"
+// @Param 登录信息 body model.ParamLogin true "用户登录信息"
 // @Security ApiKeyAuth
 // @Success 200 {object} respcode.ResponseData{msg=string,data=string}
 // @Router /api/v1/login [post]
