@@ -59,7 +59,7 @@ var doc = `{
                     },
                     {
                         "type": "integer",
-                        "description": "查询等级",
+                        "description": "查询等级 : 0(高速) 1(一级) 2(二级) 3(三级) 4(四级) 5(等外)",
                         "name": "level",
                         "in": "path",
                         "required": true
@@ -177,7 +177,7 @@ var doc = `{
                     },
                     {
                         "type": "integer",
-                        "description": "查询等级",
+                        "description": "查询等级 : 0(高速) 1(一级) 2(二级) 3(三级) 4(四级) 5(等外)",
                         "name": "level",
                         "in": "path",
                         "required": true
