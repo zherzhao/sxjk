@@ -47,20 +47,87 @@ var doc = `{
                         "type": "string",
                         "description": "Bearer 用户令牌",
                         "name": "Authorization",
-                        "in": "header"
+                        "in": "header",
+                        "required": true
                     },
                     {
                         "type": "string",
                         "description": "查询类型",
                         "name": "infotype",
-                        "in": "query",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "查询等级",
+                        "name": "level",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/respcode.ResponseData"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "string"
+                                        },
+                                        "msg": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/info/{infotype}/{level}": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "获取数据库原始数据接口 访问后会更新缓存",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "缓存相关接口"
+                ],
+                "summary": "更新缓存接口",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Bearer 用户令牌",
+                        "name": "Authorization",
+                        "in": "header",
                         "required": true
                     },
                     {
                         "type": "string",
+                        "description": "查询类型",
+                        "name": "infotype",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
                         "description": "查询等级",
                         "name": "level",
-                        "in": "query",
+                        "in": "path",
                         "required": true
                     }
                 ],

@@ -33,17 +33,18 @@ paths:
       - description: Bearer 用户令牌
         in: header
         name: Authorization
+        required: true
         type: string
       - description: 查询类型
-        in: query
+        in: path
         name: infotype
         required: true
         type: string
       - description: 查询等级
-        in: query
+        in: path
         name: level
         required: true
-        type: string
+        type: integer
       produces:
       - application/json
       responses:
@@ -61,6 +62,46 @@ paths:
       security:
       - ApiKeyAuth: []
       summary: 检查缓存命中接口
+      tags:
+      - 缓存相关接口
+  /api/v1/info/{infotype}/{level}:
+    get:
+      consumes:
+      - application/json
+      description: 获取数据库原始数据接口 访问后会更新缓存
+      parameters:
+      - description: Bearer 用户令牌
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: 查询类型
+        in: path
+        name: infotype
+        required: true
+        type: string
+      - description: 查询等级
+        in: path
+        name: level
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/respcode.ResponseData'
+            - properties:
+                data:
+                  type: string
+                msg:
+                  type: string
+              type: object
+      security:
+      - ApiKeyAuth: []
+      summary: 更新缓存接口
       tags:
       - 缓存相关接口
   /api/v1/login:
