@@ -3,11 +3,11 @@ package tcp
 import (
 	"net"
 	"webconsole/global"
-	"webconsole/internal/dao/webcache/cache"
+	"webconsole/pkg/cache/ICache"
 )
 
 type Server struct {
-	cache.Cache
+	ICache.Cache
 }
 
 func (s *Server) Listen() {
@@ -25,6 +25,6 @@ func (s *Server) Listen() {
 	}
 }
 
-func New(c cache.Cache) *Server {
+func New(c ICache.Cache) *Server {
 	return &Server{c}
 }

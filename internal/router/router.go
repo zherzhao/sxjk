@@ -1,15 +1,12 @@
 package router
 
 import (
-	"log"
-	"net/http"
 	_ "webconsole/docs"
 	"webconsole/global"
-	"webconsole/internal/dao/webcache/cache"
 	"webconsole/internal/middleware"
-	"webconsole/internal/service"
+	"webconsole/pkg/cache"
+	"webconsole/pkg/cache/tcp"
 	"webconsole/pkg/logger"
-	"webconsole/pkg/tcp"
 
 	v1 "webconsole/internal/router/api/v1"
 
@@ -32,7 +29,7 @@ func NewRouter() (r *gin.Engine, err error) {
 
 	// 配置缓存服务
 	c := cache.New(global.CacheSetting.CacheType, global.CacheSetting.TTL)
-	// 开启缓存服务
+	// 开启TCP缓存服务 监听TCP请求
 	go tcp.New(c).Listen()
 
 	s := v1.NewServer(c)
@@ -44,18 +41,11 @@ func NewRouter() (r *gin.Engine, err error) {
 	// api路由组
 	apiv1 := r.Group("/api/v1")
 
-	// Ping 测试路由
-	apiv1.GET("/ping", func(c *gin.Context) {
-		c.JSON(http.StatusOK, gin.H{
-			"msg": "pong",
-		})
-	})
-
 	// 注册路由
-	apiv1.POST("/signup", middleware.Translations(), service.SignUpHandler)
+	apiv1.POST("/signup", middleware.Translations(), v1.SignUpHandler)
 
 	// 登录路由
-	apiv1.POST("/login", service.LoginHandler)
+	apiv1.POST("/login", v1.LoginHandler)
 
 	// 缓存路由
 	cacheGroup := apiv1.Group("/cache")
@@ -72,9 +62,6 @@ func NewRouter() (r *gin.Engine, err error) {
 			}
 		})
 
-		cacheGroup.PUT("/update/*key", s.UpdateHandler)
-		cacheGroup.DELETE("/delete/*key", s.DeleteHandler)
-
 		// 获取缓存状态
 		cacheGroup.GET("/status/", s.StatusHandler)
 	}
@@ -89,7 +76,6 @@ func NewRouter() (r *gin.Engine, err error) {
 			info.GetUpdateInfo,
 			func(c *gin.Context) {
 				if c.GetString("type") == "mem" {
-					log.Println("后续执行了")
 					r.HandleContext(c) //继续之后的操作
 				}
 			})

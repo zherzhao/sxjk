@@ -1,4 +1,4 @@
-package cache
+package rdb
 
 /*
 #include <stdlib.h>
@@ -12,6 +12,13 @@ import (
 	"time"
 	"unsafe"
 )
+
+const BATCH_SIZE = 100
+
+type pair struct {
+	k string
+	v []byte
+}
 
 type rocksdbCache struct {
 	db *C.rocksdb_t              // rocksdb_t 类型的指针
@@ -35,7 +42,23 @@ func (c *rocksdbCache) Get(key string) ([]byte, error) {
 
 }
 
-const BATCH_SIZE = 100
+func (c *rocksdbCache) Set(key string, value []byte) error {
+	c.ch <- &pair{key, value}
+	return nil
+
+}
+
+func (c *rocksdbCache) Del(key string) error {
+	k := C.CString(key)
+	defer C.free(unsafe.Pointer(k))
+	C.rocksdb_delete(c.db, c.wo, k, C.size_t(len(key)), &c.e)
+	if c.e != nil {
+		return errors.New(C.GoString(c.e))
+
+	}
+	return nil
+
+}
 
 func flush_batch(db *C.rocksdb_t, b *C.rocksdb_writebatch_t, o *C.rocksdb_writeoptions_t) {
 	var e *C.char
@@ -82,22 +105,4 @@ func write_func(db *C.rocksdb_t, c chan *pair, o *C.rocksdb_writeoptions_t) {
 			t.Reset(time.Second)
 		}
 	}
-}
-
-func (c *rocksdbCache) Set(key string, value []byte) error {
-	c.ch <- &pair{key, value}
-	return nil
-
-}
-
-func (c *rocksdbCache) Del(key string) error {
-	k := C.CString(key)
-	defer C.free(unsafe.Pointer(k))
-	C.rocksdb_delete(c.db, c.wo, k, C.size_t(len(key)), &c.e)
-	if c.e != nil {
-		return errors.New(C.GoString(c.e))
-
-	}
-	return nil
-
 }

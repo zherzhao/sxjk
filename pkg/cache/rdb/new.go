@@ -1,4 +1,4 @@
-package cache
+package rdb
 
 /*
 #include <stdlib.h>
@@ -11,7 +11,7 @@ import (
 	"webconsole/global"
 )
 
-func newRocksdbCache() *rocksdbCache {
+func NewCache() *rocksdbCache {
 	options := C.rocksdb_options_create()
 	C.rocksdb_options_increase_parallelism(options, C.int(runtime.NumCPU()))
 	C.rocksdb_options_set_create_if_missing(options, 1)

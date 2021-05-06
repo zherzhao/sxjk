@@ -2,14 +2,10 @@ package v1
 
 import (
 	"bytes"
-	"fmt"
 	"io/ioutil"
-	"log"
-	"net"
 	"net/http"
-	"os"
-	"strconv"
 	"webconsole/global"
+	"webconsole/internal/dao/webcache"
 
 	"github.com/gin-gonic/gin"
 )
@@ -30,45 +26,7 @@ func (this *Info) GetUpdateInfo(c *gin.Context) {
 
 	// 如果是缓存在磁盘中
 	if global.CacheSetting.CacheType == "disk" {
-		go func(string, string) {
-			klen := strconv.Itoa(len(key))
-			vlen := strconv.Itoa(len(info))
-			test := "S" + klen + " " + vlen + " " + key + info
-
-			serverAddr := fmt.Sprintf("127.0.0.1:%s", global.CacheSetting.Port)
-			tcpAddr, err := net.ResolveTCPAddr("tcp", serverAddr)
-			if err != nil {
-				log.Println(err.Error())
-				os.Exit(1)
-
-			}
-
-			conn, err := net.DialTCP("tcp", nil, tcpAddr)
-			defer conn.Close()
-
-			if err != nil {
-				log.Println(err.Error())
-				os.Exit(1)
-
-			}
-			_, err = conn.Write([]byte(test))
-			if err != nil {
-				log.Println("Write to server failed:", err.Error())
-				os.Exit(1)
-
-			}
-
-			reply := make([]byte, 1024)
-			_, err = conn.Read(reply)
-			if err != nil {
-				log.Println("Write to server failed:", err.Error())
-				os.Exit(1)
-
-			}
-
-			fmt.Printf("reply from server:\n%v\n", string(reply))
-
-		}(key, info)
+		go webcache.UpdataCache(key, info)
 
 	} else {
 		c.Set("type", "mem")
