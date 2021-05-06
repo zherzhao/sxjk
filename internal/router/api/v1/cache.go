@@ -26,8 +26,8 @@ func NewServer(c ICache.Cache) *Server {
 // @Accept application/json
 // @Produce application/json
 // @Param Authorization header string true "Bearer 用户令牌"
-// @Param infotype query string true "查询类型"
-// @Param level query string true "查询等级"
+// @Param infotype path string true "查询类型"
+// @Param level path int true "查询等级"
 // @Security ApiKeyAuth
 // @Success 200 {object} respcode.ResponseData{msg=string,data=string}
 // @Router /api/v1/cache/hit/{infotype}/{level} [get]
