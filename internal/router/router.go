@@ -4,6 +4,7 @@ import (
 	_ "webconsole/docs"
 	"webconsole/global"
 	"webconsole/internal/middleware"
+	"webconsole/internal/router/api/v2/objects"
 	"webconsole/pkg/cache"
 	"webconsole/pkg/cache/tcp"
 	"webconsole/pkg/logger"
@@ -38,7 +39,7 @@ func NewRouter() (r *gin.Engine, err error) {
 	// 注册swagger
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
-	// api路由组
+	// apiv1路由组
 	apiv1 := r.Group("/api/v1")
 
 	// 注册路由
@@ -88,5 +89,18 @@ func NewRouter() (r *gin.Engine, err error) {
 				}
 			})
 	}
+
+	// apiv2路由组
+	apiv2 := r.Group("/api/v2")
+	ossGroup := apiv2.Group("")
+	{
+		//OSS存储服务
+		ossGroup.PUT("/OSS/objects/:file", objects.Put)
+		//ossGroup.POST("/OSS/objects/:file", objects.Post)
+		ossGroup.GET("/OSS/objects/:file", objects.Get)
+		//ossGroup.DELETE("/OSS/objects/:file", objects.Delete)
+
+	}
+
 	return r, nil
 }

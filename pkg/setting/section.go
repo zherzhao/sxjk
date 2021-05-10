@@ -39,6 +39,11 @@ type DatabaseSettingS struct {
 	MaxIdleConns int    `mapstructure:"max_idel_conns"`
 }
 
+type OssSettingS struct {
+	MqAddr string `json:"mqaddr"`
+	EsAddr string `json:"esaddr"`
+}
+
 func (s *Setting) ReadSection(key string, v interface{}) error {
 	err := s.vp.UnmarshalKey(key, v)
 	if err != nil {

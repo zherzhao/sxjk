@@ -11,6 +11,7 @@ var (
 	LoggerSetting   *setting.LoggerSettingS
 	DatabaseSetting *setting.DatabaseSettingS
 	CacheSetting    *setting.CacheSettingS
+	OssSetting      *setting.OssSettingS
 	DB              *sql.DB
 )
 
