@@ -21,6 +21,7 @@ type F struct {
 	F是否有住宿设施   string `json:"是否有住宿设施"`
 	F是否有汽车维修   string `json:"是否有汽车维修"`
 	F备注        string `json:"备注"`
+	ID         string `json:"id"`
 }
 
 type SM struct {
@@ -95,6 +96,7 @@ type SM struct {
 	M认证密钥            string `json:"认证密钥"`
 	M加密算法            string `json:"加密算法"`
 	M加密密钥            string `json:"加密密钥"`
+	ID               string `json:"id"`
 }
 
 type SZ struct {
@@ -117,4 +119,5 @@ type SZ struct {
 	S认证密钥      string `json:"认证密钥"`
 	S加密算法      string `json:"加密算法"`
 	S加密密钥      string `json:"加密密钥"`
+	ID         string `json:"id"`
 }

@@ -67,12 +67,12 @@ func NewRouter() (r *gin.Engine, err error) {
 			if miss {
 				c.Request.URL.Path = "/api/v1/info" + c.Param("key") // 将请求的URL修改
 				r.HandleContext(c)                                   // 继续之后的操作
-
 			}
 		})
 
 		// 获取缓存状态
 		cacheGroup.GET("/status/", s.StatusHandler)
+		cacheGroup.PUT("/update/*key", s.UpdateHandler)
 	}
 
 	// 数据查询路由

@@ -40,6 +40,7 @@ type L21 struct {
 	R国道调整前路线编号   string `json:"国道调整前路线编号"`
 	R是否按干线公路管理接养 string `json:"是否按干线公路管理接养"`
 	R备注          string `json:"备注"`
+	ID           string `json:"id"`
 }
 
 type L25 struct {
@@ -86,6 +87,7 @@ type L25 struct {
 	S政区代码       string `json:"政区代码"`
 	S是否在长大隧道目录中 string `json:"是否在长大隧道目录中"`
 	S备注         string `json:"备注"`
+	ID          string `json:"id"`
 }
 
 type L24 struct {
@@ -151,4 +153,5 @@ type L24 struct {
 	Q是否宽路窄桥        string `json:"是否宽路窄桥"`
 	Q是否在长大桥梁目录中    string `json:"是否在长大桥梁目录中"`
 	Q备注            string `json:"备注"`
+	ID             string `json:"id"`
 }

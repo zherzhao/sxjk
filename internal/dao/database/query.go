@@ -84,7 +84,9 @@ func RoadQuery(count int) string {
 			&road.R国道调整前路线编号,
 			&road.R是否按干线公路管理接养,
 			&road.R备注,
+			&road.ID,
 		)
+
 		roads = append(roads, road)
 	}
 
@@ -172,6 +174,7 @@ func BridgeQuery(count int) string {
 			&bridge.Q是否宽路窄桥,
 			&bridge.Q是否在长大桥梁目录中,
 			&bridge.Q备注,
+			&bridge.ID,
 		)
 
 		bridges = append(bridges, bridge)
@@ -187,7 +190,7 @@ func BridgeQuery(count int) string {
 func TunnelQuery(count int) string {
 	level := Level(count)
 
-	rows, err := global.DB.Query("select `隧道名称`,`隧道代码`,`隧道中心桩号` ,`所属路线编号`,`所属路线名称`,`所属线路技术等级`,`隧道长度(米)`,`隧道净宽(米)`,`隧道净高(米)`,`隧道按长度分类代码`,`隧道按长度分类` from l25 where `所属线路技术等级`=? AND `ID`>2", level)
+	rows, err := global.DB.Query("select * from l25 where `所属线路技术等级`=? AND `ID`>2", level)
 	if err != nil {
 		log.Println(err)
 		return ""
@@ -242,6 +245,7 @@ func TunnelQuery(count int) string {
 			&tunnel.S政区代码,
 			&tunnel.S是否在长大隧道目录中,
 			&tunnel.S备注,
+			&tunnel.ID,
 		)
 
 		tunnels = append(tunnels, tunnel)
@@ -254,7 +258,7 @@ func TunnelQuery(count int) string {
 }
 
 func FQuery(count int) string {
-	rows, err := global.DB.Query("select `路线编号`,`路线名称`,`桩号` ,`服务设施类型`,`服务设施名称`,`初始运营时间`,`布局形式`,`经营模式`,`占地面积(平方米)`,`停车场面积(平方米)`,`停车位数量(个)` from F where `ID`>2")
+	rows, err := global.DB.Query("select * from F where `ID`>2")
 	if err != nil {
 		log.Println(err)
 		return ""
@@ -286,6 +290,7 @@ func FQuery(count int) string {
 			&f.F是否有住宿设施,
 			&f.F是否有汽车维修,
 			&f.F备注,
+			&f.ID,
 		)
 
 		services = append(services, f)
@@ -298,7 +303,7 @@ func FQuery(count int) string {
 }
 
 func MQuery(count int) string {
-	rows, err := global.DB.Query("select `序号`, `收费门架编号`, `门架名称`, `门架类型`, `门架种类`, `门架标志`, `省界入出口标识`, `收费单元编码组合`, `车道数`, `纬度`, `经度`, `桩号`, `使用状态` from SM ")
+	rows, err := global.DB.Query("select * from SM ")
 	if err != nil {
 		log.Println(err)
 		return ""
@@ -381,6 +386,7 @@ func MQuery(count int) string {
 			&portal.M认证密钥,
 			&portal.M加密算法,
 			&portal.M加密密钥,
+			&portal.ID,
 		)
 
 		portals = append(portals, portal)
@@ -393,7 +399,7 @@ func MQuery(count int) string {
 }
 
 func SQuery(count int) string {
-	rows, err := global.DB.Query("select `序号`,`收费站编号`,`收费站名称` ,`收费广场数量`,`收费站HEX`,`线路类型`,`网络所属运营商`,`数据汇聚点` from SZ")
+	rows, err := global.DB.Query("select * from SZ")
 	if err != nil {
 		log.Println(err)
 		return ""
@@ -423,6 +429,7 @@ func SQuery(count int) string {
 			&toll.S认证协议,
 			&toll.S认证密钥,
 			&toll.S加密算法,
+			&toll.ID,
 		)
 		tolls = append(tolls, toll)
 	}
