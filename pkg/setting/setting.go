@@ -7,7 +7,7 @@ import (
 )
 
 type Setting struct {
-	vp *viper.Viper
+	VP *viper.Viper
 }
 
 func NewSetting() (*Setting, error) {

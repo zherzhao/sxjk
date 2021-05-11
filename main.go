@@ -16,6 +16,7 @@ import (
 	"webconsole/internal/dao/database"
 	"webconsole/internal/router"
 	"webconsole/pkg/logger"
+	"webconsole/pkg/setting"
 	sf "webconsole/pkg/snowflake"
 
 	_ "github.com/go-sql-driver/mysql"
@@ -87,6 +88,25 @@ func init() {
 
 	zap.L().Debug("database init success...")
 
+	// 初始化zinx设置
+	global.ZinxSetting = &setting.ZinxSettingS{
+		Name:           "ZinxApp",
+		MaxConn:        1000,
+		MaxPackageSize: 4096,
+		WorkerPoolSize: 8,
+		TaskQueueSize:  1024,
+		Version:        "1.0",
+		Host:           "0.0.0.0",
+		Port:           8889,
+	}
+
+	err = global.Conf.ReadSection("zinx", &global.ZinxSetting)
+	if err != nil {
+		fmt.Println("init zinx failed, err: ", err)
+		return
+	}
+
+	zap.L().Debug("zinx init success...")
 }
 
 // @title 交通一张图后端系统

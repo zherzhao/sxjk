@@ -5,6 +5,7 @@ import (
 	"webconsole/global"
 	"webconsole/internal/middleware"
 	"webconsole/internal/router/api/v2/objects"
+	"webconsole/internal/service/heartbeat"
 	"webconsole/pkg/cache"
 	"webconsole/pkg/cache/tcp"
 	"webconsole/pkg/logger"
@@ -27,14 +28,6 @@ func NewRouter() (r *gin.Engine, err error) {
 	r.Use(logger.GinLogger())
 	r.Use(logger.GinRecovery(true))
 	r.Use(middleware.Cors())
-
-	// 配置缓存服务
-	c := cache.New(global.CacheSetting.CacheType, global.CacheSetting.TTL)
-	// 开启TCP缓存服务 监听TCP请求
-	go tcp.New(c).Listen()
-
-	s := v1.NewServer(c)
-	info := v1.NewInfo()
 
 	// 注册swagger
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
@@ -59,6 +52,13 @@ func NewRouter() (r *gin.Engine, err error) {
 	// 缓存路由
 	cacheGroup := apiv1.Group("/cache")
 	{
+		// 配置缓存服务
+		c := cache.New(global.CacheSetting.CacheType, global.CacheSetting.TTL)
+		// 开启TCP缓存服务 监听TCP请求
+		go tcp.New(c).Listen()
+
+		s := v1.NewServer(c)
+
 		// 操作缓存
 		cacheGroup.Use(middleware.JWTAuthMiddleware(), middleware.PathParse)
 
@@ -78,6 +78,8 @@ func NewRouter() (r *gin.Engine, err error) {
 	// 数据查询路由
 	infoGroup := apiv1.Group("/info")
 	{
+		info := v1.NewInfo()
+
 		infoGroup.Use(middleware.JWTAuthMiddleware(), middleware.PathParse)
 
 		infoGroup.GET("/:infotype/:count",
@@ -94,6 +96,7 @@ func NewRouter() (r *gin.Engine, err error) {
 	apiv2 := r.Group("/api/v2")
 	ossGroup := apiv2.Group("")
 	{
+		go heartbeat.ListenHeartBeat()
 		//OSS存储服务
 		ossGroup.PUT("/OSS/objects/:file", objects.Put)
 		//ossGroup.POST("/OSS/objects/:file", objects.Post)

@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"encoding/binary"
 	"errors"
-	"webconsole/pkg/zinx/utils"
+	"webconsole/global"
 	"webconsole/pkg/zinx/ziface"
 )
 
@@ -61,7 +61,7 @@ func (d *DataPack) Unpack(binaryData []byte) (ziface.IMessage, error) {
 		return nil, err
 	}
 
-	if utils.GlobalConf.MaxPackageSize > 0 && msg.DataLen > utils.GlobalConf.MaxPackageSize {
+	if global.ZinxSetting.MaxPackageSize > 0 && msg.DataLen > global.ZinxSetting.MaxPackageSize {
 		return nil, errors.New("too long msg data recv")
 	}
 

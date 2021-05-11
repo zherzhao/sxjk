@@ -1,7 +1,6 @@
 package global
 
 import (
-	"database/sql"
 	"webconsole/pkg/setting"
 )
 
@@ -12,7 +11,7 @@ var (
 	DatabaseSetting *setting.DatabaseSettingS
 	CacheSetting    *setting.CacheSettingS
 	OssSetting      *setting.OssSettingS
-	DB              *sql.DB
+	ZinxSetting     *setting.ZinxSettingS
 )
 
 func Init() (err error) {

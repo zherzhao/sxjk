@@ -3,7 +3,7 @@ package znet
 import (
 	"fmt"
 	"log"
-	"webconsole/pkg/zinx/utils"
+	"webconsole/global"
 	"webconsole/pkg/zinx/ziface"
 )
 
@@ -20,8 +20,8 @@ type MsgHandle struct {
 func NewMsgHandle() *MsgHandle {
 	return &MsgHandle{
 		Apis:           make(map[uint32]ziface.IRouter),
-		TaskQueue:      make([]chan ziface.IRequest, utils.GlobalConf.WorkerPoolSize),
-		WorkerPoolSize: utils.GlobalConf.WorkerPoolSize,
+		TaskQueue:      make([]chan ziface.IRequest, global.ZinxSetting.WorkerPoolSize),
+		WorkerPoolSize: global.ZinxSetting.WorkerPoolSize,
 	}
 }
 
@@ -55,7 +55,7 @@ func (h *MsgHandle) AddRouter(msgId uint32, router ziface.IRouter) {
 func (h *MsgHandle) StartWorkerPool() {
 	for i := 0; i < int(h.WorkerPoolSize); i++ {
 		// 给当前的Worker的TaskQueue开辟空间
-		h.TaskQueue[i] = make(chan ziface.IRequest, utils.GlobalConf.TaskQueueSize)
+		h.TaskQueue[i] = make(chan ziface.IRequest, global.ZinxSetting.TaskQueueSize)
 		go h.startOneWorfer(i, h.TaskQueue[i])
 
 	}
