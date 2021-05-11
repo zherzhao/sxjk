@@ -35,7 +35,7 @@ func UpdataCache(key string, info string) {
 		return
 	}
 
-	reply := make([]byte, 1024)
+	reply := make([]byte, 2)
 	_, err = conn.Read(reply)
 	if err != nil {
 		zap.L().Error("Write to server failed: ", zap.String("", err.Error()))
