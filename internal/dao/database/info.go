@@ -2,6 +2,7 @@ package database
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
 	"webconsole/global"
 	"webconsole/internal/model"
@@ -44,7 +45,7 @@ func RoadInfo(count int) string {
 
 	for rows.Next() {
 		var road model.L21
-		rows.Scan(
+		err := rows.Scan(
 			&road.ID,
 			&road.R路线编号,
 			&road.R所在行政区划代码,
@@ -86,6 +87,10 @@ func RoadInfo(count int) string {
 			&road.R是否按干线公路管理接养,
 			&road.R备注,
 		)
+
+		if err != nil {
+			fmt.Println(err)
+		}
 
 		roads = append(roads, road)
 	}
@@ -269,7 +274,7 @@ func FInfo(count int) string {
 
 	for rows.Next() {
 		var f model.F
-		rows.Scan(
+		err := rows.Scan(
 			&f.ID,
 			&f.F路线编号,
 			&f.F路线名称,
@@ -292,6 +297,9 @@ func FInfo(count int) string {
 			&f.F是否有汽车维修,
 			&f.F备注,
 		)
+		if err != nil {
+			fmt.Println(err)
+		}
 
 		services = append(services, f)
 	}
