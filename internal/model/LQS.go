@@ -1,6 +1,7 @@
 package model
 
 type L21 struct {
+	ID           string `json:"id"`
 	R路线编号        string `json:"路线编号"`
 	R所在行政区划代码    string `json:"所在行政区划代码"`
 	R路线名称        string `json:"路线名称"`
@@ -40,10 +41,10 @@ type L21 struct {
 	R国道调整前路线编号   string `json:"国道调整前路线编号"`
 	R是否按干线公路管理接养 string `json:"是否按干线公路管理接养"`
 	R备注          string `json:"备注"`
-	ID           string `json:"id"`
 }
 
 type L25 struct {
+	ID          string `json:"id"`
 	S隧道名称       string `json:"隧道名称"`
 	S隧道代码       string `json:"隧道代码"`
 	S隧道中心桩号     string `json:"隧道中心桩号"`
@@ -87,10 +88,10 @@ type L25 struct {
 	S政区代码       string `json:"政区代码"`
 	S是否在长大隧道目录中 string `json:"是否在长大隧道目录中"`
 	S备注         string `json:"备注"`
-	ID          string `json:"id"`
 }
 
 type L24 struct {
+	ID             string `json:"id"`
 	Q桥梁名称          string `json:"桥梁名称"`
 	Q桥梁代码          string `json:"桥梁代码"`
 	Q桥梁中心桩号        string `json:"桥梁中心桩号"`
@@ -153,5 +154,4 @@ type L24 struct {
 	Q是否宽路窄桥        string `json:"是否宽路窄桥"`
 	Q是否在长大桥梁目录中    string `json:"是否在长大桥梁目录中"`
 	Q备注            string `json:"备注"`
-	ID             string `json:"id"`
 }

@@ -83,13 +83,16 @@ func NewRouter() (r *gin.Engine, err error) {
 		infoGroup.Use(middleware.JWTAuthMiddleware(), middleware.PathParse)
 
 		infoGroup.GET("/:infotype/:count",
-			middleware.QueryRouter,
 			info.GetUpdateInfo,
 			func(c *gin.Context) {
 				if c.GetString("type") == "mem" {
 					r.HandleContext(c) //继续之后的操作
 				}
 			})
+		infoGroup.GET("/:infotype/:count/query",
+			middleware.QueryParse,
+			info.QueryInfo)
+
 	}
 
 	// apiv2路由组

@@ -2,6 +2,7 @@ package database
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
 	"webconsole/global"
 	"webconsole/internal/model"
@@ -9,29 +10,12 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 )
 
-func Level(level int) string {
-	switch level {
-	case 0:
-		return "高速"
-	case 1:
-		return "一级"
-	case 2:
-		return "二级"
-	case 3:
-		return "三级"
-	case 4:
-		return "四级"
-	case 5:
-		return "等外"
-	}
-	return ""
-}
-
-func RoadQuery(count int) string {
+func RoadQuery(count int, column string, value string) string {
 	level := Level(count)
 
+	sqlStr := fmt.Sprintf("select * from l21 where `技术等级`=? AND `id`>2 AND `%s` LIKE ?", column)
 	// 查询后调用Scan 否则持有的数据库连接不会被释放
-	rows, err := global.DB.Query("select * from l21 where `技术等级`=? AND `ID`>2", level)
+	rows, err := global.DB.Query(sqlStr, level, value)
 	if err != nil {
 		log.Println(err)
 		return ""
@@ -45,6 +29,7 @@ func RoadQuery(count int) string {
 	for rows.Next() {
 		var road model.L21
 		rows.Scan(
+			&road.ID,
 			&road.R路线编号,
 			&road.R所在行政区划代码,
 			&road.R路线名称,
@@ -84,7 +69,6 @@ func RoadQuery(count int) string {
 			&road.R国道调整前路线编号,
 			&road.R是否按干线公路管理接养,
 			&road.R备注,
-			&road.ID,
 		)
 
 		roads = append(roads, road)
@@ -94,13 +78,16 @@ func RoadQuery(count int) string {
 	if err != nil {
 		log.Println(err)
 	}
+	fmt.Println(roads)
 	return string(data)
 }
 
-func BridgeQuery(count int) string {
+func BridgeQuery(count int, column string, value string) string {
 	level := Level(count)
 
-	rows, err := global.DB.Query("select * from l24 where `技术等级`=? AND `ID`>2", level)
+	sqlStr := fmt.Sprintf("select * from l24 where `技术等级`=? AND `id`>2 AND `%s` LIKE ?", column)
+	// 查询后调用Scan 否则持有的数据库连接不会被释放
+	rows, err := global.DB.Query(sqlStr, level, value)
 	if err != nil {
 		log.Println(err)
 		return ""
@@ -112,6 +99,7 @@ func BridgeQuery(count int) string {
 	for rows.Next() {
 		var bridge model.L24
 		rows.Scan(
+			&bridge.ID,
 			&bridge.Q桥梁名称,
 			&bridge.Q桥梁代码,
 			&bridge.Q桥梁中心桩号,
@@ -174,7 +162,6 @@ func BridgeQuery(count int) string {
 			&bridge.Q是否宽路窄桥,
 			&bridge.Q是否在长大桥梁目录中,
 			&bridge.Q备注,
-			&bridge.ID,
 		)
 
 		bridges = append(bridges, bridge)
@@ -187,10 +174,12 @@ func BridgeQuery(count int) string {
 	return string(data)
 }
 
-func TunnelQuery(count int) string {
+func TunnelQuery(count int, column string, value string) string {
 	level := Level(count)
 
-	rows, err := global.DB.Query("select * from l25 where `所属线路技术等级`=? AND `ID`>2", level)
+	sqlStr := fmt.Sprintf("select * from l25 where `所属线路技术等级`=? AND `id`>2 AND `%s` LIKE ?", column)
+	// 查询后调用Scan 否则持有的数据库连接不会被释放
+	rows, err := global.DB.Query(sqlStr, level, value)
 	if err != nil {
 		log.Println(err)
 		return ""
@@ -202,6 +191,7 @@ func TunnelQuery(count int) string {
 	for rows.Next() {
 		var tunnel model.L25
 		rows.Scan(
+			&tunnel.ID,
 			&tunnel.S隧道名称,
 			&tunnel.S隧道代码,
 			&tunnel.S隧道中心桩号,
@@ -245,7 +235,6 @@ func TunnelQuery(count int) string {
 			&tunnel.S政区代码,
 			&tunnel.S是否在长大隧道目录中,
 			&tunnel.S备注,
-			&tunnel.ID,
 		)
 
 		tunnels = append(tunnels, tunnel)
@@ -257,8 +246,10 @@ func TunnelQuery(count int) string {
 	return string(data)
 }
 
-func FQuery(count int) string {
-	rows, err := global.DB.Query("select * from F where `ID`>2")
+func FQuery(column string, value string) string {
+	sqlStr := fmt.Sprintf("select * from F where `%s` LIKE ?", column)
+	// 查询后调用Scan 否则持有的数据库连接不会被释放
+	rows, err := global.DB.Query(sqlStr, value)
 	if err != nil {
 		log.Println(err)
 		return ""
@@ -270,6 +261,7 @@ func FQuery(count int) string {
 	for rows.Next() {
 		var f model.F
 		rows.Scan(
+			&f.ID,
 			&f.F路线编号,
 			&f.F路线名称,
 			&f.F桩号,
@@ -290,7 +282,6 @@ func FQuery(count int) string {
 			&f.F是否有住宿设施,
 			&f.F是否有汽车维修,
 			&f.F备注,
-			&f.ID,
 		)
 
 		services = append(services, f)
@@ -302,8 +293,10 @@ func FQuery(count int) string {
 	return string(data)
 }
 
-func MQuery(count int) string {
-	rows, err := global.DB.Query("select * from SM ")
+func MQuery(column string, value string) string {
+	sqlStr := fmt.Sprintf("select * from SM where %s` LIKE ?", column)
+	// 查询后调用Scan 否则持有的数据库连接不会被释放
+	rows, err := global.DB.Query(sqlStr, value)
 	if err != nil {
 		log.Println(err)
 		return ""
@@ -386,7 +379,6 @@ func MQuery(count int) string {
 			&portal.M认证密钥,
 			&portal.M加密算法,
 			&portal.M加密密钥,
-			&portal.ID,
 		)
 
 		portals = append(portals, portal)
@@ -398,8 +390,10 @@ func MQuery(count int) string {
 	return string(data)
 }
 
-func SQuery(count int) string {
-	rows, err := global.DB.Query("select * from SZ")
+func SQuery(column string, value string) string {
+	sqlStr := fmt.Sprintf("select * from SZ where %s` LIKE ?", column)
+	// 查询后调用Scan 否则持有的数据库连接不会被释放
+	rows, err := global.DB.Query(sqlStr, value)
 	if err != nil {
 		log.Println(err)
 		return ""
@@ -429,7 +423,6 @@ func SQuery(count int) string {
 			&toll.S认证协议,
 			&toll.S认证密钥,
 			&toll.S加密算法,
-			&toll.ID,
 		)
 		tolls = append(tolls, toll)
 	}

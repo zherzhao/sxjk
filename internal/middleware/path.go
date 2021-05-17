@@ -1,8 +1,7 @@
 package middleware
 
 import (
-	"strconv"
-	"webconsole/internal/dao/database"
+	"fmt"
 
 	"github.com/gin-gonic/gin"
 )
@@ -18,27 +17,15 @@ func PathParse(c *gin.Context) {
 	c.Next()
 }
 
-// 处理路由信息的中间件
-func QueryRouter(c *gin.Context) {
-	count, _ := c.Get("count")
-	countnum, _ := strconv.Atoi(count.(string))
-	infotype, _ := c.Get("infotype")
+// 获取查询参数的中间件
+func QueryParse(c *gin.Context) {
+	column := c.Query("column")
+	value := c.Query("value")
 
-	var info string
-	switch infotype {
-	case "road":
-		info = database.RoadQuery(countnum)
-	case "bridge":
-		info = database.BridgeQuery(countnum)
-	case "tunnel":
-		info = database.TunnelQuery(countnum)
-	case "service":
-		info = database.FQuery(countnum)
-	case "portal":
-		info = database.MQuery(countnum)
-	case "toll":
-		info = database.SQuery(countnum)
-	}
-	c.Set("info", info)
+	fmt.Println(column, value)
+
+	c.Set("column", column)
+	c.Set("value", value)
+
 	c.Next()
 }
