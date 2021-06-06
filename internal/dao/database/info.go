@@ -7,6 +7,8 @@ import (
 	"webconsole/global"
 	"webconsole/internal/model"
 
+	"github.com/impact-eintr/eorm"
+
 	_ "github.com/go-sql-driver/mysql"
 )
 
@@ -25,74 +27,25 @@ func Level(level int) string {
 	case 5:
 		return "等外"
 	}
+
 	return ""
+
 }
 
 func RoadInfo(count int) string {
 	level := Level(count)
 
-	// 查询后调用Scan 否则持有的数据库连接不会被释放
-	rows, err := global.DB.Query("select * from l21 where `技术等级`=? AND `ID`>2", level)
-	if err != nil {
-		log.Println(err)
-		return ""
-	}
-
-	// 关闭rows释放持有的数据库连接
-	defer rows.Close()
+	statement := eorm.NewStatement()
+	statement = statement.SetTableName("l21").
+		AndEqual("技术等级", level).
+		AndGreaterThan("ID", "2").
+		Select("*")
 
 	roads := []model.L21{}
 
-	for rows.Next() {
-		var road model.L21
-		err := rows.Scan(
-			&road.ID,
-			&road.R路线编号,
-			&road.R所在行政区划代码,
-			&road.R路线名称,
-			&road.R起点名称,
-			&road.R止点名称,
-			&road.R起点桩号,
-			&road.R止点桩号,
-			&road.R里程公里,
-			&road.R技术等级代码,
-			&road.R技术等级,
-			&road.R是否一幅高速,
-			&road.R车道数量个,
-			&road.R面层类型代码,
-			&road.R面层类型,
-			&road.R路基宽度米,
-			&road.R路面宽度米,
-			&road.R面层厚度厘米,
-			&road.R设计时速公里小时,
-			&road.R修建年度,
-			&road.R改建年度,
-			&road.R最近一次修复养护年度,
-			&road.R断链类型,
-			&road.R是否城管路段,
-			&road.R是否断头路段,
-			&road.R路段收费性质,
-			&road.R重复路段线路编号,
-			&road.R重复路段起点桩号,
-			&road.R重复路段终点桩号,
-			&road.R养护里程,
-			&road.R可绿化里程,
-			&road.R已绿化里程,
-			&road.R地貌代码,
-			&road.R地貌汉字,
-			&road.R涵洞数量个,
-			&road.R管养单位名称,
-			&road.R省际出入口,
-			&road.R国道调整前路线编号,
-			&road.R是否按干线公路管理接养,
-			&road.R备注,
-		)
-
-		if err != nil {
-			fmt.Println(err)
-		}
-
-		roads = append(roads, road)
+	err := global.DBClient.FindAll(nil, statement, &roads)
+	if err != nil {
+		fmt.Println(err)
 	}
 
 	data, err := json.Marshal(roads)
@@ -100,89 +53,23 @@ func RoadInfo(count int) string {
 		log.Println(err)
 	}
 	return string(data)
+
 }
 
 func BridgeInfo(count int) string {
 	level := Level(count)
 
-	rows, err := global.DB.Query("select * from l24 where `技术等级`=? AND `ID`>2", level)
-	if err != nil {
-		log.Println(err)
-		return ""
-	}
-	defer rows.Close()
+	statement := eorm.NewStatement()
+	statement = statement.SetTableName("l24").
+		AndEqual("技术等级", level).
+		AndGreaterThan("ID", "2").
+		Select("*")
 
 	bridges := []model.L24{}
 
-	for rows.Next() {
-		var bridge model.L24
-		rows.Scan(
-			&bridge.ID,
-			&bridge.Q桥梁名称,
-			&bridge.Q桥梁代码,
-			&bridge.Q桥梁中心桩号,
-			&bridge.Q路线编号,
-			&bridge.Q路线名称,
-			&bridge.Q技术等级,
-			&bridge.Q桥梁全长米,
-			&bridge.Q跨径总长米,
-			&bridge.Q单孔最大跨径米,
-			&bridge.Q跨径组合孔米,
-			&bridge.Q桥梁全宽米,
-			&bridge.Q桥面净宽米,
-			&bridge.Q按跨径分类代码,
-			&bridge.Q按跨径分类类型,
-			&bridge.Q按使用年限分类代码,
-			&bridge.Q按使用年限分类类型,
-			&bridge.Q主桥上部构造结构类型代码,
-			&bridge.Q主桥上部构造结构类型类型,
-			&bridge.Q主桥上部构造材料代码,
-			&bridge.Q主桥上部构造材料名称,
-			&bridge.Q桥墩类型代码,
-			&bridge.Q桥墩类型类型,
-			&bridge.Q设计荷载等级代码,
-			&bridge.Q设计荷载等级,
-			&bridge.Q抗震等级代码,
-			&bridge.Q抗震等级,
-			&bridge.Q跨越地物代码,
-			&bridge.Q跨越地物类型,
-			&bridge.Q跨越地物名称,
-			&bridge.Q通航等级,
-			&bridge.Q墩台防撞设施类型,
-			&bridge.Q是否互通立交,
-			&bridge.Q建设单位,
-			&bridge.Q设计单位,
-			&bridge.Q施工单位,
-			&bridge.Q监理单位,
-			&bridge.Q修建年度,
-			&bridge.Q建成通车日期,
-			&bridge.Q管养单位性质代码,
-			&bridge.Q管养单位名称,
-			&bridge.Q监管单位名称,
-			&bridge.Q收费性质代码,
-			&bridge.Q收费性质,
-			&bridge.Q评定等级代码,
-			&bridge.Q评定等级,
-			&bridge.Q评定日期,
-			&bridge.Q评定单位,
-			&bridge.Q最后一次改造年度,
-			&bridge.Q最后一次改造完工日期,
-			&bridge.Q最后一次改造部位,
-			&bridge.Q最后一次改造工程性质,
-			&bridge.Q最后一次改造施工单位,
-			&bridge.Q最后一次改造是否部补助项目,
-			&bridge.Q当前主要病害部位,
-			&bridge.Q当前主要病害,
-			&bridge.Q交通管制措施代码,
-			&bridge.Q交通管制措施,
-			&bridge.Q所在政区代码,
-			&bridge.Q桥梁所在位置,
-			&bridge.Q是否宽路窄桥,
-			&bridge.Q是否在长大桥梁目录中,
-			&bridge.Q备注,
-		)
-
-		bridges = append(bridges, bridge)
+	err := global.DBClient.FindAll(nil, statement, &bridges)
+	if err != nil {
+		fmt.Println(err)
 	}
 
 	data, err := json.Marshal(bridges)
@@ -190,76 +77,31 @@ func BridgeInfo(count int) string {
 		log.Println(err)
 	}
 	return string(data)
+
 }
 
 func TunnelInfo(count int) string {
 	level := Level(count)
 
-	rows, err := global.DB.Query("select * from l25 where `所属线路技术等级`=? AND `ID`>2", level)
-	if err != nil {
-		log.Println(err)
-		return ""
-	}
-	defer rows.Close()
+	statement := eorm.NewStatement()
+	statement = statement.SetTableName("l25").
+		AndEqual("所属线路技术等级", level).
+		AndGreaterThan("ID", "2").
+		Select("*")
 
 	tunnels := []model.L25{}
 
-	for rows.Next() {
-		var tunnel model.L25
-		rows.Scan(
-			&tunnel.ID,
-			&tunnel.S隧道名称,
-			&tunnel.S隧道代码,
-			&tunnel.S隧道中心桩号,
-			&tunnel.S所属路线编号,
-			&tunnel.S所属路线名称,
-			&tunnel.S所属线路技术等级,
-			&tunnel.S隧道长度米,
-			&tunnel.S隧道净宽米,
-			&tunnel.S隧道净高米,
-			&tunnel.S隧道按长度分类代码,
-			&tunnel.S隧道按长度分类,
-			&tunnel.S是否水下隧道,
-			&tunnel.S修建年度,
-			&tunnel.S建设单位名称,
-			&tunnel.S设计单位名称,
-			&tunnel.S施工单位名称,
-			&tunnel.S监理单位名称,
-			&tunnel.S建成通车时间,
-			&tunnel.S隧道养护等级,
-			&tunnel.S管养单位性质代码,
-			&tunnel.S管养名称,
-			&tunnel.S监管单位名称,
-			&tunnel.S技术状况评定等级,
-			&tunnel.S技术状况评定日期,
-			&tunnel.S技术状况评定单位,
-			&tunnel.S土建结构评定等级,
-			&tunnel.S土建结构评定日期,
-			&tunnel.S土建结构评定单位,
-			&tunnel.S机电设施评定等级,
-			&tunnel.S机电设施评定日期,
-			&tunnel.S机电设施评定单位,
-			&tunnel.S其他工程设施评定等级,
-			&tunnel.S其他工程设施评定日期,
-			&tunnel.S其他工程设施评定单位,
-			&tunnel.S最近一次改造年度,
-			&tunnel.S最近一次改造完工日期,
-			&tunnel.S最近一次改造部位,
-			&tunnel.S最近一次改造工程性质,
-			&tunnel.S当前主要病害部位,
-			&tunnel.S当前主要病害描述,
-			&tunnel.S政区代码,
-			&tunnel.S是否在长大隧道目录中,
-			&tunnel.S备注,
-		)
-
-		tunnels = append(tunnels, tunnel)
+	err := global.DBClient.FindAll(nil, statement, &tunnels)
+	if err != nil {
+		fmt.Println(err)
 	}
+
 	data, err := json.Marshal(tunnels)
 	if err != nil {
 		log.Println(err)
 	}
 	return string(data)
+
 }
 
 func FInfo(count int) string {

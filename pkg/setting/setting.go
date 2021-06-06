@@ -1,8 +1,6 @@
 package setting
 
 import (
-	"log"
-
 	"github.com/spf13/viper"
 )
 
@@ -21,7 +19,6 @@ func NewSetting() (*Setting, error) {
 			return nil, err
 		} else {
 			// 配置文件找到后发生了其他错误
-			log.Println("test!!!")
 			return nil, err
 		}
 	}

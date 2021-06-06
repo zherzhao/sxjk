@@ -10,6 +10,7 @@ import (
 	"webconsole/internal/model"
 
 	_ "github.com/go-sql-driver/mysql"
+	"github.com/impact-eintr/eorm"
 )
 
 // 加密salt
@@ -24,10 +25,14 @@ var (
 
 // 检查注册时用户是否已经存在
 func CheckUserExist(username string) error {
-	sqlStr := `select count(user_id) from user where username = ?`
+	statement := eorm.NewStatement()
+	statement = statement.SetTableName("user").
+		AndEqual("username", username).
+		Select("count(user_id)")
+
 	var count int
 
-	err := global.DB.QueryRow(sqlStr, username).Scan(&count)
+	err := global.DBClient.FindOne(nil, statement, &count)
 	if err != nil {
 		log.Println(err)
 		return err
@@ -36,6 +41,7 @@ func CheckUserExist(username string) error {
 	if count > 0 {
 		return ErrorUserExist
 	}
+
 	return nil
 }
 
@@ -45,9 +51,10 @@ func InsertUser(user *model.User) (err error) {
 	user.Password = encryptPassword(user.Password)
 
 	// 执行SQL语句入库
-	sqlStr := `insert into user(user_id, username, password) values(?,?,?)`
+	statement := eorm.NewStatement()
+	statement = statement.SetTableName("user").InsertStruct(user)
 
-	_, err = global.DB.Exec(sqlStr, user.UserID, user.Username, user.Password)
+	_, err = global.DBClient.Insert(nil, statement)
 	if err != nil {
 		log.Println(err)
 		return err
@@ -68,8 +75,12 @@ func encryptPassword(oPassword string) string {
 func UserLogin(user *model.User) (err error) {
 	oPassword := user.Password
 
-	sqlStr := `select user_id, username, password from user where username=?`
-	err = global.DB.QueryRow(sqlStr, user.Username).Scan(&user.UserID, &user.Username, &user.Password)
+	statement := eorm.NewStatement()
+	statement = statement.SetTableName("user").
+		AndEqual("username", user.Username).
+		Select("user_id, username, password")
+
+	err = global.DBClient.FindOne(nil, statement, user)
 	if err == sql.ErrNoRows {
 		return ErrorUserNotExist
 	}

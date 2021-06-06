@@ -1,37 +1,28 @@
 package database
 
 import (
-	"database/sql"
-	"fmt"
 	"webconsole/global"
 
-	_ "github.com/go-sql-driver/mysql"
+	"github.com/impact-eintr/eorm"
 )
 
 func Init() error {
+
+	setting := eorm.Settings{
+		DriverName: "mysql",
+		User:       global.DatabaseSetting.User,
+		Password:   global.DatabaseSetting.Password,
+		Database:   global.DatabaseSetting.DBname,
+		Host:       global.DatabaseSetting.Host,
+		Options:    map[string]string{"charset": "utf8mb4"},
+	}
+
 	var err error
-	dbinfo := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=utf8mb4&parseTime=True&loc=Local",
-		global.DatabaseSetting.User,
-		global.DatabaseSetting.Password,
-		global.DatabaseSetting.Host,
-		global.DatabaseSetting.Port,
-		global.DatabaseSetting.DBname,
-	)
-
-	global.DB, err = sql.Open("mysql", dbinfo)
+	global.DBClient, err = eorm.NewClient(setting)
 	if err != nil {
 		return err
 	}
-
-	err = global.DB.Ping()
-	if err != nil {
-		return err
-	}
-
-	// 根据具体需求设置
-	//global.DB.SetConnMaxIdleTime(time.Second * 10)
-	//global.DB.SetMaxOpenConns(200)
-	//global.DB.SetMaxIdleConns(10)
 
 	return nil
+
 }
