@@ -7,4 +7,4 @@ import (
 )
 
 var DB *sql.DB
-var DBClient *eorm.Client
+var DBClients chan *eorm.Client

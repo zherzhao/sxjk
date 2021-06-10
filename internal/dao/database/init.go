@@ -1,6 +1,7 @@
 package database
 
 import (
+	"database/sql"
 	"webconsole/global"
 
 	"github.com/impact-eintr/eorm"
@@ -18,11 +19,19 @@ func Init() error {
 	}
 
 	var err error
-	global.DBClient, err = eorm.NewClient(setting)
+	global.DB, err = sql.Open(setting.DriverName, setting.DataSourceName())
 	if err != nil {
 		return err
 	}
 
+	global.DBClients = make(chan *eorm.Client, 50)
+	for i := 0; i < len(global.DBClients); i++ {
+		c, err := eorm.NewClientWithDBconn(global.DB)
+		if err != nil {
+			return err
+		}
+		global.DBClients <- c
+	}
 	return nil
 
 }

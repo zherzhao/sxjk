@@ -32,7 +32,12 @@ func CheckUserExist(username string) error {
 
 	var count int
 
-	err := global.DBClient.FindOne(nil, statement, &count)
+	c := <-global.DBClients
+	defer func() {
+		global.DBClients <- c
+	}()
+
+	err := c.FindOne(nil, statement, &count)
 	if err != nil {
 		log.Println(err)
 		return err
@@ -54,7 +59,12 @@ func InsertUser(user *model.User) (err error) {
 	statement := eorm.NewStatement()
 	statement = statement.SetTableName("user").InsertStruct(user)
 
-	_, err = global.DBClient.Insert(nil, statement)
+	c := <-global.DBClients
+	defer func() {
+		global.DBClients <- c
+	}()
+
+	_, err = c.Insert(nil, statement)
 	if err != nil {
 		log.Println(err)
 		return err
@@ -80,7 +90,12 @@ func UserLogin(user *model.User) (err error) {
 		AndEqual("username", user.Username).
 		Select("user_id, username, password")
 
-	err = global.DBClient.FindOne(nil, statement, user)
+	c := <-global.DBClients
+	defer func() {
+		global.DBClients <- c
+	}()
+
+	err = c.FindOne(nil, statement, user)
 	if err == sql.ErrNoRows {
 		return ErrorUserNotExist
 	}

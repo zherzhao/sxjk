@@ -43,7 +43,12 @@ func RoadInfo(count int) string {
 
 	roads := []model.L21{}
 
-	err := global.DBClient.FindAll(nil, statement, &roads)
+	c := <-global.DBClients
+	defer func() {
+		global.DBClients <- c
+	}()
+
+	err := c.FindAll(nil, statement, &roads)
 	if err != nil {
 		fmt.Println(err)
 	}
@@ -67,7 +72,12 @@ func BridgeInfo(count int) string {
 
 	bridges := []model.L24{}
 
-	err := global.DBClient.FindAll(nil, statement, &bridges)
+	c := <-global.DBClients
+	defer func() {
+		global.DBClients <- c
+	}()
+
+	err := c.FindAll(nil, statement, &bridges)
 	if err != nil {
 		fmt.Println(err)
 	}
@@ -91,7 +101,12 @@ func TunnelInfo(count int) string {
 
 	tunnels := []model.L25{}
 
-	err := global.DBClient.FindAll(nil, statement, &tunnels)
+	c := <-global.DBClients
+	defer func() {
+		global.DBClients <- c
+	}()
+
+	err := c.FindAll(nil, statement, &tunnels)
 	if err != nil {
 		fmt.Println(err)
 	}
@@ -112,7 +127,12 @@ func FInfo(count int) string {
 
 	services := []model.F{}
 
-	err := global.DBClient.FindAll(nil, statement, &services)
+	c := <-global.DBClients
+	defer func() {
+		global.DBClients <- c
+	}()
+
+	err := c.FindAll(nil, statement, &services)
 	if err != nil {
 		fmt.Println(err)
 	}
@@ -131,7 +151,12 @@ func MInfo(count int) string {
 
 	portals := []model.SM{}
 
-	err := global.DBClient.FindAll(nil, statement, &portals)
+	c := <-global.DBClients
+	defer func() {
+		global.DBClients <- c
+	}()
+
+	err := c.FindAll(nil, statement, &portals)
 	if err != nil {
 		fmt.Println(err)
 	}
@@ -145,43 +170,25 @@ func MInfo(count int) string {
 }
 
 func SInfo(count int) string {
-	rows, err := global.DB.Query("select * from SZ")
-	if err != nil {
-		log.Println(err)
-		return ""
-	}
-	defer rows.Close()
+	statement := eorm.NewStatement()
+	statement = statement.SetTableName("SZ").Select("*")
 
 	tolls := []model.SZ{}
 
-	for rows.Next() {
-		var toll model.SZ
-		rows.Scan(
-			&toll.S序号,
-			&toll.S收费站编号,
-			&toll.S收费站名称,
-			&toll.S收费广场数量,
-			&toll.S收费站HEX,
-			&toll.S线路类型,
-			&toll.S网络所属运营商,
-			&toll.S数据汇聚点,
-			&toll.SIMEI号,
-			&toll.S接入设备ip,
-			&toll.Ssnmp协议版本号,
-			&toll.Ssnmp端口,
-			&toll.S团体名称,
-			&toll.S用户名,
-			&toll.S安全级别,
-			&toll.S认证协议,
-			&toll.S认证密钥,
-			&toll.S加密算法,
-			&toll.S加密密钥,
-		)
-		tolls = append(tolls, toll)
+	c := <-global.DBClients
+	defer func() {
+		global.DBClients <- c
+	}()
+
+	err := c.FindAll(nil, statement, &tolls)
+	if err != nil {
+		fmt.Println(err)
 	}
+
 	data, err := json.Marshal(tolls)
 	if err != nil {
 		log.Println(err)
 	}
 	return string(data)
+
 }
