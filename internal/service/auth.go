@@ -1,7 +1,6 @@
 package service
 
 import (
-	"fmt"
 	"webconsole/internal/dao/database"
 	"webconsole/internal/model"
 	"webconsole/pkg/jwt"
@@ -14,7 +13,6 @@ func SignUp(p *model.ParamSignUp) error {
 	if err != nil {
 		return err
 	}
-	fmt.Println("test")
 	// 生成UID
 	userID := sf.GenID()
 

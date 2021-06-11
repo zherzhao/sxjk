@@ -25,29 +25,18 @@ var (
 
 // 检查注册时用户是否已经存在
 func CheckUserExist(username string) error {
+	sqlStr := `select count(user_id) from user where username = ?`
+	var count int
 
-	statement := eorm.NewStatement()
-	statement = statement.SetTableName("user").
-		AndEqual("username", username).
-		Select("count(user_id)")
-
-	var count Count
-
-	c := <-global.DBClients
-	defer func() {
-		global.DBClients <- c
-	}()
-
-	err := c.FindOne(nil, statement, &count)
+	err := global.DB.QueryRow(sqlStr, username).Scan(&count)
 	if err != nil {
 		log.Println(err)
 		return err
 	}
 
-	if count.count > 0 {
+	if count > 0 {
 		return ErrorUserExist
 	}
-
 	return nil
 }
 

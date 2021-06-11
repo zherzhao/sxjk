@@ -25,7 +25,7 @@ func Init() error {
 	}
 
 	global.DBClients = make(chan *eorm.Client, 50)
-	for i := 0; i < 50; i++ {
+	for i := 0; i < cap(global.DBClients); i++ {
 		c, err := eorm.NewClientWithDBconn(global.DB)
 		if err != nil {
 			return err
