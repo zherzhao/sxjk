@@ -1,7 +1,7 @@
 package model
 
 type User struct {
-	UserID   int64  `db:"user_id"`
-	Username string `db:"username"`
-	Password string `db:"password"`
+	UserID   int64  `eorm:"user_id"`
+	Username string `eorm:"username"`
+	Password string `eorm:"password"`
 }

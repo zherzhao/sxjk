@@ -25,12 +25,13 @@ var (
 
 // 检查注册时用户是否已经存在
 func CheckUserExist(username string) error {
+
 	statement := eorm.NewStatement()
 	statement = statement.SetTableName("user").
 		AndEqual("username", username).
 		Select("count(user_id)")
 
-	var count int
+	var count Count
 
 	c := <-global.DBClients
 	defer func() {
@@ -43,7 +44,7 @@ func CheckUserExist(username string) error {
 		return err
 	}
 
-	if count > 0 {
+	if count.count > 0 {
 		return ErrorUserExist
 	}
 
