@@ -35,7 +35,7 @@ type L21 struct {
 	R已绿化里程       string `json:"已绿化里程"`
 	R地貌代码        string `json:"地貌代码"`
 	R地貌汉字        string `json:"地貌汉字"`
-	R涵洞数量个       string `json:"涵洞数量个"`
+	R涵洞数量个       string `json:"涵洞数量(个)"`
 	R管养单位名称      string `json:"管养单位名称"`
 	R省际出入口       string `json:"省际出入口"`
 	R国道调整前路线编号   string `json:"国道调整前路线编号"`
