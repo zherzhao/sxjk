@@ -42,6 +42,14 @@ type Node struct {
 	Children []Node `json:"children"`
 }
 
+type Node2 struct {
+	Id       NodeId `json:"id"`
+	AuthName string `json:"authName"`
+	Query    string `json:"query"`
+	Path     string `json:"path"`
+	Children []Node `json:"children"`
+}
+
 var menu = []Node{
 	Node{
 		Id:       User,
