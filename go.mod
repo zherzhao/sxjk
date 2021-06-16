@@ -13,7 +13,7 @@ require (
 	github.com/go-sql-driver/mysql v1.6.0
 	github.com/impact-eintr/eorm v0.0.0-20210611035118-ff5d56f90b5a
 	github.com/natefinch/lumberjack v2.0.0+incompatible
-	github.com/spf13/viper v1.7.1
+	github.com/spf13/viper v1.8.0
 	github.com/swaggo/gin-swagger v1.3.0
 	github.com/swaggo/swag v1.7.0
 	go.uber.org/zap v1.17.0

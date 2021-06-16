@@ -36,7 +36,7 @@ func RoadInfo(count int) string {
 	level := Level(count)
 
 	statement := eorm.NewStatement()
-	statement = statement.SetTableName("l21").
+	statement = statement.SetTableName("20_l21").
 		AndEqual("技术等级", level).
 		AndGreaterThan("ID", "2").
 		Select("*")
@@ -65,7 +65,7 @@ func BridgeInfo(count int) string {
 	level := Level(count)
 
 	statement := eorm.NewStatement()
-	statement = statement.SetTableName("l24").
+	statement = statement.SetTableName("20_l24").
 		AndEqual("技术等级", level).
 		AndGreaterThan("ID", "2").
 		Select("*")
@@ -94,7 +94,7 @@ func TunnelInfo(count int) string {
 	level := Level(count)
 
 	statement := eorm.NewStatement()
-	statement = statement.SetTableName("l25").
+	statement = statement.SetTableName("20_l25").
 		AndEqual("所属线路技术等级", level).
 		AndGreaterThan("ID", "2").
 		Select("*")
@@ -147,7 +147,7 @@ func FInfo(count int) string {
 
 func MInfo(count int) string {
 	statement := eorm.NewStatement()
-	statement = statement.SetTableName("SM").Select("*")
+	statement = statement.SetTableName("20_SM").Select("*")
 
 	portals := []model.SM{}
 
@@ -171,7 +171,7 @@ func MInfo(count int) string {
 
 func SInfo(count int) string {
 	statement := eorm.NewStatement()
-	statement = statement.SetTableName("SZ").Select("*")
+	statement = statement.SetTableName("20_SZ").Select("*")
 
 	tolls := []model.SZ{}
 
