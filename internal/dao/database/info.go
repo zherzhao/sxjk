@@ -2,7 +2,6 @@ package database
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
 	"log"
 	"webconsole/global"
@@ -14,28 +13,8 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 )
 
-func Level(level int) (string, error) {
-	switch level {
-	case 0:
-		return "高速", nil
-	case 1:
-		return "一级", nil
-	case 2:
-		return "二级", nil
-	case 3:
-		return "三级", nil
-	case 4:
-		return "四级", nil
-	case 5:
-		return "等外", nil
-	default:
-		return "", errors.New("查询不匹配")
-	}
-
-}
-
 func RoadInfo(year string, count int) (string, error) {
-	level, err := Level(count)
+	level, err := model.Level(count)
 	if err != nil {
 		return "", err
 	}
@@ -69,7 +48,7 @@ func RoadInfo(year string, count int) (string, error) {
 }
 
 func BridgeInfo(year string, count int) (string, error) {
-	level, err := Level(count)
+	level, err := model.Level(count)
 	if err != nil {
 		return "", err
 	}
@@ -103,7 +82,7 @@ func BridgeInfo(year string, count int) (string, error) {
 }
 
 func TunnelInfo(year string, count int) (string, error) {
-	level, err := Level(count)
+	level, err := model.Level(count)
 	if err != nil {
 		return "", err
 	}

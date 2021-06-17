@@ -78,6 +78,8 @@ func NewRouter() (r *gin.Engine, err error) {
 	// 数据操作路由
 	dataGroup := apiv1.Group("/data")
 	{
+		// 数据导航栏路由
+		dataGroup.GET("/menus", v1.DataMenusHandler)
 		// 数据查询路由
 		infoGroup := dataGroup.Group("/info")
 		{
