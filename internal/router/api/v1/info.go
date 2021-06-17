@@ -47,11 +47,11 @@ func (this *Info) GetUpdateInfo(c *gin.Context) {
 	case "tunnel":
 		info, err = database.TunnelInfo(year, countnum)
 	case "service":
-		info = database.FInfo(year)
+		info, err = database.FInfo(year)
 	case "portal":
-		info = database.MInfo(year)
+		info, err = database.MInfo(year)
 	case "toll":
-		info = database.SInfo(year)
+		info, err = database.SInfo(year)
 	default:
 		err = errors.New("请求路径错误")
 	}
@@ -91,24 +91,30 @@ func (this *Info) GetUpdateInfo(c *gin.Context) {
 func (this *Info) QueryInfo(c *gin.Context) {
 	infotype := c.GetString("infotype")
 	countnum := c.GetInt("count")
+	year := c.GetString("year")
 	column := c.GetString("column")
 	value := c.GetString("value")
 
 	var info string
+	var err error
 
 	switch infotype {
 	case "road":
-		info = database.RoadQuery(countnum, column, value)
+		info, err = database.RoadQuery(year, countnum, column, value)
 	case "bridge":
-		info = database.BridgeQuery(countnum, column, value)
+		info, err = database.BridgeQuery(year, countnum, column, value)
 	case "tunnel":
-		info = database.TunnelQuery(countnum, column, value)
+		info, err = database.TunnelQuery(year, countnum, column, value)
 	case "service":
-		info = database.FQuery(column, value)
+		info, err = database.FQuery(year, column, value)
 	case "portal":
-		info = database.MQuery(column, value)
+		info, err = database.MQuery(year, column, value)
 	case "toll":
-		info = database.SQuery(column, value)
+		info, err = database.SQuery(year, column, value)
+	}
+
+	if err != nil {
+		respcode.ResponseErrorWithMsg(c, respcode.CodeServerBusy, err.Error())
 	}
 
 	respcode.ResponseSuccess(c, info)

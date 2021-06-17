@@ -60,7 +60,7 @@ func NewRouter() (r *gin.Engine, err error) {
 		s := v1.NewServer(c)
 
 		// 操作缓存
-		cacheGroup.Use(middleware.JWTAuthMiddleware(), middleware.PathParse)
+		cacheGroup.Use(middleware.JWTAuthMiddleware())
 
 		cacheGroup.GET("/hit/*key", s.CacheCheck, func(c *gin.Context) {
 			miss := c.GetBool("miss") // 检查是否命中缓存
@@ -78,42 +78,50 @@ func NewRouter() (r *gin.Engine, err error) {
 	// 数据操作路由
 	dataGroup := apiv1.Group("/data")
 	{
+		dataGroup.Use(middleware.JWTAuthMiddleware())
 		// 数据导航栏路由
 		dataGroup.GET("/menus", v1.DataMenusHandler)
+
 		// 数据查询路由
 		infoGroup := dataGroup.Group("/info")
 		{
 			info := v1.NewInfo()
 
-			infoGroup.Use(middleware.JWTAuthMiddleware(), middleware.PathParse)
-
 			infoGroup.GET("/:infotype/:year/:count",
+				middleware.PathParse,
 				info.GetUpdateInfo,
 				func(c *gin.Context) {
 					if c.GetString("type") == "mem" {
 						r.HandleContext(c) //继续之后的操作
 					}
 				})
-			//infoGroup.GET("/:infotype/:count/query",
-			//	middleware.QueryParse,
-			//	info.QueryInfo)
+			infoGroup.GET("/:infotype/:year/:count/query",
+				middleware.PathParse,
+				middleware.QueryParse,
+				info.QueryInfo)
 		}
 
 		// 数据添加路由
+		// 添加记录
+		// 添加表
 
 		// 数据删除路由
+		// 删除记录
+		// 删除表
 
 		// 数据修改路由
+		// 修改记录
+		// 修改表
 	}
 
 	// apiv2路由组
 	apiv2 := r.Group("/api/v2")
-	ossGroup := apiv2.Group("")
+	ossGroup := apiv2.Group("/OSS")
 	{
 		go heartbeat.ListenHeartBeat()
 		//OSS存储服务
-		ossGroup.PUT("/OSS/objects/:file", objects.Put)
-		ossGroup.GET("/OSS/objects/:file", objects.Get)
+		ossGroup.PUT("/objects/:file", objects.Put)
+		ossGroup.GET("/objects/:file", objects.Get)
 
 	}
 

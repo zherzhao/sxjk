@@ -1,7 +1,9 @@
 package middleware
 
 import (
+	"errors"
 	"strconv"
+	"webconsole/pkg/respcode"
 
 	"github.com/gin-gonic/gin"
 )
@@ -10,7 +12,12 @@ import (
 func PathParse(c *gin.Context) {
 	infotype := c.Param("infotype")
 	year := c.Param("year")
-	count, _ := strconv.Atoi(c.Param("count"))
+	count, err := strconv.Atoi(c.Param("count"))
+	if err != nil || count > 6 {
+		respcode.ResponseErrorWithMsg(c, respcode.CodeServerBusy,
+			errors.New("参数非法").Error())
+		c.Abort()
+	}
 
 	c.Set("infotype", infotype)
 	c.Set("year", year)

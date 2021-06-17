@@ -2,8 +2,6 @@ package database
 
 import (
 	"encoding/json"
-	"fmt"
-	"log"
 	"webconsole/global"
 	"webconsole/internal/model"
 
@@ -115,7 +113,7 @@ func TunnelInfo(year string, count int) (string, error) {
 
 }
 
-func FInfo(year string) string {
+func FInfo(year string) (string, error) {
 	statement := eorm.NewStatement()
 	statement = statement.SetTableName("F_"+year).
 		AndGreaterThan("ID", "2").
@@ -130,18 +128,20 @@ func FInfo(year string) string {
 
 	err := c.FindAll(nil, statement, &services)
 	if err != nil {
-		fmt.Println(err)
+		zap.L().Error("sql exec failed: ", zap.String("", err.Error()))
+		return "", err
 	}
 
 	data, err := json.Marshal(services)
 	if err != nil {
-		log.Println(err)
+		zap.L().Error("marshal failed: ", zap.String("", err.Error()))
+		return "", err
 	}
-	return string(data)
+	return string(data), nil
 
 }
 
-func MInfo(year string) string {
+func MInfo(year string) (string, error) {
 	statement := eorm.NewStatement()
 	statement = statement.SetTableName("SM_" + year).Select("*")
 
@@ -154,18 +154,20 @@ func MInfo(year string) string {
 
 	err := c.FindAll(nil, statement, &portals)
 	if err != nil {
-		fmt.Println(err)
+		zap.L().Error("sql exec failed: ", zap.String("", err.Error()))
+		return "", err
 	}
 
 	data, err := json.Marshal(portals)
 	if err != nil {
-		log.Println(err)
+		zap.L().Error("marshal failed: ", zap.String("", err.Error()))
+		return "", err
 	}
-	return string(data)
+	return string(data), nil
 
 }
 
-func SInfo(year string) string {
+func SInfo(year string) (string, error) {
 	statement := eorm.NewStatement()
 	statement = statement.SetTableName("SZ_" + year).Select("*")
 
@@ -178,13 +180,16 @@ func SInfo(year string) string {
 
 	err := c.FindAll(nil, statement, &tolls)
 	if err != nil {
-		fmt.Println(err)
+		zap.L().Error("sql exec failed: ", zap.String("", err.Error()))
+		return "", err
 	}
 
 	data, err := json.Marshal(tolls)
 	if err != nil {
-		log.Println(err)
+		zap.L().Error("marshal failed: ", zap.String("", err.Error()))
+		return "", err
 	}
-	return string(data)
+
+	return string(data), nil
 
 }
