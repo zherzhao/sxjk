@@ -11,7 +11,7 @@ import (
 )
 
 func RoadQuery(count int, column string, value string) string {
-	level := Level(count)
+	level, _ := Level(count)
 
 	sqlStr := fmt.Sprintf("select * from l21 where `技术等级`=? AND `id`>2 AND `%s` LIKE ?", column)
 	// 查询后调用Scan 否则持有的数据库连接不会被释放
@@ -83,7 +83,7 @@ func RoadQuery(count int, column string, value string) string {
 }
 
 func BridgeQuery(count int, column string, value string) string {
-	level := Level(count)
+	level, _ := Level(count)
 
 	sqlStr := fmt.Sprintf("select * from l24 where `技术等级`=? AND `id`>2 AND `%s` LIKE ?", column)
 	// 查询后调用Scan 否则持有的数据库连接不会被释放
@@ -175,7 +175,7 @@ func BridgeQuery(count int, column string, value string) string {
 }
 
 func TunnelQuery(count int, column string, value string) string {
-	level := Level(count)
+	level, _ := Level(count)
 
 	sqlStr := fmt.Sprintf("select * from l25 where `所属线路技术等级`=? AND `id`>2 AND `%s` LIKE ?", column)
 	// 查询后调用Scan 否则持有的数据库连接不会被释放

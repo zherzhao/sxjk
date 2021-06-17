@@ -2,41 +2,46 @@ package database
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"log"
 	"webconsole/global"
 	"webconsole/internal/model"
 
 	"github.com/impact-eintr/eorm"
+	"go.uber.org/zap"
 
 	_ "github.com/go-sql-driver/mysql"
 )
 
-func Level(level int) string {
+func Level(level int) (string, error) {
 	switch level {
 	case 0:
-		return "高速"
+		return "高速", nil
 	case 1:
-		return "一级"
+		return "一级", nil
 	case 2:
-		return "二级"
+		return "二级", nil
 	case 3:
-		return "三级"
+		return "三级", nil
 	case 4:
-		return "四级"
+		return "四级", nil
 	case 5:
-		return "等外"
+		return "等外", nil
+	default:
+		return "", errors.New("查询不匹配")
 	}
-
-	return ""
 
 }
 
-func RoadInfo(count int) string {
-	level := Level(count)
+func RoadInfo(year string, count int) (string, error) {
+	level, err := Level(count)
+	if err != nil {
+		return "", err
+	}
 
 	statement := eorm.NewStatement()
-	statement = statement.SetTableName("20_l21").
+	statement = statement.SetTableName("l21_"+year).
 		AndEqual("技术等级", level).
 		AndGreaterThan("ID", "2").
 		Select("*")
@@ -48,24 +53,29 @@ func RoadInfo(count int) string {
 		global.DBClients <- c
 	}()
 
-	err := c.FindAll(nil, statement, &roads)
+	err = c.FindAll(nil, statement, &roads)
 	if err != nil {
-		fmt.Println(err)
+		zap.L().Error("sql exec failed: ", zap.String("", err.Error()))
+		return "", err
 	}
 
 	data, err := json.Marshal(roads)
 	if err != nil {
-		log.Println(err)
+		zap.L().Error("marshal failed: ", zap.String("", err.Error()))
+		return "", err
 	}
-	return string(data)
+	return string(data), nil
 
 }
 
-func BridgeInfo(count int) string {
-	level := Level(count)
+func BridgeInfo(year string, count int) (string, error) {
+	level, err := Level(count)
+	if err != nil {
+		return "", err
+	}
 
 	statement := eorm.NewStatement()
-	statement = statement.SetTableName("20_l24").
+	statement = statement.SetTableName("l24_"+year).
 		AndEqual("技术等级", level).
 		AndGreaterThan("ID", "2").
 		Select("*")
@@ -77,24 +87,29 @@ func BridgeInfo(count int) string {
 		global.DBClients <- c
 	}()
 
-	err := c.FindAll(nil, statement, &bridges)
+	err = c.FindAll(nil, statement, &bridges)
 	if err != nil {
-		fmt.Println(err)
+		zap.L().Error("sql exec failed: ", zap.String("", err.Error()))
+		return "", err
 	}
 
 	data, err := json.Marshal(bridges)
 	if err != nil {
-		log.Println(err)
+		zap.L().Error("marshal failed: ", zap.String("", err.Error()))
+		return "", err
 	}
-	return string(data)
+	return string(data), nil
 
 }
 
-func TunnelInfo(count int) string {
-	level := Level(count)
+func TunnelInfo(year string, count int) (string, error) {
+	level, err := Level(count)
+	if err != nil {
+		return "", err
+	}
 
 	statement := eorm.NewStatement()
-	statement = statement.SetTableName("20_l25").
+	statement = statement.SetTableName("l25_"+year).
 		AndEqual("所属线路技术等级", level).
 		AndGreaterThan("ID", "2").
 		Select("*")
@@ -106,22 +121,24 @@ func TunnelInfo(count int) string {
 		global.DBClients <- c
 	}()
 
-	err := c.FindAll(nil, statement, &tunnels)
+	err = c.FindAll(nil, statement, &tunnels)
 	if err != nil {
-		fmt.Println(err)
+		zap.L().Error("sql exec failed: ", zap.String("", err.Error()))
+		return "", err
 	}
 
 	data, err := json.Marshal(tunnels)
 	if err != nil {
-		log.Println(err)
+		zap.L().Error("marshal failed: ", zap.String("", err.Error()))
+		return "", err
 	}
-	return string(data)
+	return string(data), nil
 
 }
 
-func FInfo(count int) string {
+func FInfo(year string) string {
 	statement := eorm.NewStatement()
-	statement = statement.SetTableName("F").
+	statement = statement.SetTableName("F_"+year).
 		AndGreaterThan("ID", "2").
 		Select("*")
 
@@ -145,9 +162,9 @@ func FInfo(count int) string {
 
 }
 
-func MInfo(count int) string {
+func MInfo(year string) string {
 	statement := eorm.NewStatement()
-	statement = statement.SetTableName("20_SM").Select("*")
+	statement = statement.SetTableName("SM_" + year).Select("*")
 
 	portals := []model.SM{}
 
@@ -169,9 +186,9 @@ func MInfo(count int) string {
 
 }
 
-func SInfo(count int) string {
+func SInfo(year string) string {
 	statement := eorm.NewStatement()
-	statement = statement.SetTableName("20_SZ").Select("*")
+	statement = statement.SetTableName("SZ_" + year).Select("*")
 
 	tolls := []model.SZ{}
 

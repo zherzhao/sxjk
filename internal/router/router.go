@@ -1,6 +1,7 @@
 package router
 
 import (
+	"log"
 	_ "webconsole/docs"
 	"webconsole/global"
 	"webconsole/internal/middleware"
@@ -46,7 +47,6 @@ func NewRouter() (r *gin.Engine, err error) {
 	{
 		homeGroup.Use(middleware.JWTAuthMiddleware())
 		homeGroup.GET("/menus", v1.MenusHandler)
-
 	}
 
 	// 缓存路由
@@ -65,8 +65,8 @@ func NewRouter() (r *gin.Engine, err error) {
 		cacheGroup.GET("/hit/*key", s.CacheCheck, func(c *gin.Context) {
 			miss := c.GetBool("miss") // 检查是否命中缓存
 			if miss {
-				c.Request.URL.Path = "/api/v1/info" + c.Param("key") // 将请求的URL修改
-				r.HandleContext(c)                                   // 继续之后的操作
+				c.Request.URL.Path = "/api/v1/data/info" + c.Param("key") // 将请求的URL修改
+				r.HandleContext(c)                                        // 继续之后的操作
 			}
 		})
 
@@ -75,24 +75,33 @@ func NewRouter() (r *gin.Engine, err error) {
 		cacheGroup.PUT("/update/*key", s.UpdateHandler)
 	}
 
-	// 数据查询路由
-	infoGroup := apiv1.Group("/info")
+	// 数据操作路由
+	dataGroup := apiv1.Group("/data")
 	{
-		info := v1.NewInfo()
+		// 数据查询路由
+		infoGroup := dataGroup.Group("/info")
+		{
+			info := v1.NewInfo()
 
-		infoGroup.Use(middleware.JWTAuthMiddleware(), middleware.PathParse)
+			infoGroup.Use(middleware.JWTAuthMiddleware(), middleware.PathParse)
 
-		infoGroup.GET("/:infotype/:count",
-			info.GetUpdateInfo,
-			func(c *gin.Context) {
-				if c.GetString("type") == "mem" {
-					r.HandleContext(c) //继续之后的操作
-				}
-			})
-		infoGroup.GET("/:infotype/:count/query",
-			middleware.QueryParse,
-			info.QueryInfo)
+			infoGroup.GET("/:infotype/:year/:count",
+				info.GetUpdateInfo,
+				func(c *gin.Context) {
+					if c.GetString("type") == "mem" {
+						r.HandleContext(c) //继续之后的操作
+					}
+				})
+			//infoGroup.GET("/:infotype/:count/query",
+			//	middleware.QueryParse,
+			//	info.QueryInfo)
+		}
 
+		// 数据添加路由
+
+		// 数据删除路由
+
+		// 数据修改路由
 	}
 
 	// apiv2路由组
@@ -102,11 +111,13 @@ func NewRouter() (r *gin.Engine, err error) {
 		go heartbeat.ListenHeartBeat()
 		//OSS存储服务
 		ossGroup.PUT("/OSS/objects/:file", objects.Put)
-		//ossGroup.POST("/OSS/objects/:file", objects.Post)
 		ossGroup.GET("/OSS/objects/:file", objects.Get)
-		//ossGroup.DELETE("/OSS/objects/:file", objects.Delete)
 
 	}
+
+	r.NoRoute(func(c *gin.Context) {
+		log.Println("404 test")
+	})
 
 	return r, nil
 }

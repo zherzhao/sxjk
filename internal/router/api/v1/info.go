@@ -2,6 +2,7 @@ package v1
 
 import (
 	"bytes"
+	"errors"
 	"io/ioutil"
 	"net/http"
 	"webconsole/global"
@@ -30,30 +31,39 @@ func NewInfo() Info {
 // @Param level path int true "查询等级 : 0(高速) 1(一级) 2(二级) 3(三级) 4(四级) 5(等外)"
 // @Security ApiKeyAuth
 // @Success 200 {object} respcode.ResponseData{msg=string,data=string}
-// @Router /api/v1/info/{infotype}/{level} [get]
+// @Router /api/v1/info/{infotype}/{year}/{level} [get]
 func (this *Info) GetUpdateInfo(c *gin.Context) {
 	infotype := c.GetString("infotype")
+	year := c.GetString("year")
 	countnum := c.GetInt("count")
 
 	var info string
+	var err error
 	switch infotype {
 	case "road":
-		info = database.RoadInfo(countnum)
+		info, err = database.RoadInfo(year, countnum)
 	case "bridge":
-		info = database.BridgeInfo(countnum)
+		info, err = database.BridgeInfo(year, countnum)
 	case "tunnel":
-		info = database.TunnelInfo(countnum)
+		info, err = database.TunnelInfo(year, countnum)
 	case "service":
-		info = database.FInfo(countnum)
+		info = database.FInfo(year)
 	case "portal":
-		info = database.MInfo(countnum)
+		info = database.MInfo(year)
 	case "toll":
-		info = database.SInfo(countnum)
+		info = database.SInfo(year)
+	default:
+		err = errors.New("请求路径错误")
+	}
+
+	if err != nil {
+		respcode.ResponseErrorWithMsg(c, respcode.CodeServerBusy, err.Error())
+		return
 	}
 
 	respcode.ResponseSuccess(c, info)
 
-	key := "/" + c.Param("infotype") + "/" + c.Param("count")
+	key := "/" + c.Param("infotype") + "/" + c.Param("year") + "/" + c.Param("count")
 
 	// 如果是缓存在磁盘中
 	if global.CacheSetting.CacheType == "disk" {
@@ -63,7 +73,6 @@ func (this *Info) GetUpdateInfo(c *gin.Context) {
 		c.Request.URL.Path = "/api/v1/cache/update" + key //将请求的URL修改
 		c.Request.Method = http.MethodPut
 		c.Request.Body = ioutil.NopCloser(bytes.NewReader([]byte(info)))
-
 	}
 }
 

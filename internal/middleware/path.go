@@ -1,7 +1,6 @@
 package middleware
 
 import (
-	"fmt"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
@@ -10,11 +9,11 @@ import (
 // 获取路径的中间件
 func PathParse(c *gin.Context) {
 	infotype := c.Param("infotype")
+	year := c.Param("year")
 	count, _ := strconv.Atoi(c.Param("count"))
 
-	fmt.Println(infotype, count)
-
 	c.Set("infotype", infotype)
+	c.Set("year", year)
 	c.Set("count", count)
 
 	c.Next()

@@ -2,7 +2,6 @@ package v1
 
 import (
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -31,7 +30,7 @@ func NewServer(c ICache.Cache) *Server {
 // @Param level query string true "查询等级"
 // @Security ApiKeyAuth
 // @Success 200 {string} string "成功"
-// @Router /api/v1/cache/hit/{infotype}/{level} [get]
+// @Router /api/v1/cache/hit/{infotype}/{year}/{level} [get]
 func (s *Server) CacheCheck(c *gin.Context) {
 	key := c.Param("key")
 	if key == "" {
@@ -52,7 +51,6 @@ func (s *Server) CacheCheck(c *gin.Context) {
 
 func (s *Server) UpdateHandler(c *gin.Context) {
 	key := c.Param("key")
-	fmt.Println(key)
 
 	if key == "" {
 		c.JSON(http.StatusBadRequest, nil)
