@@ -31,8 +31,16 @@ func QueryParse(c *gin.Context) {
 	column := c.Query("column")
 	value := c.Query("value")
 
-	c.Set("column", column)
-	c.Set("value", value)
+	if column == "" || value == "" {
+		respcode.ResponseErrorWithMsg(c, respcode.CodeServerBusy,
+			errors.New("缺失查询参数").Error())
+		c.Abort()
 
-	c.Next()
+	} else {
+		c.Set("column", column)
+		c.Set("value", value)
+		c.Next()
+
+	}
+
 }

@@ -87,30 +87,31 @@ func NewRouter() (r *gin.Engine, err error) {
 		{
 			info := v1.NewInfo()
 
-			infoGroup.GET("/:infotype/:year/:count",
-				middleware.PathParse,
-				info.GetUpdateInfo,
+			// 获取记录
+			infoGroup.GET("/:infotype/:year/:count", middleware.PathParse, info.GetInfo,
 				func(c *gin.Context) {
 					if c.GetString("type") == "mem" {
-						r.HandleContext(c) //继续之后的操作
-					}
+						r.HandleContext(c)
+					} // 继续之后的操作
 				})
-			infoGroup.GET("/:infotype/:year/:count/query",
-				middleware.PathParse,
-				middleware.QueryParse,
-				info.QueryInfo)
+
+			// 查询记录
+			infoGroup.GET("/:infotype/:year/:count/query", middleware.PathParse,
+				middleware.QueryParse, info.QueryInfo)
+			// 添加记录
+			infoGroup.POST("/:infotype/:year/:count/:id", middleware.PathParse, info.UpdateInfo)
+
+			// 删除记录
+			// 修改记录
 		}
 
 		// 数据添加路由
-		// 添加记录
 		// 添加表
 
 		// 数据删除路由
-		// 删除记录
 		// 删除表
 
 		// 数据修改路由
-		// 修改记录
 		// 修改表
 	}
 

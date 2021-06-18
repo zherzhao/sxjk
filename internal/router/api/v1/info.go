@@ -8,6 +8,7 @@ import (
 	"webconsole/global"
 	"webconsole/internal/dao/database"
 	"webconsole/internal/dao/webcache"
+	"webconsole/internal/model"
 	"webconsole/pkg/respcode"
 
 	"github.com/gin-gonic/gin"
@@ -20,7 +21,7 @@ func NewInfo() Info {
 	return Info{}
 }
 
-// GetUpdataInfo 获取数据库原始数据接口 访问后会更新缓存
+// GetInfo 获取数据库原始数据接口 访问后会更新缓存
 // @Summary 更新缓存接口
 // @Description 获取数据库原始数据接口 访问后会更新缓存
 // @Tags 缓存相关接口
@@ -32,7 +33,7 @@ func NewInfo() Info {
 // @Security ApiKeyAuth
 // @Success 200 {object} respcode.ResponseData{msg=string,data=string}
 // @Router /api/v1/info/{infotype}/{year}/{level} [get]
-func (this *Info) GetUpdateInfo(c *gin.Context) {
+func (this *Info) GetInfo(c *gin.Context) {
 	infotype := c.GetString("infotype")
 	year := c.GetString("year")
 	countnum := c.GetInt("count")
@@ -100,17 +101,19 @@ func (this *Info) QueryInfo(c *gin.Context) {
 
 	switch infotype {
 	case "road":
-		info, err = database.RoadQuery(year, countnum, column, value)
+		info, err = database.Query("l21_", year, countnum, column, value, model.L21{})
 	case "bridge":
-		info, err = database.BridgeQuery(year, countnum, column, value)
+		info, err = database.Query("l24_", year, countnum, column, value, model.L24{})
 	case "tunnel":
 		info, err = database.TunnelQuery(year, countnum, column, value)
 	case "service":
-		info, err = database.FQuery(year, column, value)
+		info, err = database.Query("F_", year, countnum, column, value, model.F{})
 	case "portal":
-		info, err = database.MQuery(year, column, value)
+		info, err = database.Query("SM_", year, countnum, column, value, model.SM{})
 	case "toll":
-		info, err = database.SQuery(year, column, value)
+		info, err = database.Query("SZ_", year, countnum, column, value, model.SZ{})
+	default:
+		err = errors.New("查询类型不存在")
 	}
 
 	if err != nil {
@@ -118,4 +121,51 @@ func (this *Info) QueryInfo(c *gin.Context) {
 	}
 
 	respcode.ResponseSuccess(c, info)
+}
+
+// UpdateInfo 根据 id 数据库数据接口
+// @Summary 修改指定数据
+// @Description 获取数据库原始数据接口 访问后会更新缓存
+// @Tags 缓存相关接口
+// @Accept application/json
+// @Produce application/json
+// @Param Authorization header string true "Bearer 用户令牌"
+// @Param infotype path string true "查询类型 : road(路)  bridge(桥) tunnel(隧道) service(服务区) portal(收费门架) toll(收费站)"
+// @Param level path int true "查询等级 : 0(高速) 1(一级) 2(二级) 3(三级) 4(四级) 5(等外)"
+// @Security ApiKeyAuth
+// @Success 200 {object} respcode.ResponseData{msg=string,data=string}
+// @Router /api/v1/info/{infotype}/{level} [get]
+func (this *Info) UpdateInfo(c *gin.Context) {
+	infotype := c.GetString("infotype")
+	countnum := c.GetInt("count")
+	year := c.GetString("year")
+	column := c.GetString("column")
+	value := c.GetString("value")
+
+	var info string
+	var err error
+
+	switch infotype {
+	case "road":
+		info, err = database.Query("l21_", year, countnum, column, value, model.L21{})
+	case "bridge":
+		info, err = database.Query("l24_", year, countnum, column, value, model.L24{})
+	case "tunnel":
+		info, err = database.Query("l25_", year, countnum, column, value, model.L25{})
+	case "service":
+		info, err = database.Query("F_", year, countnum, column, value, model.F{})
+	case "portal":
+		info, err = database.Query("SM_", year, countnum, column, value, model.SM{})
+	case "toll":
+		info, err = database.Query("SZ_", year, countnum, column, value, model.SZ{})
+	default:
+		err = errors.New("查询类型不存在")
+	}
+
+	if err != nil {
+		respcode.ResponseErrorWithMsg(c, respcode.CodeServerBusy, err.Error())
+	}
+
+	respcode.ResponseSuccess(c, info)
+
 }

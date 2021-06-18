@@ -25,6 +25,7 @@ type F struct {
 }
 
 type SM struct {
+	ID               string `json:"id"`
 	M序号              string `json:"序号"`
 	M收费门架编号          string `json:"收费门架编号"`
 	M门架名称            string `json:"门架名称"`
@@ -99,6 +100,7 @@ type SM struct {
 }
 
 type SZ struct {
+	ID         string `json:"id"`
 	S序号        string `json:"序号"`
 	S收费站编号     string `json:"收费站编号"`
 	S收费站名称     string `json:"收费站名称"`
