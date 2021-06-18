@@ -105,7 +105,6 @@ func (this *Info) QueryInfo(c *gin.Context) {
 	case "bridge":
 		info, err = database.Query("l24_", year, countnum, column, value, model.L24{})
 	case "tunnel":
-		info, err = database.TunnelQuery(year, countnum, column, value)
 	case "service":
 		info, err = database.Query("F_", year, countnum, column, value, model.F{})
 	case "portal":
