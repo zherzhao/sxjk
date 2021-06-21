@@ -10,20 +10,33 @@ import (
 
 // 获取路径的中间件
 func PathParse(c *gin.Context) {
-	infotype := c.Param("infotype")
+
 	year := c.Param("year")
 	count, err := strconv.Atoi(c.Param("count"))
-	if err != nil || count > 6 {
+	if err != nil || count >= 6 {
 		respcode.ResponseErrorWithMsg(c, respcode.CodeServerBusy,
 			errors.New("参数非法").Error())
 		c.Abort()
 	}
+	infotype := c.Param("infotype")
+	var flag bool
+	for _, v := range []string{"road", "bridge", "tunnel", "service", "protal", "toll"} {
+		if infotype == v {
+			flag = true
+			break
+		}
+	}
 
-	c.Set("infotype", infotype)
-	c.Set("year", year)
-	c.Set("count", count)
+	if flag {
+		c.Set("infotype", infotype)
+		c.Set("year", year)
+		c.Set("count", count)
+		c.Next()
+	} else {
+		respcode.ResponseErrorWithMsg(c, respcode.CodeServerBusy, "路径错误")
+		c.Abort()
+	}
 
-	c.Next()
 }
 
 // 获取查询参数的中间件

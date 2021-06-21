@@ -87,8 +87,8 @@ func NewRouter() (r *gin.Engine, err error) {
 			info := v1.NewInfo()
 
 			// 获取记录
-			infoGroup.GET("/:infotype/:year/:count", middleware.PathParse, middleware.RBACMiddleware(),
-				info.GetInfo,
+			infoGroup.GET("/:infotype/:year/:count", middleware.PathParse,
+				middleware.RBACMiddleware(), info.GetInfo,
 				func(c *gin.Context) {
 					if c.GetString("type") == "mem" {
 						r.HandleContext(c)
@@ -97,7 +97,8 @@ func NewRouter() (r *gin.Engine, err error) {
 
 			// 查询记录
 			infoGroup.GET("/:infotype/:year/:count/query", middleware.PathParse,
-				middleware.QueryParse, info.QueryInfo)
+				middleware.QueryParse, middleware.RBACMiddleware(),
+				info.QueryInfo)
 			// 添加记录
 			infoGroup.POST("/:infotype/:year/:count/:id", middleware.PathParse, info.UpdateInfo)
 

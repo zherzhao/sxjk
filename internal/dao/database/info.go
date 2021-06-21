@@ -13,8 +13,7 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 )
 
-func Info(unit, prefix, year string, count int, t interface{}) (string, error) {
-
+func Info(role, prefix, year string, count int, t interface{}) (string, error) {
 	statement := eorm.NewStatement()
 	statement = statement.SetTableName(prefix + year)
 	if sLevel, ok := prefixMap[prefix]; ok {
@@ -25,6 +24,10 @@ func Info(unit, prefix, year string, count int, t interface{}) (string, error) {
 		statement = statement.AndEqual(sLevel, level).AndGreaterThan("ID", "2")
 	}
 
+	unit := "大同"
+	if role == "user" {
+		statement = statement.AndLike("管养单位名称", unit+"%")
+	}
 	statement = statement.Select("*")
 
 	c := <-global.DBClients

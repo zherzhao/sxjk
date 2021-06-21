@@ -1,3 +1,4 @@
 {
-    "root":["manager"]
+    "root":["manager"],
+    "manager":["user"]
 }
