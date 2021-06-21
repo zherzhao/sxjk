@@ -1,7 +1,7 @@
 package database
 
 import (
-	"encoding/json"
+	"context"
 	"errors"
 	"reflect"
 	"webconsole/global"
@@ -13,19 +13,16 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 )
 
-func Info(unit, prefix, year string, count int, t interface{}) (string, error) {
-
+func Update(prefix, year string, count int, t interface{}) error {
 	statement := eorm.NewStatement()
 	statement = statement.SetTableName(prefix + year)
 	if sLevel, ok := prefixMap[prefix]; ok {
 		level, err := model.Level(count)
 		if err != nil {
-			return "", err
+			return err
 		}
 		statement = statement.AndEqual(sLevel, level).AndGreaterThan("ID", "2")
 	}
-
-	statement = statement.Select("*")
 
 	c := <-global.DBClients
 	defer func() {
@@ -35,32 +32,28 @@ func Info(unit, prefix, year string, count int, t interface{}) (string, error) {
 	var res interface{}
 	switch reflect.TypeOf(t).String() {
 	case "model.L21":
-		res = &[]model.L21{}
+		res = &model.L21{}
 	case "model.L24":
-		res = &[]model.L24{}
+		res = &model.L24{}
 	case "model.L25":
-		res = &[]model.L25{}
+		res = &model.L25{}
 	case "model.F":
-		res = &[]model.F{}
+		res = &model.F{}
 	case "model.SM":
-		res = &[]model.SM{}
+		res = &model.SM{}
 	case "model.SZ":
-		res = &[]model.SZ{}
+		res = &model.SZ{}
 	default:
-		return "", errors.New("无法找到对应数据模型")
+		return errors.New("无法找到对应数据模型")
 	}
 
-	err := c.FindAll(nil, statement, res)
+	statement = statement.UpdateStruct(res)
+	_, err := c.Update(context.Background(), statement)
 	if err != nil {
 		zap.L().Error("sql exec failed: ", zap.String("", err.Error()))
-		return "", err
+		return err
 	}
 
-	data, err := json.Marshal(res)
-	if err != nil {
-		zap.L().Error("marshal failed: ", zap.String("", err.Error()))
-		return "", err
-	}
-	return string(data), nil
+	return nil
 
 }

@@ -9,6 +9,7 @@ var (
 	ServerSetting   *setting.ServerSettingS
 	LoggerSetting   *setting.LoggerSettingS
 	DatabaseSetting *setting.DatabaseSettingS
+	RBACSetting     *setting.RBACSettingS
 	CacheSetting    *setting.CacheSettingS
 	OssSetting      *setting.OssSettingS
 	ZinxSetting     *setting.ZinxSettingS

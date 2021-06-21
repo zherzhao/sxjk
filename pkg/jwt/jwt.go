@@ -9,7 +9,7 @@ import (
 
 const TokenExpireDuration = time.Hour * 24
 
-var salt = []byte("impact-eintr")
+var salt = []byte("github.com/impact-eintr")
 
 // MyClaims自定义声明结构体并内嵌jwt.StandardClaims
 // jwt包自带的jwt.StandardClaims只包含了官方字段
@@ -18,13 +18,15 @@ var salt = []byte("impact-eintr")
 type MyClaims struct {
 	UserID   int64  `json:"user_id"`
 	UserName string `json:"username"`
+	UserRole string `json:"userrole"`
 	jwt.StandardClaims
 }
 
-func GenToken(userID int64, userName string) (string, error) {
+func GenToken(userID int64, userName, userRole string) (string, error) {
 	c := MyClaims{
 		UserID:   userID,
 		UserName: userName,
+		UserRole: userRole,
 		StandardClaims: jwt.StandardClaims{
 			ExpiresAt: time.Now().Add(TokenExpireDuration).Unix(), // 过期时间
 			Issuer:    "webconsole",                               // 签发人

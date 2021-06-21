@@ -16,6 +16,7 @@ import (
 	"webconsole/internal/dao/database"
 	"webconsole/internal/router"
 	"webconsole/pkg/logger"
+	"webconsole/pkg/rbac"
 	"webconsole/pkg/setting"
 	sf "webconsole/pkg/snowflake"
 
@@ -35,14 +36,6 @@ func init() {
 		return
 	}
 
-	// 初始化ID生成器
-	if err := sf.Init(global.ServerSetting.StartTime, global.ServerSetting.MachineID); err != nil {
-		fmt.Println("init logger failed, err: ", err)
-		return
-	}
-
-	zap.L().Debug("ID init success...")
-
 	// 初始化日志
 	err = global.Conf.ReadSection("log", &global.LoggerSetting)
 	if err != nil {
@@ -57,6 +50,14 @@ func init() {
 
 	zap.L().Debug("logger init success...")
 
+	// 初始化ID生成器
+	if err := sf.Init(global.ServerSetting.StartTime, global.ServerSetting.MachineID); err != nil {
+		fmt.Println("init logger failed, err: ", err)
+		return
+	}
+
+	zap.L().Debug("ID init success...")
+
 	// 初始化缓存设置
 	err = global.Conf.ReadSection("cache", &global.CacheSetting)
 	if err != nil {
@@ -67,7 +68,6 @@ func init() {
 	if ctyp := global.CacheSetting.CacheType; ctyp != "" {
 		zap.L().Debug("cache init success...", zap.String("cachetype", ctyp))
 	} else {
-		// 如果不设置缓存，可以直接连接到数据库(待设计)
 		log.Fatalln("未指定缓存类型")
 	}
 
@@ -86,6 +86,19 @@ func init() {
 		return
 	}
 
+	zap.L().Debug("database init success...")
+
+	// 初始化RBAC
+
+	err = global.Conf.ReadSection("rbac", &global.RBACSetting)
+	if err != nil {
+		fmt.Println("init RBAC failed, err: ", err)
+	}
+
+	if err := rbac.Init(); err != nil {
+		fmt.Println("init RBAC failed, err: ", err)
+		return
+	}
 	zap.L().Debug("database init success...")
 
 	// 初始化zinx设置

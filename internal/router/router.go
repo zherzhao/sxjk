@@ -6,7 +6,6 @@ import (
 	"webconsole/global"
 	"webconsole/internal/middleware"
 	"webconsole/internal/router/api/v2/objects"
-	"webconsole/internal/service/heartbeat"
 	"webconsole/pkg/cache"
 	"webconsole/pkg/cache/tcp"
 	"webconsole/pkg/logger"
@@ -88,7 +87,8 @@ func NewRouter() (r *gin.Engine, err error) {
 			info := v1.NewInfo()
 
 			// 获取记录
-			infoGroup.GET("/:infotype/:year/:count", middleware.PathParse, info.GetInfo,
+			infoGroup.GET("/:infotype/:year/:count", middleware.PathParse, middleware.RBACMiddleware(),
+				info.GetInfo,
 				func(c *gin.Context) {
 					if c.GetString("type") == "mem" {
 						r.HandleContext(c)
@@ -119,7 +119,6 @@ func NewRouter() (r *gin.Engine, err error) {
 	apiv2 := r.Group("/api/v2")
 	ossGroup := apiv2.Group("/OSS")
 	{
-		go heartbeat.ListenHeartBeat()
 		//OSS存储服务
 		ossGroup.PUT("/objects/:file", objects.Put)
 		ossGroup.GET("/objects/:file", objects.Get)

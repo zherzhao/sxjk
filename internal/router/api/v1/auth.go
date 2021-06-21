@@ -89,7 +89,7 @@ func LoginHandler(c *gin.Context) {
 	}
 
 	// 2. 业务处理
-	userID, aToken, err := service.Login(p)
+	userID, userRole, aToken, err := service.Login(p)
 	if err != nil {
 		zap.L().Error("登录失败", zap.Error(err))
 		if errors.Is(err, database.ErrorUserNotExist) {
@@ -105,7 +105,7 @@ func LoginHandler(c *gin.Context) {
 		return
 	}
 
-	data := map[string]string{"token": aToken, "userid": fmt.Sprintf("%d", userID), "username": p.UserName}
+	data := map[string]string{"token": aToken, "userrole": userRole, "userid": fmt.Sprintf("%d", userID), "username": p.UserName}
 
 	// 3. 返回响应
 	respcode.ResponseSuccess(c, data)

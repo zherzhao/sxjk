@@ -1,6 +1,7 @@
 package database
 
 import (
+	"context"
 	"crypto/md5"
 	"database/sql"
 	"encoding/hex"
@@ -54,7 +55,7 @@ func InsertUser(user *model.User) (err error) {
 		global.DBClients <- c
 	}()
 
-	_, err = c.Insert(nil, statement)
+	_, err = c.Insert(context.Background(), statement)
 	if err != nil {
 		log.Println(err)
 		return err
@@ -78,14 +79,14 @@ func UserLogin(user *model.User) (err error) {
 	statement := eorm.NewStatement()
 	statement = statement.SetTableName("user").
 		AndEqual("username", user.Username).
-		Select("user_id, username, password")
+		Select("user_id, username, password, role, unit")
 
 	c := <-global.DBClients
 	defer func() {
 		global.DBClients <- c
 	}()
 
-	err = c.FindOne(nil, statement, user)
+	err = c.FindOne(context.Background(), statement, user)
 	if err == sql.ErrNoRows {
 		return ErrorUserNotExist
 	}

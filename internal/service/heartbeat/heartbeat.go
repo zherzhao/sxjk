@@ -41,19 +41,3 @@ func (h *HelloRouter) Handle(request ziface.IRequest) {
 		fmt.Println("call back error")
 	}
 }
-
-func main() {
-	fmt.Println("Hello Zinx")
-	// 1. 创建server句柄
-	s := znet.NewServer("[zinx v0.9]")
-	// 2. 注册路由
-	s.AddRouter(MsgPing, &PingRouter{})
-	s.AddRouter(MsgHello, &HelloRouter{})
-
-	// 3. 启动server
-	s.Run()
-}
-
-func ListenHeartBeat() {
-
-}

@@ -2,6 +2,7 @@ package database
 
 import (
 	"encoding/json"
+	"errors"
 	"reflect"
 	"webconsole/global"
 	"webconsole/internal/model"
@@ -57,7 +58,7 @@ func Query(prefix, year string, count int, column, value string, t interface{}) 
 	case "model.SZ":
 		res = &[]model.SZ{}
 	default:
-		return "", nil
+		return "", errors.New("无法找到对应数据模型")
 	}
 
 	err := c.FindAll(nil, statement, res)

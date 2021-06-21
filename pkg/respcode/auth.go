@@ -8,6 +8,7 @@ const (
 	CodeInvalidParam
 
 	CodeUserExist
+	CodeUserPermissionDenied
 	CodeUserNotExist
 	CodeInvalidPassword
 
@@ -20,11 +21,12 @@ const (
 )
 
 var codeMsgMap = map[RespCode]string{
-	CodeSuccess:         "success",
-	CodeInvalidParam:    "请求参数错误",
-	CodeUserExist:       "用户名已经存在",
-	CodeUserNotExist:    "该用户不存在",
-	CodeInvalidPassword: "用户密码错误",
+	CodeSuccess:              "success",
+	CodeInvalidParam:         "请求参数错误",
+	CodeUserExist:            "用户名已经存在",
+	CodeUserNotExist:         "该用户不存在",
+	CodeUserPermissionDenied: "用户没有权限",
+	CodeInvalidPassword:      "用户密码错误",
 
 	CodeNullAuth:     "请头中auth为空",
 	CodeInvalidToken: "无效的Token",

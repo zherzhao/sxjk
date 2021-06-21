@@ -12,6 +12,8 @@ import (
 	"webconsole/pkg/respcode"
 
 	"github.com/gin-gonic/gin"
+	validator "github.com/go-playground/validator/v10"
+	"go.uber.org/zap"
 )
 
 type Info struct {
@@ -37,24 +39,26 @@ func (this *Info) GetInfo(c *gin.Context) {
 	infotype := c.GetString("infotype")
 	year := c.GetString("year")
 	countnum := c.GetInt("count")
+	userRole := c.GetString("userRole")
 
 	var info string
 	var err error
+
 	switch infotype {
 	case "road":
-		info, err = database.RoadInfo(year, countnum)
+		info, err = database.Info(userRole, "l21_", year, countnum, model.L21{})
 	case "bridge":
-		info, err = database.BridgeInfo(year, countnum)
+		info, err = database.Info(userRole, "l24_", year, countnum, model.L24{})
 	case "tunnel":
-		info, err = database.TunnelInfo(year, countnum)
+		info, err = database.Info(userRole, "l25_", year, countnum, model.L25{})
 	case "service":
-		info, err = database.FInfo(year)
+		info, err = database.Info(userRole, "F_", year, countnum, model.F{})
 	case "portal":
-		info, err = database.MInfo(year)
+		info, err = database.Info(userRole, "SM_", year, countnum, model.SM{})
 	case "toll":
-		info, err = database.SInfo(year)
+		info, err = database.Info(userRole, "SZ_", year, countnum, model.SZ{})
 	default:
-		err = errors.New("请求路径错误")
+		err = errors.New("查询类型不存在")
 	}
 
 	if err != nil {
@@ -141,22 +145,35 @@ func (this *Info) UpdateInfo(c *gin.Context) {
 	column := c.GetString("column")
 	value := c.GetString("value")
 
-	var info string
 	var err error
 
 	switch infotype {
 	case "road":
-		info, err = database.Query("l21_", year, countnum, column, value, model.L21{})
+		p := new(model.L21)
+
+		if err := c.ShouldBindJSON(&p); err != nil {
+			zap.L().Error("Update Error: ", zap.Error(err))
+			errs, ok := err.(validator.ValidationErrors)
+			if !ok {
+				respcode.ResponseError(c, respcode.CodeInvalidParam)
+				return
+			}
+
+			respcode.ResponseErrorWithMsg(c, respcode.CodeServerBusy, errs.Translate(global.Trans))
+			return
+		}
+		err = database.Update("l21_", year, countnum, p)
+
 	case "bridge":
-		info, err = database.Query("l24_", year, countnum, column, value, model.L24{})
+		_, err = database.Query("l24_", year, countnum, column, value, model.L24{})
 	case "tunnel":
-		info, err = database.Query("l25_", year, countnum, column, value, model.L25{})
+		_, err = database.Query("l25_", year, countnum, column, value, model.L25{})
 	case "service":
-		info, err = database.Query("F_", year, countnum, column, value, model.F{})
+		_, err = database.Query("F_", year, countnum, column, value, model.F{})
 	case "portal":
-		info, err = database.Query("SM_", year, countnum, column, value, model.SM{})
+		_, err = database.Query("SM_", year, countnum, column, value, model.SM{})
 	case "toll":
-		info, err = database.Query("SZ_", year, countnum, column, value, model.SZ{})
+		_, err = database.Query("SZ_", year, countnum, column, value, model.SZ{})
 	default:
 		err = errors.New("查询类型不存在")
 	}
@@ -165,6 +182,6 @@ func (this *Info) UpdateInfo(c *gin.Context) {
 		respcode.ResponseErrorWithMsg(c, respcode.CodeServerBusy, err.Error())
 	}
 
-	respcode.ResponseSuccess(c, info)
+	respcode.ResponseSuccess(c, nil)
 
 }

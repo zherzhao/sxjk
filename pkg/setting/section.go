@@ -42,6 +42,11 @@ type DatabaseSettingS struct {
 	MaxIdleConns int    `mapstructure:"max_idel_conns"`
 }
 
+type RBACSettingS struct {
+	RoleFile  string `mapstructure:"roleFile"`
+	InherFile string `mapstructure:"inherFile"`
+}
+
 type OssSettingS struct {
 	MqAddr string `mapstructure:"mqaddr"`
 	EsAddr string `mapstructure:"esaddr"`
