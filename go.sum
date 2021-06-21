@@ -221,6 +221,8 @@ github.com/impact-eintr/WebKits v0.0.0-20210620125824-9ce5332938fe h1:l/m1b+yr5m
 github.com/impact-eintr/WebKits v0.0.0-20210620125824-9ce5332938fe/go.mod h1:HbdDOHcbZosTXhxf+stsftzVdoTooBdb/4lUPnuRQz0=
 github.com/impact-eintr/eorm v0.0.0-20210611035118-ff5d56f90b5a h1:IzhK/cZOSDsCOEHINohx9H5Gxjwag80X068e7XXSmOM=
 github.com/impact-eintr/eorm v0.0.0-20210611035118-ff5d56f90b5a/go.mod h1:fU4ZCri+Ly/chDTfbnN4sHWHW+hOhqXk6Gv80bzReYA=
+github.com/impact-eintr/eorm v0.0.0-20210621131339-db8925b23140 h1:n4zIu3ZpIUJpkoW1uSbWK2IfknLgXRqJ+hNAZ2dSTy4=
+github.com/impact-eintr/eorm v0.0.0-20210621131339-db8925b23140/go.mod h1:fU4ZCri+Ly/chDTfbnN4sHWHW+hOhqXk6Gv80bzReYA=
 github.com/json-iterator/go v1.1.5/go.mod h1:+SdeFBvtyEkXs7REEP0seUULqWtbJapLOCVDaaPEHmU=
 github.com/json-iterator/go v1.1.6/go.mod h1:+SdeFBvtyEkXs7REEP0seUULqWtbJapLOCVDaaPEHmU=
 github.com/json-iterator/go v1.1.9/go.mod h1:KdQUCv79m/52Kvf8AW2vK1V8akMuk1QjK/uOdHXbAo4=

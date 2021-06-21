@@ -13,9 +13,10 @@ func RBACMiddleware() gin.HandlerFunc {
 		infotype := c.GetString("infotype")
 		var permission string
 
-		if c.GetInt("count") > 0 {
+		switch {
+		case c.GetInt("count") > 0:
 			permission = infotype + "-records"
-		} else {
+		case c.GetInt("count") == 0:
 			permission = infotype + "-record"
 		}
 

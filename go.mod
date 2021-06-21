@@ -13,7 +13,7 @@ require (
 	github.com/go-playground/validator/v10 v10.6.1
 	github.com/go-sql-driver/mysql v1.6.0
 	github.com/impact-eintr/WebKits v0.0.0-20210620125824-9ce5332938fe // indirect
-	github.com/impact-eintr/eorm v0.0.0-20210611035118-ff5d56f90b5a
+	github.com/impact-eintr/eorm v0.0.0-20210621131339-db8925b23140
 	github.com/natefinch/lumberjack v2.0.0+incompatible
 	github.com/spf13/viper v1.8.0
 	github.com/swaggo/gin-swagger v1.3.0
