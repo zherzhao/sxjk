@@ -40,23 +40,24 @@ func (this *Info) GetInfo(c *gin.Context) {
 	year := c.GetString("year")
 	countnum := c.GetInt("count")
 	userRole := c.GetString("userRole")
+	unit := c.GetString("userUnit")
 
 	var info string
 	var err error
 
 	switch infotype {
 	case "road":
-		info, err = database.Info(userRole, "l21_", year, countnum, model.L21{})
+		info, err = database.Info(unit, userRole, "l21_", year, countnum, model.L21{})
 	case "bridge":
-		info, err = database.Info(userRole, "l24_", year, countnum, model.L24{})
+		info, err = database.Info(unit, userRole, "l24_", year, countnum, model.L24{})
 	case "tunnel":
-		info, err = database.Info(userRole, "l25_", year, countnum, model.L25{})
+		info, err = database.Info(unit, userRole, "l25_", year, countnum, model.L25{})
 	case "service":
-		info, err = database.Info(userRole, "F_", year, countnum, model.F{})
+		info, err = database.Info(unit, userRole, "F_", year, countnum, model.F{})
 	case "portal":
-		info, err = database.Info(userRole, "SM_", year, countnum, model.SM{})
+		info, err = database.Info(unit, userRole, "SM_", year, countnum, model.SM{})
 	case "toll":
-		info, err = database.Info(userRole, "SZ_", year, countnum, model.SZ{})
+		info, err = database.Info(unit, userRole, "SZ_", year, countnum, model.SZ{})
 	default:
 		err = errors.New("查询类型不存在")
 	}

@@ -2,6 +2,7 @@ package middleware
 
 import (
 	"errors"
+	"fmt"
 	"strconv"
 	"webconsole/pkg/respcode"
 
@@ -22,6 +23,7 @@ func PathParse(c *gin.Context) {
 	var flag bool
 	for _, v := range []string{"road", "bridge", "tunnel", "service", "protal", "toll"} {
 		if infotype == v {
+			fmt.Println(v)
 			flag = true
 			break
 		}

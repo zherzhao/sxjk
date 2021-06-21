@@ -42,7 +42,7 @@ func Login(p *model.ParamLogin) (userid int64, userRole, aToken string, err erro
 	}
 
 	// 验证通过后发放token
-	aToken, err = jwt.GenToken(user.UserID, user.Username, user.Role)
+	aToken, err = jwt.GenToken(user.UserID, user.Username, user.Role, user.Unit)
 	return user.UserID, user.Role, aToken, err
 
 }
