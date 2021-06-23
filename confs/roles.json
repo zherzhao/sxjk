@@ -5,6 +5,7 @@
     "manager":["add-table",
                "del-table",
                "edit-table",
+               "read-maps",
                "service-record",
                "portal-record",
                "toll-record",
@@ -14,7 +15,8 @@
                "service-records",
                "portal-records",
                "toll-records"],
-    "user":["road-record",
+    "user":["read-map",
+            "road-record",
             "bridge-record",
             "tunnel-record"]
 }

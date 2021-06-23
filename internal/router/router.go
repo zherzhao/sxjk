@@ -116,6 +116,12 @@ func NewRouter() (r *gin.Engine, err error) {
 		// 修改表
 	}
 
+	iserver := apiv1.Group("/iserver/services")
+
+	iserver.GET("/:mapname/rest/maps/:year",
+		middleware.JWTAuthMiddleware(), middleware.MapRBACMiddleware(),
+		v1.MapHandler)
+
 	// apiv2路由组
 	apiv2 := r.Group("/api/v2")
 	ossGroup := apiv2.Group("/OSS")
