@@ -3,6 +3,7 @@ package v1
 import (
 	"errors"
 	"fmt"
+	"net/http"
 	"webconsole/global"
 	"webconsole/internal/dao/database"
 	"webconsole/internal/model"
@@ -105,6 +106,18 @@ func LoginHandler(c *gin.Context) {
 		return
 	}
 
+	http.SetCookie(c.Writer, &http.Cookie{
+		Name:     "user_token", //你的cookie的名字
+		Value:    aToken,       //cookie值
+		Path:     "/",
+		Domain:   "localhost",
+		MaxAge:   604800,
+		Secure:   false,
+		HttpOnly: true,
+		// SameSite: http.SameSiteNoneMode, //下面是详细解释
+	})
+
+	// c.SetCookie("user_token", string(u.Id), 6000, "/", "localhost", false, true)
 	data := map[string]string{"token": aToken, "userrole": userRole, "userid": fmt.Sprintf("%d", userID), "username": p.UserName}
 
 	// 3. 返回响应

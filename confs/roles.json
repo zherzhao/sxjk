@@ -1,11 +1,12 @@
 {
     "root":["check-user",
             "del-user",
-            "edit-user"],
+            "edit-user",
+            "manage-iserver"],
     "manager":["add-table",
                "del-table",
                "edit-table",
-               "read-maps",
+               "query-datas",
                "service-record",
                "portal-record",
                "toll-record",
@@ -15,7 +16,7 @@
                "service-records",
                "portal-records",
                "toll-records"],
-    "user":["read-map",
+    "user":["query-datas",
             "road-record",
             "bridge-record",
             "tunnel-record"]

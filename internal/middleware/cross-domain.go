@@ -8,8 +8,9 @@ import (
 
 func Cors() gin.HandlerFunc {
 	return func(context *gin.Context) {
+		origin := context.Request.Header.Get("Origin")
 		method := context.Request.Method
-		context.Header("Access-Control-Allow-Origin", "*")
+		context.Header("Access-Control-Allow-Origin", origin)
 		context.Header("Access-Control-Allow-Headers", "Content-Type,AccessToken,X-CSRF-Token, Authorization, Token")
 		context.Header("Access-Control-Allow-Methods", "POST, UPDATE, DELETE ,GET, OPTIONS")
 		context.Header("Access-Control-Expose-Headers", "Content-Length, Access-Control-Allow-Origin, Access-Control-Allow-Headers, Content-Type")

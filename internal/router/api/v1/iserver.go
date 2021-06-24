@@ -13,13 +13,11 @@ var simpleHostProxy = httputil.ReverseProxy{
 	Director: func(req *http.Request) {
 		req.URL.Scheme = "http"
 		req.URL.Host = Host
-		req.URL.Path = "/iserver/services/map-2020/rest/maps/2020"
 		req.Host = Host
 	},
 }
 
-func MapHandler(ctx *gin.Context) {
-
+func DataHandler(ctx *gin.Context) {
 	ctx.Request.URL.Path = ctx.Request.URL.Path[7:]
 	simpleHostProxy.ServeHTTP(ctx.Writer, ctx.Request)
 }

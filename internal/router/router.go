@@ -1,6 +1,7 @@
 package router
 
 import (
+	"fmt"
 	"log"
 	_ "webconsole/docs"
 	"webconsole/global"
@@ -9,6 +10,7 @@ import (
 	"webconsole/pkg/cache"
 	"webconsole/pkg/cache/tcp"
 	"webconsole/pkg/logger"
+	"webconsole/pkg/respcode"
 
 	v1 "webconsole/internal/router/api/v1"
 
@@ -99,11 +101,16 @@ func NewRouter() (r *gin.Engine, err error) {
 			infoGroup.GET("/:infotype/:year/:count/query", middleware.PathParse,
 				middleware.QueryParse, middleware.RBACMiddleware(),
 				info.QueryInfo)
-			// 添加记录
-			infoGroup.POST("/:infotype/:year/:count/:id", middleware.PathParse, info.UpdateInfo)
+			// 修改记录
+			infoGroup.POST("/:infotype/:year/:count/:id", middleware.PathParse,
+				middleware.QueryParse, middleware.RBACMiddleware(),
+				info.UpdateInfo)
 
 			// 删除记录
-			// 修改记录
+			infoGroup.DELETE("/:infotype/:year/:count/:id", middleware.PathParse, info.UpdateInfo)
+
+			// 添加记录
+			//infoGroup.POST("/:infotype/:year/:count/:id", middleware.PathParse, info.UpdateInfo)
 		}
 
 		// 数据添加路由
@@ -116,11 +123,23 @@ func NewRouter() (r *gin.Engine, err error) {
 		// 修改表
 	}
 
-	iserver := apiv1.Group("/iserver/services")
+	iserver := apiv1.Group("/iserver")
 
-	iserver.GET("/:mapname/rest/maps/:year",
-		middleware.JWTAuthMiddleware(), middleware.MapRBACMiddleware(),
-		v1.MapHandler)
+	iserver.Any("/services/:dataname/rest/data/*result",
+		func() gin.HandlerFunc {
+			return func(context *gin.Context) {
+				cookie, err := context.Cookie("user_token")
+				if err != nil {
+					respcode.ResponseErrorWithMsg(context, respcode.CodeServerBusy, err.Error())
+					context.Abort()
+				} else {
+					fmt.Println(cookie)
+					context.Next()
+				}
+			}
+		}(),
+		middleware.QueryRBACMiddleware(),
+		v1.DataHandler)
 
 	// apiv2路由组
 	apiv2 := r.Group("/api/v2")

@@ -30,12 +30,25 @@ func RBACMiddleware() gin.HandlerFunc {
 	}
 }
 
-func MapRBACMiddleware() gin.HandlerFunc {
+func QueryRBACMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		c.Set("mapname", c.Param("mapname"))
-		c.Set("year", c.Param("year"))
 		role := c.GetString("userRole")
-		var permission string = "read-maps"
+		var permission string = "query-datas"
+
+		if global.RBAC.IsGranted(role, global.Permissions[permission], nil) {
+			c.Next()
+		} else {
+			respcode.ResponseError(c, respcode.CodeUserPermissionDenied)
+			c.Abort()
+		}
+
+	}
+}
+
+func ManageRBACMiddleware() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		role := c.GetString("userRole")
+		var permission string = "manage-iserver"
 
 		if global.RBAC.IsGranted(role, global.Permissions[permission], nil) {
 			c.Next()
