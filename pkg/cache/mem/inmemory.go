@@ -3,7 +3,6 @@ package mem
 import (
 	"sync"
 	"time"
-	"webconsole/global"
 	"webconsole/pkg/cache/ICache"
 )
 
@@ -50,7 +49,7 @@ func (c *inMemoryCache) Set(k string, v []byte) error {
 }
 
 func (c *inMemoryCache) Get(k string) ([]byte, error) {
-	if global.CacheSetting.TTL != 0 {
+	if c.ttl != 0 {
 		c.mutex.Lock()
 		val := c.c[k].c
 		c.c[k] = value{val, time.Now()}
@@ -73,8 +72,10 @@ func (c *inMemoryCache) Del(k string) error {
 		c.Remove(k, v.c)
 	}
 	return nil
+
 }
 
 func (c *inMemoryCache) GetStat() ICache.Stat {
 	return c.Stat
+
 }

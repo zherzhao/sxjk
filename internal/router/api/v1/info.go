@@ -1,10 +1,7 @@
 package v1
 
 import (
-	"bytes"
 	"errors"
-	"io/ioutil"
-	"net/http"
 	"webconsole/global"
 	"webconsole/internal/dao/database"
 	"webconsole/internal/dao/webcache"
@@ -71,14 +68,10 @@ func (this *Info) GetInfo(c *gin.Context) {
 
 	key := "/" + c.Param("infotype") + "/" + c.Param("year") + "/" + c.Param("count")
 
-	// 如果是缓存在磁盘中
-	if global.CacheSetting.CacheType == "disk" {
-		go webcache.UpdataCache(key, info)
-	} else {
-		c.Set("type", "mem")
-		c.Request.URL.Path = "/api/v1/cache/update" + key //将请求的URL修改
-		c.Request.Method = http.MethodPut
-		c.Request.Body = ioutil.NopCloser(bytes.NewReader([]byte(info)))
+	if global.CacheSetting.CacheType == "mem" ||
+		global.CacheSetting.CacheType == "disk" {
+		webcache.UpdataCache(c, key, info)
+		// c.Request.Body = ioutil.NopCloser(bytes.NewReader([]byte(info)))
 	}
 }
 

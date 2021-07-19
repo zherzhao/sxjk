@@ -1,6 +1,7 @@
 package v1
 
 import (
+	"log"
 	"net/http"
 	"net/http/httputil"
 
@@ -19,5 +20,7 @@ var simpleHostProxy = httputil.ReverseProxy{
 
 func DataHandler(ctx *gin.Context) {
 	ctx.Request.URL.Path = ctx.Request.URL.Path[7:]
+	test := ctx.Request.Header.Get("Authorization")
+	log.Println(test)
 	simpleHostProxy.ServeHTTP(ctx.Writer, ctx.Request)
 }

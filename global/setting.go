@@ -11,8 +11,6 @@ var (
 	DatabaseSetting *setting.DatabaseSettingS
 	RBACSetting     *setting.RBACSettingS
 	CacheSetting    *setting.CacheSettingS
-	OssSetting      *setting.OssSettingS
-	ZinxSetting     *setting.ZinxSettingS
 )
 
 func Init() (err error) {

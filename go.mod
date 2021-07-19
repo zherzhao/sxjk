@@ -11,7 +11,7 @@ require (
 	github.com/go-playground/universal-translator v0.17.0
 	github.com/go-playground/validator/v10 v10.6.1
 	github.com/go-sql-driver/mysql v1.6.0
-	github.com/impact-eintr/WebKits v0.0.0-20210620125824-9ce5332938fe
+	github.com/impact-eintr/WebKits v0.0.0-20210718100215-f2162a372f11
 	github.com/impact-eintr/eorm v0.0.0-20210621131339-db8925b23140
 	github.com/natefinch/lumberjack v2.0.0+incompatible
 	github.com/spf13/viper v1.8.0

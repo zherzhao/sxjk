@@ -40,7 +40,7 @@ func (s *Server) process(conn net.Conn) {
 		op, err := r.ReadByte()
 		if err != nil {
 			if err != io.EOF {
-				log.Println("异常关闭:", err)
+				log.Println("test 异常关闭:", err)
 			}
 			return
 		}

@@ -215,6 +215,8 @@ github.com/ianlancetaylor/demangle v0.0.0-20181102032728-5e5cf60278f6/go.mod h1:
 github.com/ianlancetaylor/demangle v0.0.0-20200824232613-28f6c0f3b639/go.mod h1:aSSvb/t6k1mPoxDqO4vJh6VOCGPwU4O0C2/Eqndh1Sc=
 github.com/impact-eintr/WebKits v0.0.0-20210620125824-9ce5332938fe h1:l/m1b+yr5mr/8iGqzKJou+eP6Na9g8lzQzVax3JTDk0=
 github.com/impact-eintr/WebKits v0.0.0-20210620125824-9ce5332938fe/go.mod h1:HbdDOHcbZosTXhxf+stsftzVdoTooBdb/4lUPnuRQz0=
+github.com/impact-eintr/WebKits v0.0.0-20210718100215-f2162a372f11 h1:sFNJ3GeM4Xz+KRLxIwRftnHL92xQ0c2xaYGXym194lI=
+github.com/impact-eintr/WebKits v0.0.0-20210718100215-f2162a372f11/go.mod h1:N+IGVUHSN/SSabd+XIopizF04FwUkSXPqhRA6W6nD0w=
 github.com/impact-eintr/eorm v0.0.0-20210621131339-db8925b23140 h1:n4zIu3ZpIUJpkoW1uSbWK2IfknLgXRqJ+hNAZ2dSTy4=
 github.com/impact-eintr/eorm v0.0.0-20210621131339-db8925b23140/go.mod h1:fU4ZCri+Ly/chDTfbnN4sHWHW+hOhqXk6Gv80bzReYA=
 github.com/json-iterator/go v1.1.5/go.mod h1:+SdeFBvtyEkXs7REEP0seUULqWtbJapLOCVDaaPEHmU=

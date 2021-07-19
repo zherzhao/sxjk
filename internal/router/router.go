@@ -1,16 +1,11 @@
 package router
 
 import (
-	"fmt"
 	"log"
 	_ "webconsole/docs"
 	"webconsole/global"
 	"webconsole/internal/middleware"
-	"webconsole/internal/router/api/v2/objects"
-	"webconsole/pkg/cache"
-	"webconsole/pkg/cache/tcp"
 	"webconsole/pkg/logger"
-	"webconsole/pkg/respcode"
 
 	v1 "webconsole/internal/router/api/v1"
 
@@ -51,30 +46,28 @@ func NewRouter() (r *gin.Engine, err error) {
 	}
 
 	// 缓存路由
-	cacheGroup := apiv1.Group("/cache")
-	{
-		// 配置缓存服务
-		c := cache.New(global.CacheSetting.CacheType, global.CacheSetting.TTL)
-		// 开启TCP缓存服务 监听TCP请求
-		go tcp.New(c).Listen()
+	//cacheGroup := apiv1.Group("/cache")
+	//{
+	//	// 配置缓存服务
+	//	c := cache.New(global.CacheSetting.CacheType, global.CacheSetting.TTL)
+	//	// 开启TCP缓存服务 监听TCP请求
+	//	go tcp.New(c).Listen()
 
-		s := v1.NewServer(c)
+	//	cli := v1.NewClient(c)
 
-		// 操作缓存
-		cacheGroup.Use(middleware.JWTAuthMiddleware())
+	//	// 权限验证
+	//	cacheGroup.Use(middleware.JWTAuthMiddleware())
 
-		cacheGroup.GET("/hit/*key", s.CacheCheck, func(c *gin.Context) {
-			miss := c.GetBool("miss") // 检查是否命中缓存
-			if miss {
-				c.Request.URL.Path = "/api/v1/data/info" + c.Param("key") // 将请求的URL修改
-				r.HandleContext(c)                                        // 继续之后的操作
-			}
-		})
+	//	// 操作缓存
+	//	cacheGroup.GET("/hit/*key", c.CacheCheck,
+	//		func(c *gin.Context) {
+	//			// 将请求的URL修改
+	//			c.Request.URL.Path = "/api/v1/data/info" + c.Param("key")
+	//			// 继续之后的操作
+	//			r.HandleContext(c)
+	//		})
 
-		// 获取缓存状态
-		cacheGroup.GET("/status/", s.StatusHandler)
-		cacheGroup.PUT("/update/*key", s.UpdateHandler)
-	}
+	//}
 
 	// 数据操作路由
 	dataGroup := apiv1.Group("/data")
@@ -90,17 +83,13 @@ func NewRouter() (r *gin.Engine, err error) {
 
 			// 获取记录
 			infoGroup.GET("/:infotype/:year/:count", middleware.PathParse,
-				middleware.RBACMiddleware(), info.GetInfo,
-				func(c *gin.Context) {
-					if c.GetString("type") == "mem" {
-						r.HandleContext(c)
-					} // 继续之后的操作
-				})
+				middleware.RBACMiddleware(), info.GetInfo)
 
 			// 查询记录
 			infoGroup.GET("/:infotype/:year/:count/query", middleware.PathParse,
 				middleware.QueryParse, middleware.RBACMiddleware(),
 				info.QueryInfo)
+
 			// 修改记录
 			infoGroup.POST("/:infotype/:year/:count/:id", middleware.PathParse,
 				middleware.QueryParse, middleware.RBACMiddleware(),
@@ -126,33 +115,24 @@ func NewRouter() (r *gin.Engine, err error) {
 	iserver := apiv1.Group("/iserver")
 
 	iserver.Any("/services/:dataname/rest/data/*result",
-		func() gin.HandlerFunc {
-			return func(context *gin.Context) {
-				cookie, err := context.Cookie("user_token")
-				if err != nil {
-					respcode.ResponseErrorWithMsg(context, respcode.CodeServerBusy, err.Error())
-					context.Abort()
-				} else {
-					fmt.Println(cookie)
-					context.Next()
-				}
-			}
-		}(),
-		middleware.QueryRBACMiddleware(),
+		//func() gin.HandlerFunc {
+		//	return func(context *gin.Context) {
+		//		cookie, err := context.Cookie("user_token")
+		//		if err != nil {
+		//			respcode.ResponseErrorWithMsg(context, respcode.CodeServerBusy, err.Error())
+		//			context.Abort()
+		//		} else {
+		//			fmt.Println(cookie)
+		//			context.Next()
+		//		}
+		//	}
+		//}(),
+		//middleware.QueryRBACMiddleware(),
 		v1.DataHandler)
 
-	// apiv2路由组
-	apiv2 := r.Group("/api/v2")
-	ossGroup := apiv2.Group("/OSS")
-	{
-		//OSS存储服务
-		ossGroup.PUT("/objects/:file", objects.Put)
-		ossGroup.GET("/objects/:file", objects.Get)
-
-	}
-
 	r.NoRoute(func(c *gin.Context) {
-		log.Println("404 test")
+		log.Println("404 page not found")
+
 	})
 
 	return r, nil
