@@ -3,7 +3,6 @@ package v1
 import (
 	"errors"
 	"fmt"
-	"net/http"
 	"webconsole/global"
 	"webconsole/internal/dao/database"
 	"webconsole/internal/model"
@@ -22,12 +21,12 @@ const (
 // SignUpHandler 注册接口
 // @Summary 处理注册请求
 // @Description 首页注册
-// @Tags 用户相关api
+// @Tags 注册api
 // @Accept application/json
 // @Produce application/json
 // @Param 注册信息 body model.ParamSignUp true "用户注册信息"
 // @Security ApiKeyAuth
-// @Success 200 {object} respcode.ResponseData{msg=string,data=string}
+// @Success 200 {object} respcode.ResponseData{code=int,msg=string,data=string}
 // @Router /api/v1/sigin [post]
 func SignUpHandler(c *gin.Context) {
 	// 1. 获取参数 参数校验
@@ -65,12 +64,12 @@ func SignUpHandler(c *gin.Context) {
 // LoginHandler 登录接口
 // @Summary 处理登录请求
 // @Description 首页登录
-// @Tags 用户相关api
+// @Tags 登陆api
 // @Accept application/json
 // @Produce application/json
 // @Param 登录信息 body model.ParamLogin true "用户登录信息"
 // @Security ApiKeyAuth
-// @Success 200 {object} respcode.ResponseData{msg=string,data=string}
+// @Success 200 {object} respcode.ResponseData{code=int,msg=string,data=string}
 // @Router /api/v1/login [post]
 func LoginHandler(c *gin.Context) {
 	// 获取请求参数以及参数校验
@@ -106,19 +105,11 @@ func LoginHandler(c *gin.Context) {
 		return
 	}
 
-	http.SetCookie(c.Writer, &http.Cookie{
-		Name:     "user_token", //你的cookie的名字
-		Value:    aToken,       //cookie值
-		Path:     "/",
-		Domain:   "localhost",
-		MaxAge:   604800,
-		Secure:   false,
-		HttpOnly: true,
-		// SameSite: http.SameSiteNoneMode, //下面是详细解释
-	})
-
-	// c.SetCookie("user_token", string(u.Id), 6000, "/", "localhost", false, true)
-	data := map[string]string{"token": aToken, "userrole": userRole, "userid": fmt.Sprintf("%d", userID), "username": p.UserName}
+	data := map[string]string{
+		"token":    aToken,
+		"userrole": userRole,
+		"userid":   fmt.Sprintf("%d", userID),
+		"username": p.UserName}
 
 	// 3. 返回响应
 	respcode.ResponseSuccess(c, data)

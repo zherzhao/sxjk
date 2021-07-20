@@ -7,7 +7,7 @@
         "version": "1.0.0"
     },
     "paths": {
-        "/api/v1/cache/hit/{infotype}/{level}": {
+        "/api/v1/cache/hit/{infotype}/{year}/{level}": {
             "get": {
                 "security": [
                     {
@@ -30,6 +30,81 @@
                         "type": "string",
                         "description": "Bearer 用户令牌",
                         "name": "Authorization",
+                        "in": "header"
+                    },
+                    {
+                        "type": "string",
+                        "description": "查询类型",
+                        "name": "infotype",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "查询年份 格式: 202X ",
+                        "name": "year",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "查询等级",
+                        "name": "level",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/respcode.ResponseData"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "code": {
+                                            "type": "integer"
+                                        },
+                                        "data": {
+                                            "type": "string"
+                                        },
+                                        "msg": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/data/info/{infotype}/{year}/{level}": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "获取数据库原始数据接口 访问后会更新缓存",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "数据操作api"
+                ],
+                "summary": "更新缓存接口",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Bearer 用户令牌",
+                        "name": "Authorization",
                         "in": "header",
                         "required": true
                     },
@@ -41,10 +116,228 @@
                         "required": true
                     },
                     {
+                        "type": "string",
+                        "description": "查询年份 格式: 202X ",
+                        "name": "year",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
                         "type": "integer",
                         "description": "查询等级 : 0(高速) 1(一级) 2(二级) 3(三级) 4(四级) 5(等外)",
                         "name": "level",
                         "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/respcode.ResponseData"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "code": {
+                                            "type": "integer"
+                                        },
+                                        "data": {
+                                            "type": "string"
+                                        },
+                                        "msg": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "没完成 别调用!!! 获取数据库原始数据接口 访问后会更新缓存",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "数据操作api"
+                ],
+                "summary": "修改指定数据",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Bearer 用户令牌",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "查询类型 : road(路)  bridge(桥) tunnel(隧道) service(服务区) portal(收费门架) toll(收费站)",
+                        "name": "infotype",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "查询年份 格式: 202X ",
+                        "name": "year",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "查询等级 : 0(高速) 1(一级) 2(二级) 3(三级) 4(四级) 5(等外)",
+                        "name": "level",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/respcode.ResponseData"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "string"
+                                        },
+                                        "msg": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/data/info/{infotype}/{year}/{level}/query": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "获取数据库原始数据接口 访问后会更新缓存",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "数据操作api"
+                ],
+                "summary": "获取查询数据",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Bearer 用户令牌",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "查询类型 : road(路)  bridge(桥) tunnel(隧道) service(服务区) portal(收费门架) toll(收费站)",
+                        "name": "infotype",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "查询年份 格式: 202X ",
+                        "name": "year",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "查询等级 : 0(高速) 1(一级) 2(二级) 3(三级) 4(四级) 5(等外)",
+                        "name": "level",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "道路信息（示例）",
+                        "name": "查询信息",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/model.L21"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/respcode.ResponseData"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "code": {
+                                            "type": "integer"
+                                        },
+                                        "data": {
+                                            "type": "string"
+                                        },
+                                        "msg": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/data/menus": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "用于前端渲染数据管理侧边栏",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "用户相关接口"
+                ],
+                "summary": "获取数据导航栏",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Bearer 用户令牌",
+                        "name": "Authorization",
+                        "in": "header",
                         "required": true
                     }
                 ],
@@ -125,72 +418,6 @@
                 }
             }
         },
-        "/api/v1/info/{infotype}/{level}": {
-            "get": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "description": "获取数据库原始数据接口 访问后会更新缓存",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "缓存相关接口"
-                ],
-                "summary": "更新缓存接口",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Bearer 用户令牌",
-                        "name": "Authorization",
-                        "in": "header",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "查询类型 : road(路)  bridge(桥) tunnel(隧道) service(服务区) portal(收费门架) toll(收费站)",
-                        "name": "infotype",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "type": "integer",
-                        "description": "查询等级 : 0(高速) 1(一级) 2(二级) 3(三级) 4(四级) 5(等外)",
-                        "name": "level",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "allOf": [
-                                {
-                                    "$ref": "#/definitions/respcode.ResponseData"
-                                },
-                                {
-                                    "type": "object",
-                                    "properties": {
-                                        "data": {
-                                            "type": "string"
-                                        },
-                                        "msg": {
-                                            "type": "string"
-                                        }
-                                    }
-                                }
-                            ]
-                        }
-                    }
-                }
-            }
-        },
         "/api/v1/login": {
             "post": {
                 "security": [
@@ -206,7 +433,7 @@
                     "application/json"
                 ],
                 "tags": [
-                    "用户相关api"
+                    "登陆api"
                 ],
                 "summary": "处理登录请求",
                 "parameters": [
@@ -231,6 +458,9 @@
                                 {
                                     "type": "object",
                                     "properties": {
+                                        "code": {
+                                            "type": "integer"
+                                        },
                                         "data": {
                                             "type": "string"
                                         },
@@ -260,7 +490,7 @@
                     "application/json"
                 ],
                 "tags": [
-                    "用户相关api"
+                    "注册api"
                 ],
                 "summary": "处理注册请求",
                 "parameters": [
@@ -285,6 +515,9 @@
                                 {
                                     "type": "object",
                                     "properties": {
+                                        "code": {
+                                            "type": "integer"
+                                        },
                                         "data": {
                                             "type": "string"
                                         },
@@ -298,9 +531,171 @@
                     }
                 }
             }
+        },
+        "/api/v2/iserver/services/data-vector/rest/data": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "用于转发IServer数据，并做权限检验",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "IServer相关api"
+                ],
+                "summary": "获取IServer数据接口",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Bearer 用户令牌",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/v2.IServerResp"
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
+        "model.L21": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string"
+                },
+                "修建年度": {
+                    "type": "string"
+                },
+                "养护里程": {
+                    "type": "string"
+                },
+                "可绿化里程": {
+                    "type": "string"
+                },
+                "国道调整前路线编号": {
+                    "type": "string"
+                },
+                "地貌代码": {
+                    "type": "string"
+                },
+                "地貌汉字": {
+                    "type": "string"
+                },
+                "备注": {
+                    "type": "string"
+                },
+                "已绿化里程": {
+                    "type": "string"
+                },
+                "所在行政区划代码": {
+                    "type": "string"
+                },
+                "技术等级": {
+                    "type": "string"
+                },
+                "技术等级代码": {
+                    "type": "string"
+                },
+                "改建年度": {
+                    "type": "string"
+                },
+                "断链类型": {
+                    "type": "string"
+                },
+                "是否一幅高速": {
+                    "type": "string"
+                },
+                "是否城管路段": {
+                    "type": "string"
+                },
+                "是否按干线公路管理接养": {
+                    "type": "string"
+                },
+                "是否断头路段": {
+                    "type": "string"
+                },
+                "最近一次修复养护年度": {
+                    "type": "string"
+                },
+                "止点名称": {
+                    "type": "string"
+                },
+                "止点桩号": {
+                    "type": "string"
+                },
+                "涵洞数量(个)": {
+                    "type": "string"
+                },
+                "省际出入口": {
+                    "type": "string"
+                },
+                "管养单位名称": {
+                    "type": "string"
+                },
+                "设计时速(公里/小时)": {
+                    "type": "string"
+                },
+                "起点名称": {
+                    "type": "string"
+                },
+                "起点桩号": {
+                    "type": "string"
+                },
+                "路基宽度(米)": {
+                    "type": "string"
+                },
+                "路段收费性质": {
+                    "type": "string"
+                },
+                "路线名称": {
+                    "type": "string"
+                },
+                "路线编号": {
+                    "type": "string"
+                },
+                "路面宽度(米)": {
+                    "type": "string"
+                },
+                "车道数量(个)": {
+                    "type": "string"
+                },
+                "里程(公里)": {
+                    "type": "string"
+                },
+                "重复路段线路编号": {
+                    "type": "string"
+                },
+                "重复路段终点桩号": {
+                    "type": "string"
+                },
+                "重复路段起点桩号": {
+                    "type": "string"
+                },
+                "面层厚度(厘米)": {
+                    "type": "string"
+                },
+                "面层类型": {
+                    "type": "string"
+                },
+                "面层类型代码": {
+                    "type": "string"
+                }
+            }
+        },
         "model.ParamLogin": {
             "type": "object",
             "required": [
@@ -348,6 +743,9 @@
                     "type": "object"
                 }
             }
+        },
+        "v2.IServerResp": {
+            "type": "object"
         }
     }
 }

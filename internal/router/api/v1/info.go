@@ -2,6 +2,7 @@ package v1
 
 import (
 	"errors"
+	"fmt"
 	"webconsole/global"
 	"webconsole/internal/dao/database"
 	"webconsole/internal/dao/webcache"
@@ -9,30 +10,22 @@ import (
 	"webconsole/pkg/respcode"
 
 	"github.com/gin-gonic/gin"
-	validator "github.com/go-playground/validator/v10"
-	"go.uber.org/zap"
 )
-
-type Info struct {
-}
-
-func NewInfo() Info {
-	return Info{}
-}
 
 // GetInfo 获取数据库原始数据接口 访问后会更新缓存
 // @Summary 更新缓存接口
 // @Description 获取数据库原始数据接口 访问后会更新缓存
-// @Tags 缓存相关接口
+// @Tags 数据操作api
 // @Accept application/json
 // @Produce application/json
 // @Param Authorization header string true "Bearer 用户令牌"
 // @Param infotype path string true "查询类型 : road(路)  bridge(桥) tunnel(隧道) service(服务区) portal(收费门架) toll(收费站)"
+// @Param year path string true "查询年份 格式: 202X "
 // @Param level path int true "查询等级 : 0(高速) 1(一级) 2(二级) 3(三级) 4(四级) 5(等外)"
 // @Security ApiKeyAuth
-// @Success 200 {object} respcode.ResponseData{msg=string,data=string}
-// @Router /api/v1/info/{infotype}/{year}/{level} [get]
-func (this *Info) GetInfo(c *gin.Context) {
+// @Success 200 {object} respcode.ResponseData{code=int,msg=string,data=string}
+// @Router /api/v1/data/info/{infotype}/{year}/{level} [get]
+func GetInfo(c *gin.Context) {
 	infotype := c.GetString("infotype")
 	year := c.GetString("year")
 	countnum := c.GetInt("count")
@@ -66,11 +59,13 @@ func (this *Info) GetInfo(c *gin.Context) {
 
 	respcode.ResponseSuccess(c, info)
 
-	key := "/" + c.Param("infotype") + "/" + c.Param("year") + "/" + c.Param("count")
+	key := fmt.Sprintf("%s/%s/%s/%s",
+		c.GetString("userUnit"), c.Param("infotype"),
+		c.Param("year"), c.Param("count"))
 
 	if global.CacheSetting.CacheType == "mem" ||
 		global.CacheSetting.CacheType == "disk" {
-		webcache.UpdataCache(c, key, info)
+		webcache.UpdataCache(key, info)
 		// c.Request.Body = ioutil.NopCloser(bytes.NewReader([]byte(info)))
 	}
 }
@@ -78,16 +73,18 @@ func (this *Info) GetInfo(c *gin.Context) {
 // QueryInfo 查询数据库数据接口
 // @Summary 获取查询数据
 // @Description 获取数据库原始数据接口 访问后会更新缓存
-// @Tags 缓存相关接口
+// @Tags 数据操作api
 // @Accept application/json
 // @Produce application/json
 // @Param Authorization header string true "Bearer 用户令牌"
 // @Param infotype path string true "查询类型 : road(路)  bridge(桥) tunnel(隧道) service(服务区) portal(收费门架) toll(收费站)"
+// @Param year path string true "查询年份 格式: 202X "
 // @Param level path int true "查询等级 : 0(高速) 1(一级) 2(二级) 3(三级) 4(四级) 5(等外)"
+// @Param 查询信息 body model.L21 true "道路信息（示例）"
 // @Security ApiKeyAuth
-// @Success 200 {object} respcode.ResponseData{msg=string,data=string}
-// @Router /api/v1/info/{infotype}/{level} [get]
-func (this *Info) QueryInfo(c *gin.Context) {
+// @Success 200 {object} respcode.ResponseData{code=int,msg=string,data=string}
+// @Router /api/v1/data/info/{infotype}/{year}/{level}/query [post]
+func QueryInfo(c *gin.Context) {
 	infotype := c.GetString("infotype")
 	countnum := c.GetInt("count")
 	year := c.GetString("year")
@@ -103,6 +100,7 @@ func (this *Info) QueryInfo(c *gin.Context) {
 	case "bridge":
 		info, err = database.Query("l24_", year, countnum, column, value, model.L24{})
 	case "tunnel":
+		info, err = database.Query("l25_", year, countnum, column, value, model.L25{})
 	case "service":
 		info, err = database.Query("F_", year, countnum, column, value, model.F{})
 	case "portal":
@@ -122,17 +120,18 @@ func (this *Info) QueryInfo(c *gin.Context) {
 
 // UpdateInfo 根据 id 数据库数据接口
 // @Summary 修改指定数据
-// @Description 获取数据库原始数据接口 访问后会更新缓存
-// @Tags 缓存相关接口
+// @Description  没完成 别调用!!! 获取数据库原始数据接口 访问后会更新缓存
+// @Tags 数据操作api
 // @Accept application/json
 // @Produce application/json
 // @Param Authorization header string true "Bearer 用户令牌"
 // @Param infotype path string true "查询类型 : road(路)  bridge(桥) tunnel(隧道) service(服务区) portal(收费门架) toll(收费站)"
+// @Param year path string true "查询年份 格式: 202X "
 // @Param level path int true "查询等级 : 0(高速) 1(一级) 2(二级) 3(三级) 4(四级) 5(等外)"
 // @Security ApiKeyAuth
 // @Success 200 {object} respcode.ResponseData{msg=string,data=string}
-// @Router /api/v1/info/{infotype}/{level} [get]
-func (this *Info) UpdateInfo(c *gin.Context) {
+// @Router /api/v1/data/info/{infotype}/{year}/{level} [post]
+func UpdateInfo(c *gin.Context) {
 	infotype := c.GetString("infotype")
 	countnum := c.GetInt("count")
 	year := c.GetString("year")
@@ -143,21 +142,7 @@ func (this *Info) UpdateInfo(c *gin.Context) {
 
 	switch infotype {
 	case "road":
-		p := new(model.L21)
-
-		if err := c.ShouldBindJSON(&p); err != nil {
-			zap.L().Error("Update Error: ", zap.Error(err))
-			errs, ok := err.(validator.ValidationErrors)
-			if !ok {
-				respcode.ResponseError(c, respcode.CodeInvalidParam)
-				return
-			}
-
-			respcode.ResponseErrorWithMsg(c, respcode.CodeServerBusy, errs.Translate(global.Trans))
-			return
-		}
-		err = database.Update("l21_", year, countnum, p)
-
+		_, err = database.Query("l21_", year, countnum, column, value, model.L21{})
 	case "bridge":
 		_, err = database.Query("l24_", year, countnum, column, value, model.L24{})
 	case "tunnel":

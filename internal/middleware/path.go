@@ -2,7 +2,6 @@ package middleware
 
 import (
 	"errors"
-	"fmt"
 	"strconv"
 	"webconsole/pkg/respcode"
 
@@ -11,31 +10,30 @@ import (
 
 // 获取路径的中间件
 func PathParse(c *gin.Context) {
+	var countflag, typeflag bool
 
 	year := c.Param("year")
 	count, err := strconv.Atoi(c.Param("count"))
-	if err != nil || count >= 6 {
-		respcode.ResponseErrorWithMsg(c, respcode.CodeServerBusy,
-			errors.New("参数非法").Error())
-		c.Abort()
+	if err == nil && count < 6 {
+		countflag = true
 	}
+
 	infotype := c.Param("infotype")
-	var flag bool
 	for _, v := range []string{"road", "bridge", "tunnel", "service", "protal", "toll"} {
 		if infotype == v {
-			fmt.Println(v)
-			flag = true
+			typeflag = true
 			break
 		}
 	}
 
-	if flag {
+	if countflag && typeflag {
 		c.Set("infotype", infotype)
 		c.Set("year", year)
 		c.Set("count", count)
 		c.Next()
 	} else {
-		respcode.ResponseErrorWithMsg(c, respcode.CodeServerBusy, "路径错误")
+		respcode.ResponseErrorWithMsg(c, respcode.CodeServerBusy,
+			errors.New("路径非法").Error())
 		c.Abort()
 	}
 

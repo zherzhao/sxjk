@@ -7,27 +7,26 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func RBACMiddleware() gin.HandlerFunc {
-	return func(c *gin.Context) {
-		role := c.GetString("userRole")
-		infotype := c.GetString("infotype")
-		var permission string
+func RBACMiddleware(c *gin.Context) {
 
-		switch {
-		case c.GetInt("count") > 0:
-			permission = infotype + "-records"
-		case c.GetInt("count") == 0:
-			permission = infotype + "-record"
-		}
+	role := c.GetString("userRole")
+	infotype := c.GetString("infotype")
+	var permission string
 
-		if global.RBAC.IsGranted(role, global.Permissions[permission], nil) {
-			c.Next()
-		} else {
-			respcode.ResponseError(c, respcode.CodeUserPermissionDenied)
-			c.Abort()
-		}
-
+	switch {
+	case c.GetInt("count") > 0:
+		permission = infotype + "-records"
+	case c.GetInt("count") == 0:
+		permission = infotype + "-record"
 	}
+
+	if global.RBAC.IsGranted(role, global.Permissions[permission], nil) {
+		c.Next()
+	} else {
+		respcode.ResponseError(c, respcode.CodeUserPermissionDenied)
+		c.Abort()
+	}
+
 }
 
 func QueryRBACMiddleware() gin.HandlerFunc {

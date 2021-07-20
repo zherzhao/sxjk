@@ -6,10 +6,10 @@ import (
 	"github.com/impact-eintr/ecache/client"
 )
 
-func CacheCheck(key string) []byte {
+func CacheDelete(key string) {
 
 	cmd := &client.Cmd{
-		Name: "get",
+		Name: "del",
 		Key:  key,
 	}
 	cli, err := client.New("tcp", "127.0.0.1:6430")
@@ -17,7 +17,5 @@ func CacheCheck(key string) []byte {
 		log.Fatalln(err)
 	}
 	cli.Run(cmd)
-
-	return cmd.Value
 
 }

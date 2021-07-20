@@ -1,10 +1,11 @@
 package v1
 
 import (
-	"net/http"
 	"webconsole/internal/dao/webcache"
+	"webconsole/pkg/respcode"
 
 	"github.com/gin-gonic/gin"
+	"github.com/impact-eintr/WebKits/encoding"
 )
 
 // CacheCheck 检查缓存命中接口
@@ -14,46 +15,33 @@ import (
 // @Accept application/json
 // @Produce application/json
 // @Param Authorization header string false "Bearer 用户令牌"
-// @Param infotype query string true "查询类型"
-// @Param level query string true "查询等级"
+// @Param infotype path string true "查询类型"
+// @Param year path string true "查询年份 格式: 202X "
+// @Param level path string true "查询等级"
 // @Security ApiKeyAuth
-// @Success 200 {string} string "成功"
+// @Success 200 {object} respcode.ResponseData{code=int,msg=string,data=string}
 // @Router /api/v1/cache/hit/{infotype}/{year}/{level} [get]
 func CacheCheck(c *gin.Context) {
 	key := c.GetString("userUnit") + c.Param("key")
 	if key == "" {
-		c.JSON(http.StatusBadRequest, nil)
+		respcode.ResponseError(c, respcode.CodeInvalidParam)
 		return
 	}
 
-	webcache.CacheCheck(key)
+	b := webcache.CacheCheck(key)
+	if len(b) > 0 {
+		respcode.ResponseSuccess(c, encoding.Bytes2str(b))
+		c.Abort()
+	}
 
-	//respcode.ResponseSuccess(c, string(b))
 }
 
-//func (s *Server) DeleteHandler(c *gin.Context) {
-//	key := c.Param("key")
-//
-//	if key == "" {
-//		c.JSON(http.StatusBadRequest, nil)
-//		return
-//	}
-//
-//	err := s.Del(key)
-//	if err != nil {
-//		// 缓存更新失败后 需要加入消息队列重试
-//		log.Println(err)
-//	}
-//}
-//
-//func (s *Server) StatusHandler(c *gin.Context) {
-//	log.Println(s.GetStat())
-//	b, err := json.Marshal(s.GetStat())
-//	if err != nil {
-//		log.Println(err)
-//		c.JSON(http.StatusInternalServerError, nil)
-//		return
-//	}
-//
-//	respcode.ResponseSuccess(c, string(b))
-//}
+func CacheDelete(c *gin.Context) {
+	key := c.GetString("userUnit") + c.Param("key")
+	if key == "" {
+		respcode.ResponseError(c, respcode.CodeInvalidParam)
+		return
+	}
+	webcache.CacheDelete(key)
+
+}
