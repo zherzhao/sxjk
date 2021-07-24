@@ -3,7 +3,6 @@ package v1
 import (
 	"errors"
 	"fmt"
-	"webconsole/global"
 	"webconsole/internal/dao/database"
 	"webconsole/internal/dao/webcache"
 	"webconsole/internal/model"
@@ -63,10 +62,7 @@ func GetInfo(c *gin.Context) {
 		c.GetString("userUnit"), c.Param("infotype"),
 		c.Param("year"), c.Param("count"))
 
-	if global.CacheSetting.CacheType == "mem" ||
-		global.CacheSetting.CacheType == "disk" {
-		webcache.UpdataCache(key, info)
-	}
+	webcache.UpdataCache(key, info)
 }
 
 // QueryInfo 查询数据库数据接口

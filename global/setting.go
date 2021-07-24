@@ -10,7 +10,6 @@ var (
 	LoggerSetting   *setting.LoggerSettingS
 	DatabaseSetting *setting.DatabaseSettingS
 	RBACSetting     *setting.RBACSettingS
-	CacheSetting    *setting.CacheSettingS
 )
 
 func Init() (err error) {

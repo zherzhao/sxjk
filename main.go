@@ -57,21 +57,6 @@ func init() {
 
 	zap.L().Debug("ID init success...")
 
-	// 初始化缓存设置
-	err = global.Conf.ReadSection("cache", &global.CacheSetting)
-	if err != nil {
-		fmt.Println("init cache failed, err: ", err)
-		return
-	}
-
-	if ctyp := global.CacheSetting.CacheType; ctyp != "" {
-		zap.L().Debug("cache init success...", zap.String("cachetype", ctyp))
-	} else {
-		log.Fatalln("未指定缓存类型")
-	}
-
-	zap.L().Debug("cache init success...")
-
 	// 初始化sql设置
 	err = global.Conf.ReadSection("database", &global.DatabaseSetting)
 	if err != nil {

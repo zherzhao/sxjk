@@ -23,13 +23,6 @@ type LoggerSettingS struct {
 	MaxBackups int    `mapstructure:"max_bacups"`
 }
 
-type CacheSettingS struct {
-	CacheType string `mapstructure:"cachetype"`
-	Port      string `mapstructure:"port"`
-	TTL       int    `mapstructure:"ttl"`
-	CacheDir  string `mapstructure:"cachedir"`
-}
-
 type DatabaseSettingS struct {
 	Host         string `mapstructure:"host"`
 	User         string `mapstructure:"user"`
