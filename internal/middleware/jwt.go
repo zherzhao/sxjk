@@ -19,7 +19,6 @@ func JWTAuthMiddleware() gin.HandlerFunc {
 			respcode.ResponseError(c, respcode.CodeNullAuth)
 			c.Abort()
 			return
-
 		}
 		// 按空格分割
 		parts := strings.SplitN(authHeader, " ", 2)
@@ -27,7 +26,6 @@ func JWTAuthMiddleware() gin.HandlerFunc {
 			respcode.ResponseError(c, respcode.CodeInvalidToken)
 			c.Abort()
 			return
-
 		}
 		// parts[1]是获取到的tokenString，我们使用之前定义好的解析JWT的函数来解析它
 		mc, err := jwt.ParseToken(parts[1])
@@ -35,14 +33,11 @@ func JWTAuthMiddleware() gin.HandlerFunc {
 			respcode.ResponseError(c, respcode.CodeInvalidToken)
 			c.Abort()
 			return
-
 		}
 		// 将当前请求的username信息保存到请求的上下文c上
 		c.Set("userID", mc.UserID)
 		c.Set("userRole", mc.UserRole)
 		c.Set("userUnit", mc.UserUnit)
 		c.Next() // 后续的处理函数可以用过c.Get("username")来获取当前请求的用户信息
-
 	}
-
 }

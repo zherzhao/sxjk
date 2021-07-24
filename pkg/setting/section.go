@@ -41,8 +41,10 @@ type DatabaseSettingS struct {
 }
 
 type RBACSettingS struct {
-	RoleFile  string `mapstructure:"roleFile"`
-	InherFile string `mapstructure:"inherFile"`
+	DefaultRoleFile   string `mapstructure:"defaultroleFile"`
+	DefaultInherFile  string `mapstructure:"defaultinherFile"`
+	CustomerRoleFile  string `mapstructure:"customerroleFile"`
+	CustomerInherFile string `mapstructure:"customerinherFile"`
 }
 
 func (s *Setting) ReadSection(key string, v interface{}) error {

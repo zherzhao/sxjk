@@ -6,30 +6,28 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func CorsV1() gin.HandlerFunc {
+func Cors() gin.HandlerFunc {
 	return func(context *gin.Context) {
-		origin := context.Request.Header.Get("Origin")
-		method := context.Request.Method
-		context.Header("Access-Control-Allow-Origin", origin)
-		context.Header("Access-Control-Allow-Headers", "Content-Type,AccessToken,X-CSRF-Token, Authorization, Token")
-		context.Header("Access-Control-Allow-Methods", "POST, UPDATE, DELETE ,GET, OPTIONS")
-		context.Header("Access-Control-Expose-Headers", "Content-Length, Access-Control-Allow-Origin, Access-Control-Allow-Headers, Content-Type")
-		context.Header("Access-Control-Allow-Credentials", "true")
-		if method == "OPTIONS" {
-			context.AbortWithStatus(http.StatusNoContent)
-		}
-		context.Next()
-	}
-}
+		v := context.Request.URL.Path[5:7]
+		if v == "v1" {
+			origin := context.Request.Header.Get("Origin")
+			context.Header("Access-Control-Allow-Origin", origin)
+			context.Header("Access-Control-Allow-Headers", "Content-Type,AccessToken,X-CSRF-Token, Authorization, Token")
+			context.Header("Access-Control-Allow-Methods", "POST, UPDATE, DELETE ,GET, OPTIONS")
+			context.Header("Access-Control-Expose-Headers", "Content-Length, Access-Control-Allow-Origin, Access-Control-Allow-Headers, Content-Type")
+			context.Header("Access-Control-Allow-Credentials", "true")
+		} else if v == "v2" {
+			context.Header("Access-Control-Allow-Headers", "Content-Type,AccessToken,X-CSRF-Token, Authorization, Token")
+			context.Header("Access-Control-Allow-Methods", "POST, UPDATE, DELETE ,GET, OPTIONS")
+			context.Header("Access-Control-Allow-Credentials", "true")
 
-func CorsV2() gin.HandlerFunc {
-	return func(context *gin.Context) {
+		}
+
 		method := context.Request.Method
-		context.Header("Access-Control-Allow-Headers", "Content-Type,AccessToken,X-CSRF-Token, Authorization, Token")
-		context.Header("Access-Control-Allow-Methods", "POST, UPDATE, DELETE ,GET, OPTIONS")
-		context.Header("Access-Control-Allow-Credentials", "true")
 		if method == "OPTIONS" {
-			context.Header("Access-Control-Allow-Origin", "*")
+			if v == "v2" {
+				context.Header("Access-Control-Allow-Origin", "*")
+			}
 			context.AbortWithStatus(http.StatusNoContent)
 		}
 		context.Next()

@@ -19,7 +19,7 @@ func PathParse(c *gin.Context) {
 	}
 
 	infotype := c.Param("infotype")
-	for _, v := range []string{"road", "bridge", "tunnel", "service", "protal", "toll"} {
+	for _, v := range []string{"road", "bridge", "tunnel", "service", "portal", "toll"} {
 		if infotype == v {
 			typeflag = true
 			break
@@ -36,7 +36,6 @@ func PathParse(c *gin.Context) {
 			errors.New("路径非法").Error())
 		c.Abort()
 	}
-
 }
 
 // 获取查询参数的中间件
@@ -48,12 +47,9 @@ func QueryParse(c *gin.Context) {
 		respcode.ResponseErrorWithMsg(c, respcode.CodeServerBusy,
 			errors.New("缺失查询参数").Error())
 		c.Abort()
-
 	} else {
 		c.Set("column", column)
 		c.Set("value", value)
 		c.Next()
-
 	}
-
 }

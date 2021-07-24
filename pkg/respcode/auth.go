@@ -14,6 +14,7 @@ const (
 
 	CodeNullAuth
 	CodeInvalidToken
+	CodeInvalidInher
 
 	CodeServerBusy
 
@@ -30,6 +31,7 @@ var codeMsgMap = map[RespCode]string{
 
 	CodeNullAuth:     "请头中auth为空",
 	CodeInvalidToken: "无效的Token",
+	CodeInvalidInher: "发现环继承",
 
 	CodeServerBusy: "服务器繁忙，通知后端查看日志",
 

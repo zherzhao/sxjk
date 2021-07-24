@@ -3,6 +3,7 @@ package database
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"reflect"
 	"webconsole/global"
 	"webconsole/internal/model"
@@ -14,43 +15,54 @@ import (
 )
 
 func Info(unit, role, prefix, year string, count int, t interface{}) (string, error) {
+	var res interface{}
+	var flag bool = true
+	var condition string
+
+	switch reflect.TypeOf(t).String() {
+	case "model.L21":
+		res = &[]model.L21{}
+		condition = "所在行政区划代码"
+	case "model.L24":
+		res = &[]model.L24{}
+		condition = "所在政区代码"
+	case "model.L25":
+		res = &[]model.L25{}
+		condition = "政区代码"
+	case "model.F":
+		res = &[]model.F{}
+		flag = false
+	case "model.SM":
+		res = &[]model.SM{}
+		flag = false
+	case "model.SZ":
+		res = &[]model.SZ{}
+		flag = false
+	default:
+		return "", errors.New("无法找到对应数据模型")
+	}
+
 	statement := eorm.NewStatement()
-	statement = statement.SetTableName(prefix + year)
 	if sLevel, ok := prefixMap[prefix]; ok {
 		level, err := model.Level(count)
 		if err != nil {
 			return "", err
 		}
-		statement = statement.AndEqual(sLevel, level).AndGreaterThan("ID", "2")
+		statement = statement.SetTableName(fmt.Sprintf(
+			"(select * from %s WHERE `%s`='%s' )as res", prefix+year, sLevel, level))
 	}
-
-	if role == "user" {
-		statement = statement.AndLike("管养单位名称", unit+"%")
-	}
-	statement = statement.Select("*")
 
 	c := <-global.DBClients
 	defer func() {
 		global.DBClients <- c
 	}()
 
-	var res interface{}
-	switch reflect.TypeOf(t).String() {
-	case "model.L21":
-		res = &[]model.L21{}
-	case "model.L24":
-		res = &[]model.L24{}
-	case "model.L25":
-		res = &[]model.L25{}
-	case "model.F":
-		res = &[]model.F{}
-	case "model.SM":
-		res = &[]model.SM{}
-	case "model.SZ":
-		res = &[]model.SZ{}
-	default:
-		return "", errors.New("无法找到对应数据模型")
+	if flag {
+		for _, v := range global.AreaMap[unit] {
+			statement = statement.OrEqual(condition, v)
+		}
 	}
+	statement = statement.AndGreaterThan("ID", "2").Select("*")
 
 	err := c.FindAll(nil, statement, res)
 	if err != nil {

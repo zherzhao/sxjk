@@ -7,3 +7,10 @@ type User struct {
 	Role     string `eorm:"role"`
 	Unit     string `eorm:"unit"`
 }
+
+type RespUser struct {
+	UserID   int64  `eorm:"user_id"`
+	Username string `eorm:"username"`
+	Role     string `eorm:"role"`
+	Unit     string `eorm:"unit"`
+}

@@ -66,7 +66,6 @@ func GetInfo(c *gin.Context) {
 	if global.CacheSetting.CacheType == "mem" ||
 		global.CacheSetting.CacheType == "disk" {
 		webcache.UpdataCache(key, info)
-		// c.Request.Body = ioutil.NopCloser(bytes.NewReader([]byte(info)))
 	}
 }
 
@@ -88,6 +87,7 @@ func QueryInfo(c *gin.Context) {
 	infotype := c.GetString("infotype")
 	countnum := c.GetInt("count")
 	year := c.GetString("year")
+	unit := c.GetString("userUnit")
 	column := c.GetString("column")
 	value := c.GetString("value")
 
@@ -96,17 +96,17 @@ func QueryInfo(c *gin.Context) {
 
 	switch infotype {
 	case "road":
-		info, err = database.Query("l21_", year, countnum, column, value, model.L21{})
+		info, err = database.Query("l21_", year, unit, countnum, column, value, model.L21{})
 	case "bridge":
-		info, err = database.Query("l24_", year, countnum, column, value, model.L24{})
+		info, err = database.Query("l24_", year, unit, countnum, column, value, model.L24{})
 	case "tunnel":
-		info, err = database.Query("l25_", year, countnum, column, value, model.L25{})
+		info, err = database.Query("l25_", year, unit, countnum, column, value, model.L25{})
 	case "service":
-		info, err = database.Query("F_", year, countnum, column, value, model.F{})
+		info, err = database.Query("F_", year, unit, countnum, column, value, model.F{})
 	case "portal":
-		info, err = database.Query("SM_", year, countnum, column, value, model.SM{})
+		info, err = database.Query("SM_", year, unit, countnum, column, value, model.SM{})
 	case "toll":
-		info, err = database.Query("SZ_", year, countnum, column, value, model.SZ{})
+		info, err = database.Query("SZ_", year, unit, countnum, column, value, model.SZ{})
 	default:
 		err = errors.New("查询类型不存在")
 	}
@@ -133,26 +133,15 @@ func QueryInfo(c *gin.Context) {
 // @Router /api/v1/data/info/{infotype}/{year}/{level} [post]
 func UpdateInfo(c *gin.Context) {
 	infotype := c.GetString("infotype")
-	countnum := c.GetInt("count")
-	year := c.GetString("year")
-	column := c.GetString("column")
-	value := c.GetString("value")
-
 	var err error
 
 	switch infotype {
 	case "road":
-		_, err = database.Query("l21_", year, countnum, column, value, model.L21{})
 	case "bridge":
-		_, err = database.Query("l24_", year, countnum, column, value, model.L24{})
 	case "tunnel":
-		_, err = database.Query("l25_", year, countnum, column, value, model.L25{})
 	case "service":
-		_, err = database.Query("F_", year, countnum, column, value, model.F{})
 	case "portal":
-		_, err = database.Query("SM_", year, countnum, column, value, model.SM{})
 	case "toll":
-		_, err = database.Query("SZ_", year, countnum, column, value, model.SZ{})
 	default:
 		err = errors.New("查询类型不存在")
 	}

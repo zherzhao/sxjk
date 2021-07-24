@@ -3,6 +3,7 @@ package database
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"reflect"
 	"webconsole/global"
 	"webconsole/internal/model"
@@ -20,37 +21,22 @@ var (
 	}
 )
 
-func Query(prefix, year string, count int, column, value string, t interface{}) (string, error) {
-	statement := eorm.NewStatement()
-	statement = statement.SetTableName(prefix + year)
-	if sLevel, ok := prefixMap[prefix]; ok {
-		level, err := model.Level(count)
-		if err != nil {
-			return "", err
-		}
-		statement = statement.AndEqual(sLevel, level)
-	}
-
-	switch column {
-	case "id":
-		statement = statement.AndEqual(column, value).Select("*")
-	default:
-		statement = statement.AndLike(column, "%"+value).Select("*")
-	}
-
-	c := <-global.DBClients
-	defer func() {
-		global.DBClients <- c
-	}()
-
+func Query(prefix, year, unit string, count int, column, value string, t interface{}) (string, error) {
+	var condition, sLevel, level string
+	var ok bool
+	var err error
 	var res interface{}
+
 	switch reflect.TypeOf(t).String() {
 	case "model.L21":
 		res = &[]model.L21{}
+		condition = "所在行政区划代码"
 	case "model.L24":
 		res = &[]model.L24{}
+		condition = "所在政区代码"
 	case "model.L25":
 		res = &[]model.L25{}
+		condition = "政区代码"
 	case "model.F":
 		res = &[]model.F{}
 	case "model.SM":
@@ -61,7 +47,45 @@ func Query(prefix, year string, count int, column, value string, t interface{}) 
 		return "", errors.New("无法找到对应数据模型")
 	}
 
-	err := c.FindAll(nil, statement, res)
+	statement := eorm.NewStatement()
+	if sLevel, ok = prefixMap[prefix]; ok {
+		level, err = model.Level(count)
+		if err != nil {
+			return "", err
+		}
+		if unit != "" {
+			switch column {
+			case "id":
+				statement = statement.SetTableName(prefix + year)
+				statement = statement.AndEqual(column, value).Select("*")
+			default:
+				statement = statement.SetTableName(fmt.Sprintf(
+					"(select * from %s WHERE `%s`='%s' AND `%s` LIKE '%s')as res",
+					prefix+year, sLevel, level, column, "%"+value+"%"))
+				for _, v := range global.AreaMap[unit] {
+					statement = statement.OrEqual(condition, v)
+				}
+				statement = statement.Select("*")
+			}
+		} else {
+			statement = statement.SetTableName(prefix + year)
+			statement = statement.AndEqual(sLevel, level)
+
+			switch column {
+			case "id":
+				statement = statement.AndEqual(column, value).Select("*")
+			default:
+				statement = statement.AndLike(column, "%"+value+"%").Select("*")
+			}
+		}
+	}
+
+	c := <-global.DBClients
+	defer func() {
+		global.DBClients <- c
+	}()
+
+	err = c.FindAll(nil, statement, res)
 	if err != nil {
 		zap.L().Error("sql exec failed: ", zap.String("", err.Error()))
 		return "", err

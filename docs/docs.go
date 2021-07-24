@@ -574,6 +574,15 @@ var doc = `{
                         "name": "Authorization",
                         "in": "header",
                         "required": true
+                    },
+                    {
+                        "description": "查询组建构建信息",
+                        "name": "查询信息",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/v2.IServerReq"
+                        }
                     }
                 ],
                 "responses": {
@@ -758,6 +767,28 @@ var doc = `{
                 },
                 "msg": {
                     "type": "object"
+                }
+            }
+        },
+        "v2.IServerReq": {
+            "type": "object",
+            "properties": {
+                "datasetNames": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "getFeatureMode": {
+                    "type": "string"
+                },
+                "queryParameter": {
+                    "type": "object",
+                    "properties": {
+                        "attributeFilter": {
+                            "type": "string"
+                        }
+                    }
                 }
             }
         },

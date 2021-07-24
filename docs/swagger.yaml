@@ -114,6 +114,20 @@ definitions:
       msg:
         type: object
     type: object
+  v2.IServerReq:
+    properties:
+      datasetNames:
+        items:
+          type: string
+        type: array
+      getFeatureMode:
+        type: string
+      queryParameter:
+        properties:
+          attributeFilter:
+            type: string
+        type: object
+    type: object
   v2.IServerResp:
     type: object
 info:
@@ -452,6 +466,12 @@ paths:
         name: Authorization
         required: true
         type: string
+      - description: 查询组建构建信息
+        in: body
+        name: 查询信息
+        required: true
+        schema:
+          $ref: '#/definitions/v2.IServerReq'
       produces:
       - application/json
       responses:
