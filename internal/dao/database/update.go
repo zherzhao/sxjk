@@ -3,6 +3,7 @@ package database
 import (
 	"context"
 	"errors"
+	"log"
 	"reflect"
 	"webconsole/global"
 	"webconsole/internal/model"
@@ -13,15 +14,39 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 )
 
-func Update(prefix, year string, count int, t interface{}) error {
+func UpdateRecordHandler(prefix, year, unit string, count int, t interface{}) error {
+	//var condition, sLevel, level string
+	var err error
 	statement := eorm.NewStatement()
 	statement = statement.SetTableName(prefix + year)
-	if sLevel, ok := prefixMap[prefix]; ok {
-		level, err := model.Level(count)
-		if err != nil {
-			return err
-		}
-		statement = statement.AndEqual(sLevel, level).AndGreaterThan("ID", "2")
+
+	switch reflect.TypeOf(t).String() {
+	case "*model.L21":
+		log.Println(t.(*model.L21))
+		statement = statement.AndEqual("id", t.(*model.L21).ID).
+			UpdateStruct(t.(*model.L21))
+	case "*model.L24":
+		log.Println(t.(*model.L24))
+		statement = statement.AndEqual("id", t.(*model.L24).ID).
+			UpdateStruct(t.(*model.L24))
+	case "*model.L25":
+		log.Println(t.(*model.L25))
+		statement = statement.AndEqual("id", t.(*model.L25).ID).
+			UpdateStruct(t.(*model.L25))
+	case "*model.F":
+		log.Println(t.(*model.F))
+		statement = statement.AndEqual("id", t.(*model.F).ID).
+			UpdateStruct(t.(*model.F))
+	case "*model.SM":
+		log.Println(t.(*model.SM))
+		statement = statement.AndEqual("id", t.(*model.SM).ID).
+			UpdateStruct(t.(*model.SM))
+	case "*model.SZ":
+		log.Println(t.(*model.SZ))
+		statement = statement.AndEqual("id", t.(*model.SZ).ID).
+			UpdateStruct(t.(*model.SZ))
+	default:
+		return errors.New("无法找到对应数据模型")
 	}
 
 	c := <-global.DBClients
@@ -29,31 +54,11 @@ func Update(prefix, year string, count int, t interface{}) error {
 		global.DBClients <- c
 	}()
 
-	var res interface{}
-	switch reflect.TypeOf(t).String() {
-	case "model.L21":
-		res = &model.L21{}
-	case "model.L24":
-		res = &model.L24{}
-	case "model.L25":
-		res = &model.L25{}
-	case "model.F":
-		res = &model.F{}
-	case "model.SM":
-		res = &model.SM{}
-	case "model.SZ":
-		res = &model.SZ{}
-	default:
-		return errors.New("无法找到对应数据模型")
-	}
-
-	statement = statement.UpdateStruct(res)
-	_, err := c.Update(context.Background(), statement)
+	_, err = c.Update(context.Background(), statement)
 	if err != nil {
 		zap.L().Error("sql exec failed: ", zap.String("", err.Error()))
 		return err
 	}
-
 	return nil
 
 }

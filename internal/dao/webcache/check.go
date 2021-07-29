@@ -14,7 +14,8 @@ func CacheCheck(key string) []byte {
 	}
 	cli, err := client.New("tcp", "127.0.0.1:6430")
 	if err != nil {
-		log.Fatalln(err)
+		log.Println(err)
+		return nil
 	}
 	cli.Run(cmd)
 

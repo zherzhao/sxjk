@@ -48,36 +48,34 @@ func Query(prefix, year, unit string, count int, column, value string, t interfa
 	}
 
 	statement := eorm.NewStatement()
-	if sLevel, ok = prefixMap[prefix]; ok {
+	if sLevel, ok = prefixMap[prefix]; !ok || unit == "" {
+		statement = statement.SetTableName(prefix + year)
+		switch column {
+		case "id":
+			statement = statement.AndEqual(column, value).Select("*")
+		default:
+			statement = statement.AndLike(column, "%"+value+"%").Select("*")
+		}
+	} else {
 		level, err = model.Level(count)
 		if err != nil {
 			return "", err
 		}
-		if unit != "" {
-			switch column {
-			case "id":
-				statement = statement.SetTableName(prefix + year)
-				statement = statement.AndEqual(column, value).Select("*")
-			default:
-				statement = statement.SetTableName(fmt.Sprintf(
-					"(select * from %s WHERE `%s`='%s' AND `%s` LIKE '%s')as res",
-					prefix+year, sLevel, level, column, "%"+value+"%"))
-				for _, v := range global.AreaMap[unit] {
-					statement = statement.OrEqual(condition, v)
-				}
-				statement = statement.Select("*")
-			}
-		} else {
-			statement = statement.SetTableName(prefix + year)
-			statement = statement.AndEqual(sLevel, level)
-
-			switch column {
-			case "id":
-				statement = statement.AndEqual(column, value).Select("*")
-			default:
-				statement = statement.AndLike(column, "%"+value+"%").Select("*")
-			}
+		switch column {
+		case "id":
+			statement = statement.SetTableName(fmt.Sprintf(
+				"(select * from %s WHERE `%s`='%s' AND `%s` = '%s')as res",
+				prefix+year, sLevel, level, column, value))
+		default:
+			statement = statement.SetTableName(fmt.Sprintf(
+				"(select * from %s WHERE `%s`='%s' AND `%s` LIKE '%s')as res",
+				prefix+year, sLevel, level, column, "%"+value+"%"))
 		}
+		for _, v := range global.AreaMap[unit] {
+			statement = statement.OrEqual(condition, v)
+		}
+		statement = statement.Select("*")
+
 	}
 
 	c := <-global.DBClients

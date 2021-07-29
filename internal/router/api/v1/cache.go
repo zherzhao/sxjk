@@ -32,6 +32,8 @@ func CacheCheck(c *gin.Context) {
 	if len(b) > 0 {
 		respcode.ResponseSuccess(c, encoding.Bytes2str(b))
 		c.Abort()
+	} else {
+		c.Next()
 	}
 
 }

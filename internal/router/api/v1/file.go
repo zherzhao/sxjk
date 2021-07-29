@@ -26,10 +26,14 @@ func UploadTable(c *gin.Context) {
 		return
 	}
 	fp := path.Join("/tmp", header.Filename)
-	os.WriteFile(fp, content, 0644)
-	c.Set("tableName", fp)
+	err = os.WriteFile(fp, content, 0644)
+	if err != nil {
+		respcode.ResponseErrorWithMsg(c, respcode.CodeServerBusy, errors.New("文件写入失败"))
+		c.Abort()
+		return
+	}
 
-	respcode.ResponseSuccess(c, nil)
+	c.Set("tableName", fp)
 	c.Next()
 
 }

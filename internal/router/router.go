@@ -1,17 +1,15 @@
 package router
 
 import (
-	"fmt"
-	"log"
 	_ "webconsole/docs"
 	"webconsole/global"
 	"webconsole/internal/middleware"
 	"webconsole/pkg/logger"
+	"webconsole/pkg/respcode"
 
 	v1 "webconsole/internal/router/api/v1"
 	v2 "webconsole/internal/router/api/v2"
 
-	"github.com/360EntSecGroup-Skylar/excelize/v2"
 	"github.com/gin-gonic/gin"
 	ginSwagger "github.com/swaggo/gin-swagger"
 	"github.com/swaggo/gin-swagger/swaggerFiles"
@@ -37,6 +35,7 @@ func NewRouter() (r *gin.Engine, err error) {
 
 	// 注册路由
 	apiv1.POST("/signup", middleware.Translations(), v1.SignUpHandler)
+	apiv1.GET("/signup", middleware.UserRBAC("application"), v1.SignUpCode)
 
 	// 登录路由
 	apiv1.POST("/login", v1.LoginHandler)
@@ -62,19 +61,16 @@ func NewRouter() (r *gin.Engine, err error) {
 	{
 		homeGroup.Use(middleware.JWTAuthMiddleware())
 		homeGroup.GET("/menus", v1.MenusHandler)
-		homeGroup.POST("/roles", v1.UpdateRoles,
-			func(c *gin.Context) {
-				for v := range cacheKey {
-					c.Request.URL.Path = "/api/v1/cache/hit" + v // 将请求的URL修改
-					c.Request.Method = "DELETE"
-					r.HandleContext(c) // 继续之后的操作
-					//c.Abort()
-				}
-			})
-		homeGroup.GET("/roles", v1.GetRoles)
-		homeGroup.HEAD("/roles", v1.DefaultRoles)
+		homeGroup.POST("/roles", middleware.RoleRBAC("edit-role"), v1.UpdateRoles,
+			middleware.ClearCache(r, cacheKey))
+		homeGroup.GET("/roles", middleware.RoleRBAC("check-role"), v1.GetRoles)
+		homeGroup.HEAD("/roles", middleware.RoleRBAC("default-role"), v1.DefaultRoles)
 
-		homeGroup.GET("/users", v1.GetUsers)
+		homeGroup.GET("/users", middleware.UserRBAC("check-user"), v1.GetUsers)
+		homeGroup.GET("/users/query",
+			middleware.UserRBAC("query-user"), middleware.QueryParse, v1.QueryUsers)
+		homeGroup.POST("/users", middleware.UserRBAC("edit-user"), v1.UpdateUsers)
+		homeGroup.DELETE("/users/:id", middleware.UserRBAC("del-user"), v1.DeleteUsers)
 	}
 
 	// 数据路由
@@ -89,41 +85,31 @@ func NewRouter() (r *gin.Engine, err error) {
 		{
 			// 获取记录
 			infoGroup.GET("/:infotype/:year/:count", middleware.PathParse,
-				middleware.RBACMiddleware, v1.GetInfo)
+				middleware.RecordRBAC, v1.GetInfo)
 			// 查询记录
 			infoGroup.GET("/:infotype/:year/:count/query", middleware.PathParse,
-				middleware.QueryParse, middleware.RBACMiddleware,
+				middleware.QueryParse, middleware.RecordRBAC,
 				v1.QueryInfo)
 			// 修改记录
-			infoGroup.POST("/:infotype/:year/:count/:id", middleware.PathParse,
-				middleware.QueryParse, middleware.RBACMiddleware,
-				v1.UpdateInfo)
+			infoGroup.POST("/:infotype/:year/:count",
+				middleware.PathParse, middleware.RecordRBAC,
+				v1.UpdateInfo, middleware.ClearCache(r, cacheKey))
 			// 删除记录
 			infoGroup.DELETE("/:infotype/:year/:count/:id",
-				middleware.PathParse, v1.UpdateInfo)
+				middleware.PathParse, v1.DeleteInfo,
+				middleware.ClearCache(r, cacheKey))
 		}
 
 		// 数据(表)操作路由
 		tableGroup := dataGroup.Group("/table")
 		{
 			// 添加表
-			tableGroup.POST("/:tabletype/:year", v1.UploadTable,
-				func(c *gin.Context) {
-					fp := c.GetString("tableName")
-					f, err := excelize.OpenFile(fp)
-					if err != nil {
-						fmt.Println(err)
-						return
-					}
-
-					rows, _ := f.GetRows("Sheet1")
-					for _, r := range rows {
-						fmt.Println(r)
-					}
-				})
+			tableGroup.POST("/:tabletype/:year", middleware.TableRBAC("add-table"),
+				v1.UploadTable, v1.ParseTable)
 			// 删除表
+			tableGroup.DELETE("/:tabletype/:year", middleware.TableRBAC("del-table"),
+				v1.DeleteTable)
 
-			// 修改表
 		}
 	}
 
@@ -133,12 +119,12 @@ func NewRouter() (r *gin.Engine, err error) {
 	iserver := apiv2.Group("/iserver")
 	{
 		iserver.Any("/services/:dataname/rest/data/*result",
-			middleware.IServerRBACMiddleware,
+			middleware.IServerRBAC,
 			v2.IServerHandler)
 	}
 
 	r.NoRoute(func(c *gin.Context) {
-		log.Println("404 page not found")
+		respcode.ResponseNotFound(c)
 	})
 
 	return r, nil

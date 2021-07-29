@@ -9,8 +9,9 @@ type User struct {
 }
 
 type RespUser struct {
-	UserID   int64  `eorm:"user_id"`
-	Username string `eorm:"username"`
-	Role     string `eorm:"role"`
-	Unit     string `eorm:"unit"`
+	UserID    int64  `json:"user_id"`
+	UserIDStr string `json:"user_id_str"`
+	Username  string `json:"username"`
+	Role      string `json:"role"`
+	Unit      string `json:"unit"`
 }

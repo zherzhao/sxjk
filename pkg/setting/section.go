@@ -9,6 +9,7 @@ type ServerSettingS struct {
 	Mode    string `mapstructure:"mode"`
 	Version string `mapstructure:"version"`
 	Locale  string `mapstructure:"locale"`
+	Host    string `mapstructure:"host"`
 	Port    int    `mapstructure:"port"`
 
 	StartTime string `mapstructure:"start_time"`

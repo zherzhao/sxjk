@@ -62,12 +62,12 @@ func GetInfo(c *gin.Context) {
 		c.GetString("userUnit"), c.Param("infotype"),
 		c.Param("year"), c.Param("count"))
 
-	webcache.UpdataCache(key, info)
+	webcache.CacheUpdate(key, info)
 }
 
 // QueryInfo 查询数据库数据接口
 // @Summary 获取查询数据
-// @Description 获取数据库原始数据接口 访问后会更新缓存
+// @Description 查询表数据（年报）数据接口
 // @Tags 数据操作api
 // @Accept application/json
 // @Produce application/json
@@ -116,7 +116,7 @@ func QueryInfo(c *gin.Context) {
 
 // UpdateInfo 根据 id 数据库数据接口
 // @Summary 修改指定数据
-// @Description  没完成 别调用!!! 获取数据库原始数据接口 访问后会更新缓存
+// @Description  更新数据库原始数据接口 访问后会删除缓存
 // @Tags 数据操作api
 // @Accept application/json
 // @Produce application/json
@@ -129,15 +129,94 @@ func QueryInfo(c *gin.Context) {
 // @Router /api/v1/data/info/{infotype}/{year}/{level} [post]
 func UpdateInfo(c *gin.Context) {
 	infotype := c.GetString("infotype")
+	year := c.GetString("year")
+	unit := c.GetString("userUnit")
+	level := c.GetInt("count")
 	var err error
 
 	switch infotype {
 	case "road":
+		t := new(model.L21)
+		c.ShouldBindJSON(t)
+		database.UpdateRecordHandler("l21_", year, unit, level, t)
 	case "bridge":
+		t := new(model.L24)
+		c.ShouldBindJSON(t)
+		database.UpdateRecordHandler("l24_", year, unit, level, t)
 	case "tunnel":
+		t := new(model.L25)
+		c.ShouldBindJSON(t)
+		database.UpdateRecordHandler("l25_", year, unit, level, t)
 	case "service":
+		t := new(model.F)
+		c.ShouldBindJSON(t)
+		database.UpdateRecordHandler("F_", year, unit, level, t)
 	case "portal":
+		t := new(model.SM)
+		c.ShouldBindJSON(t)
+		database.UpdateRecordHandler("SM_", year, unit, level, t)
 	case "toll":
+		t := new(model.SZ)
+		c.ShouldBindJSON(t)
+		database.UpdateRecordHandler("SZ_", year, unit, level, t)
+	default:
+		err = errors.New("查询类型不存在")
+	}
+
+	if err != nil {
+		respcode.ResponseErrorWithMsg(c, respcode.CodeServerBusy, err.Error())
+	}
+
+	respcode.ResponseSuccess(c, nil)
+
+}
+
+// DeleteInfo 根据 id 删除数据库数据接口
+// @Summary 删除指定数据
+// @Description  删除数据库原始数据接口 访问后会删除缓存
+// @Tags 数据操作api
+// @Accept application/json
+// @Produce application/json
+// @Param Authorization header string true "Bearer 用户令牌"
+// @Param infotype path string true "查询类型 : road(路)  bridge(桥) tunnel(隧道) service(服务区) portal(收费门架) toll(收费站)"
+// @Param year path string true "查询年份 格式: 202X "
+// @Param level path int true "查询等级 : 0(高速) 1(一级) 2(二级) 3(三级) 4(四级) 5(等外)"
+// @Security ApiKeyAuth
+// @Success 200 {object} respcode.ResponseData{msg=string,data=string}
+// @Router /api/v1/data/info/{infotype}/{year}/{level} [post]
+func DeleteInfo(c *gin.Context) {
+	var err error
+	infotype := c.GetString("infotype")
+	year := c.GetString("year")
+	unit := c.GetString("userUnit")
+	level := c.GetInt("count")
+	id := c.Param("id")
+
+	switch infotype {
+	case "road":
+		t := new(model.L21)
+		t.ID = id
+		err = database.DeleteRecordHandler("l21_", year, unit, level, t)
+	case "bridge":
+		t := new(model.L24)
+		t.ID = id
+		err = database.DeleteRecordHandler("l24_", year, unit, level, t)
+	case "tunnel":
+		t := new(model.L25)
+		t.ID = id
+		err = database.DeleteRecordHandler("l25_", year, unit, level, t)
+	case "service":
+		t := new(model.F)
+		t.ID = id
+		err = database.DeleteRecordHandler("F_", year, unit, level, t)
+	case "portal":
+		t := new(model.SM)
+		t.ID = id
+		err = database.DeleteRecordHandler("SM_", year, unit, level, t)
+	case "toll":
+		t := new(model.SZ)
+		t.ID = id
+		err = database.DeleteRecordHandler("SZ_", year, unit, level, t)
 	default:
 		err = errors.New("查询类型不存在")
 	}

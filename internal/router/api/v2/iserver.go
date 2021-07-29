@@ -4,11 +4,10 @@ import (
 	"net/http"
 	"net/http/httputil"
 	"strconv"
+	"webconsole/global"
 
 	"github.com/gin-gonic/gin"
 )
-
-const Host = "59.49.106.69:8090"
 
 // IServerHandler 获取IServer数据接口
 // @Summary 获取IServer数据接口
@@ -17,11 +16,11 @@ const Host = "59.49.106.69:8090"
 // @Accept application/json
 // @Produce application/json
 // @Param Authorization header string true "Bearer 用户令牌"
-// @Param 查询信息 body IServerReq true "查询组建构建信息"
+// @Param 查询信息 body model.IServerReq true "查询组建构建信息"
 // @Success 200 {object} model.IServerReq{}
 // @Security ApiKeyAuth
 // @Success 200 {object} model.IServerResp{}
-// @Router /api/v2/iserver/services/{服务}/rest/{服务} [post]
+// @Router /api/v2/iserver/services/{service}/rest/{service} [post]
 func IServerHandler(ctx *gin.Context) {
 	if len(ctx.Request.URL.Path) < 7 {
 		return
@@ -30,8 +29,8 @@ func IServerHandler(ctx *gin.Context) {
 	var simpleHostProxy = httputil.ReverseProxy{
 		Director: func(req *http.Request) {
 			req.URL.Scheme = "http"
-			req.URL.Host = Host
-			req.Host = Host
+			req.URL.Host = global.ServerSetting.Host
+			req.Host = global.ServerSetting.Host
 			Len, _ := strconv.Atoi(ctx.Request.Header.Get("Content-Length"))
 			req.ContentLength = int64(Len)
 		},

@@ -180,7 +180,7 @@ var doc = `{
                         "ApiKeyAuth": []
                     }
                 ],
-                "description": "没完成 别调用!!! 获取数据库原始数据接口 访问后会更新缓存",
+                "description": "删除数据库原始数据接口 访问后会删除缓存",
                 "consumes": [
                     "application/json"
                 ],
@@ -190,7 +190,7 @@ var doc = `{
                 "tags": [
                     "数据操作api"
                 ],
-                "summary": "修改指定数据",
+                "summary": "删除指定数据",
                 "parameters": [
                     {
                         "type": "string",
@@ -253,7 +253,7 @@ var doc = `{
                         "ApiKeyAuth": []
                     }
                 ],
-                "description": "获取数据库原始数据接口 访问后会更新缓存",
+                "description": "查询表数据（年报）数据接口",
                 "consumes": [
                     "application/json"
                 ],
@@ -346,7 +346,7 @@ var doc = `{
                     "application/json"
                 ],
                 "tags": [
-                    "用户相关接口"
+                    "用户相关api"
                 ],
                 "summary": "获取数据导航栏",
                 "parameters": [
@@ -398,7 +398,7 @@ var doc = `{
                     "application/json"
                 ],
                 "tags": [
-                    "用户相关接口"
+                    "用户相关api"
                 ],
                 "summary": "获取导航栏数据",
                 "parameters": [
@@ -421,6 +421,433 @@ var doc = `{
                                 {
                                     "type": "object",
                                     "properties": {
+                                        "data": {
+                                            "type": "string"
+                                        },
+                                        "msg": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/home/roles": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "请求后可以拿到权限数据",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "权限相关api"
+                ],
+                "summary": "获取权限数据接口",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Bearer 用户令牌",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/respcode.ResponseData"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "code": {
+                                            "type": "integer"
+                                        },
+                                        "data": {
+                                            "type": "object",
+                                            "additionalProperties": {
+                                                "type": "array",
+                                                "items": {
+                                                    "type": "string"
+                                                }
+                                            }
+                                        },
+                                        "msg": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "请求后可以跟新权限数据 构造一个新的权限json 作为 body",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "权限相关api"
+                ],
+                "summary": "更新权限数据接口",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Bearer 用户令牌",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/respcode.ResponseData"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "code": {
+                                            "type": "integer"
+                                        },
+                                        "data": {
+                                            "type": "object",
+                                            "additionalProperties": {
+                                                "type": "array",
+                                                "items": {
+                                                    "type": "string"
+                                                }
+                                            }
+                                        },
+                                        "msg": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            },
+            "head": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "请求后可以拿到用户数据",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "权限相关api"
+                ],
+                "summary": "恢复默认权限接口",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Bearer 用户令牌",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/respcode.ResponseData"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "code": {
+                                            "type": "integer"
+                                        },
+                                        "data": {
+                                            "type": "string"
+                                        },
+                                        "msg": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/home/users": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "请求后可以拿到用户数据",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "用户相关api"
+                ],
+                "summary": "获取用户数据接口",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Bearer 用户令牌",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/respcode.ResponseData"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "code": {
+                                            "type": "integer"
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/model.RespUser"
+                                            }
+                                        },
+                                        "msg": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "请求后可以将post请求body中提供的用户新数据替换原来的用户数据",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "用户相关api"
+                ],
+                "summary": "更新用户数据接口",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Bearer 用户令牌",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "description": "用户信息",
+                        "name": "用户信息",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/model.RespUser"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/respcode.ResponseData"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "code": {
+                                            "type": "integer"
+                                        },
+                                        "data": {
+                                            "type": "string"
+                                        },
+                                        "msg": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/home/users/query": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "请求后可以获取指定的用户数据",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "用户相关api"
+                ],
+                "summary": "查询用户数据接口",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Bearer 用户令牌",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "属性",
+                        "name": "column",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "值",
+                        "name": "value",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/respcode.ResponseData"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "code": {
+                                            "type": "integer"
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/model.RespUser"
+                                            }
+                                        },
+                                        "msg": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/home/users/{id}": {
+            "delete": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "请求后可以删除用户数据（直接从数据库删除）",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "用户相关api"
+                ],
+                "summary": "删除用户数据接口",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Bearer 用户令牌",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "用户id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/respcode.ResponseData"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "code": {
+                                            "type": "integer"
+                                        },
                                         "data": {
                                             "type": "string"
                                         },
@@ -492,7 +919,60 @@ var doc = `{
                 }
             }
         },
-        "/api/v1/sigin": {
+        "/api/v1/signup": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "申请一个注册码 重复请求上一个就会失效 重启后端服务也会失效",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "注册api"
+                ],
+                "summary": "申请一个注册码",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Bearer 用户令牌",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/respcode.ResponseData"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "code": {
+                                            "type": "integer"
+                                        },
+                                        "data": {
+                                            "type": "string"
+                                        },
+                                        "msg": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            },
             "post": {
                 "security": [
                     {
@@ -549,7 +1029,7 @@ var doc = `{
                 }
             }
         },
-        "/api/v2/iserver/services/data-vector/rest/data": {
+        "/api/v2/iserver/services/{service}/rest/{service}": {
             "post": {
                 "security": [
                     {
@@ -581,7 +1061,7 @@ var doc = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/v2.IServerReq"
+                            "$ref": "#/definitions/model.IServerReq"
                         }
                     }
                 ],
@@ -589,7 +1069,7 @@ var doc = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/v2.IServerResp"
+                            "$ref": "#/definitions/model.IServerResp"
                         }
                     }
                 }
@@ -597,6 +1077,31 @@ var doc = `{
         }
     },
     "definitions": {
+        "model.IServerReq": {
+            "type": "object",
+            "properties": {
+                "datasetNames": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "getFeatureMode": {
+                    "type": "string"
+                },
+                "queryParameter": {
+                    "type": "object",
+                    "properties": {
+                        "attributeFilter": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "model.IServerResp": {
+            "type": "object"
+        },
         "model.L21": {
             "type": "object",
             "properties": {
@@ -742,13 +1247,41 @@ var doc = `{
             "required": [
                 "password",
                 "repassword",
-                "username"
+                "unit",
+                "username",
+                "verifycode"
             ],
             "properties": {
                 "password": {
                     "type": "string"
                 },
                 "repassword": {
+                    "type": "string"
+                },
+                "unit": {
+                    "type": "string"
+                },
+                "username": {
+                    "type": "string"
+                },
+                "verifycode": {
+                    "type": "string"
+                }
+            }
+        },
+        "model.RespUser": {
+            "type": "object",
+            "properties": {
+                "role": {
+                    "type": "string"
+                },
+                "unit": {
+                    "type": "string"
+                },
+                "user_id": {
+                    "type": "integer"
+                },
+                "user_id_str": {
                     "type": "string"
                 },
                 "username": {
@@ -769,31 +1302,6 @@ var doc = `{
                     "type": "object"
                 }
             }
-        },
-        "v2.IServerReq": {
-            "type": "object",
-            "properties": {
-                "datasetNames": {
-                    "type": "array",
-                    "items": {
-                        "type": "string"
-                    }
-                },
-                "getFeatureMode": {
-                    "type": "string"
-                },
-                "queryParameter": {
-                    "type": "object",
-                    "properties": {
-                        "attributeFilter": {
-                            "type": "string"
-                        }
-                    }
-                }
-            }
-        },
-        "v2.IServerResp": {
-            "type": "object"
         }
     }
 }`

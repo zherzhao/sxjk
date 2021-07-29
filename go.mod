@@ -12,9 +12,9 @@ require (
 	github.com/go-playground/universal-translator v0.17.0
 	github.com/go-playground/validator/v10 v10.7.0
 	github.com/go-sql-driver/mysql v1.6.0
-	github.com/impact-eintr/WebKits v1.0.0
+	github.com/impact-eintr/WebKits v1.0.1
 	github.com/impact-eintr/ecache v0.0.2
-	github.com/impact-eintr/eorm v0.0.0-20210621131339-db8925b23140
+	github.com/impact-eintr/eorm v0.0.4
 	github.com/leodido/go-urn v1.2.1 // indirect
 	github.com/mattn/go-isatty v0.0.13 // indirect
 	github.com/natefinch/lumberjack v2.0.0+incompatible

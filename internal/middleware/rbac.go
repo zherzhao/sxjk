@@ -14,7 +14,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func RBACMiddleware(c *gin.Context) {
+func RecordRBAC(c *gin.Context) {
 	role := c.GetString("userRole")
 	infotype := c.GetString("infotype")
 
@@ -28,7 +28,7 @@ func RBACMiddleware(c *gin.Context) {
 	}
 }
 
-func QueryRBACMiddleware(c *gin.Context) {
+func QueryRBAC(c *gin.Context) {
 	role := c.GetString("userRole")
 	var permission string = "query-data"
 
@@ -40,7 +40,7 @@ func QueryRBACMiddleware(c *gin.Context) {
 	}
 }
 
-func IServerRBACMiddleware(c *gin.Context) {
+func IServerRBAC(c *gin.Context) {
 	role := c.GetString("userRole")
 	permission := []string{"query-data", "query-datas", "manage-iserver"}
 
@@ -67,12 +67,10 @@ func IServerRBACMiddleware(c *gin.Context) {
 				}
 				tmp[i] = v
 			}
-
 			err = json.Unmarshal(tmp, test)
 			if err != nil {
 				return
 			}
-
 			attr := test.QueryParameter.AttributeFilter
 			if strings.HasPrefix(attr, "路线名称") {
 				unit := c.GetString("userUnit")
@@ -81,7 +79,6 @@ func IServerRBACMiddleware(c *gin.Context) {
 			} else {
 				log.Println("小心sql注入！")
 			}
-
 			count = 0
 			tmp, _ = json.Marshal(test)
 			for i, v := range tmp {
@@ -95,17 +92,48 @@ func IServerRBACMiddleware(c *gin.Context) {
 				}
 				tmp[i] = v
 			}
-
-			log.Println(string(tmp))
-			log.Println(string(b))
-
 			c.Request.Header.Set("Content-Length", fmt.Sprintf("%d", len(tmp)))
 			c.Request.Body = ioutil.NopCloser(bytes.NewReader([]byte(tmp)))
 		}
-
 		c.Next()
 	} else {
 		respcode.ResponseError(c, respcode.CodeUserPermissionDenied)
 		c.Abort()
+	}
+}
+
+func RoleRBAC(p string) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		role := c.GetString("userRole")
+		if global.Auth.RBAC.IsGranted(role, global.Auth.Permissions[p], nil) {
+			c.Next()
+		} else {
+			respcode.ResponseError(c, respcode.CodeUserPermissionDenied)
+			c.Abort()
+		}
+	}
+}
+
+func UserRBAC(p string) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		role := c.GetString("userRole")
+		if global.Auth.RBAC.IsGranted(role, global.Auth.Permissions[p], nil) {
+			c.Next()
+		} else {
+			respcode.ResponseError(c, respcode.CodeUserPermissionDenied)
+			c.Abort()
+		}
+	}
+}
+
+func TableRBAC(p string) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		role := c.GetString("userRole")
+		if global.Auth.RBAC.IsGranted(role, global.Auth.Permissions[p], nil) {
+			c.Next()
+		} else {
+			respcode.ResponseError(c, respcode.CodeUserPermissionDenied)
+			c.Abort()
+		}
 	}
 }

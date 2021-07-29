@@ -1,6 +1,7 @@
 server:
   name: webconsole
-  version: v0.0.1
+  version: v1.0.0
+  host: 59.49.106.69
   port: 9426
   mode: dev
   start_time: 2021-04-16
@@ -15,16 +16,23 @@ log:
   max_backups: 7
 
 cache:
-  cacheType: disk
+  cacheType: mem
   port: 9425
-  ttl: 0
-  cachedir: /home/yixingwei/Share/rocksdb
+  ttl: 5
+  cachedir: /home/eintr/Share/rocksdb
 
 database:
-  host: 127.0.0.1
-  port: 3306
+  #host: 220.194.140.188:3306
+  host: 127.0.0.1:3306
   user: root
+    #password: ShanXiJiaoKeDataBase
   password: 123456
-  dbname: sql_demo
+  dbname: sxjk
   max_open_conns: 20
   max_idel_conns: 20
+
+rbac:
+  defaultroleFile: /home/eintr/Projects/sxjk/confs/roles.json
+  defaultinherFile: /home/eintr/Projects/sxjk/confs/inher.json
+  customerroleFile: /home/eintr/Projects/sxjk/confs/customerRoles.json
+  customerinherFile: /home/eintr/Projects/sxjk/confs/customerInher.json

@@ -50,7 +50,7 @@ type Node struct {
 	Children []Node `json:"children"`
 }
 
-var menu = []Node{
+var rootMenu = []Node{
 	Node{
 		Id:       User,
 		AuthName: idMap[User],
@@ -109,7 +109,7 @@ var menu = []Node{
 // MenusHandler 获取导航栏数据接口
 // @Summary 获取导航栏数据
 // @Description 用于前端渲染用户家目录侧边栏
-// @Tags 用户相关接口
+// @Tags 用户相关api
 // @Accept application/json
 // @Produce application/json
 // @Param Authorization header string true "Bearer 用户令牌"
@@ -117,7 +117,7 @@ var menu = []Node{
 // @Success 200 {object} respcode.ResponseData{msg=string,data=string}
 // @Router /api/v1/home/menus [get]
 func MenusHandler(c *gin.Context) {
-	respcode.ResponseSuccess(c, menu)
+	respcode.ResponseSuccess(c, rootMenu)
 
 }
 
@@ -132,7 +132,7 @@ type Node2 struct {
 // DtaMenusHandler 获取导航栏数据接口
 // @Summary 获取数据导航栏
 // @Description 用于前端渲染数据管理侧边栏
-// @Tags 用户相关接口
+// @Tags 用户相关api
 // @Accept application/json
 // @Produce application/json
 // @Param Authorization header string true "Bearer 用户令牌"

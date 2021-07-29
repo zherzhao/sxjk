@@ -1,4 +1,20 @@
 definitions:
+  model.IServerReq:
+    properties:
+      datasetNames:
+        items:
+          type: string
+        type: array
+      getFeatureMode:
+        type: string
+      queryParameter:
+        properties:
+          attributeFilter:
+            type: string
+        type: object
+    type: object
+  model.IServerResp:
+    type: object
   model.L21:
     properties:
       id:
@@ -98,12 +114,31 @@ definitions:
         type: string
       repassword:
         type: string
+      unit:
+        type: string
       username:
+        type: string
+      verifycode:
         type: string
     required:
     - password
     - repassword
+    - unit
     - username
+    - verifycode
+    type: object
+  model.RespUser:
+    properties:
+      role:
+        type: string
+      unit:
+        type: string
+      user_id:
+        type: integer
+      user_id_str:
+        type: string
+      username:
+        type: string
     type: object
   respcode.ResponseData:
     properties:
@@ -113,22 +148,6 @@ definitions:
         type: object
       msg:
         type: object
-    type: object
-  v2.IServerReq:
-    properties:
-      datasetNames:
-        items:
-          type: string
-        type: array
-      getFeatureMode:
-        type: string
-      queryParameter:
-        properties:
-          attributeFilter:
-            type: string
-        type: object
-    type: object
-  v2.IServerResp:
     type: object
 info:
   contact: {}
@@ -233,7 +252,7 @@ paths:
     post:
       consumes:
       - application/json
-      description: 没完成 别调用!!! 获取数据库原始数据接口 访问后会更新缓存
+      description: 删除数据库原始数据接口 访问后会删除缓存
       parameters:
       - description: Bearer 用户令牌
         in: header
@@ -272,14 +291,14 @@ paths:
               type: object
       security:
       - ApiKeyAuth: []
-      summary: 修改指定数据
+      summary: 删除指定数据
       tags:
       - 数据操作api
   /api/v1/data/info/{infotype}/{year}/{level}/query:
     post:
       consumes:
       - application/json
-      description: 获取数据库原始数据接口 访问后会更新缓存
+      description: 查询表数据（年报）数据接口
       parameters:
       - description: Bearer 用户令牌
         in: header
@@ -358,7 +377,7 @@ paths:
       - ApiKeyAuth: []
       summary: 获取数据导航栏
       tags:
-      - 用户相关接口
+      - 用户相关api
   /api/v1/home/menus:
     get:
       consumes:
@@ -388,7 +407,261 @@ paths:
       - ApiKeyAuth: []
       summary: 获取导航栏数据
       tags:
-      - 用户相关接口
+      - 用户相关api
+  /api/v1/home/roles:
+    get:
+      consumes:
+      - application/json
+      description: 请求后可以拿到权限数据
+      parameters:
+      - description: Bearer 用户令牌
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/respcode.ResponseData'
+            - properties:
+                code:
+                  type: integer
+                data:
+                  additionalProperties:
+                    items:
+                      type: string
+                    type: array
+                  type: object
+                msg:
+                  type: string
+              type: object
+      security:
+      - ApiKeyAuth: []
+      summary: 获取权限数据接口
+      tags:
+      - 权限相关api
+    head:
+      consumes:
+      - application/json
+      description: 请求后可以拿到用户数据
+      parameters:
+      - description: Bearer 用户令牌
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/respcode.ResponseData'
+            - properties:
+                code:
+                  type: integer
+                data:
+                  type: string
+                msg:
+                  type: string
+              type: object
+      security:
+      - ApiKeyAuth: []
+      summary: 恢复默认权限接口
+      tags:
+      - 权限相关api
+    post:
+      consumes:
+      - application/json
+      description: 请求后可以跟新权限数据 构造一个新的权限json 作为 body
+      parameters:
+      - description: Bearer 用户令牌
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/respcode.ResponseData'
+            - properties:
+                code:
+                  type: integer
+                data:
+                  additionalProperties:
+                    items:
+                      type: string
+                    type: array
+                  type: object
+                msg:
+                  type: string
+              type: object
+      security:
+      - ApiKeyAuth: []
+      summary: 更新权限数据接口
+      tags:
+      - 权限相关api
+  /api/v1/home/users:
+    get:
+      consumes:
+      - application/json
+      description: 请求后可以拿到用户数据
+      parameters:
+      - description: Bearer 用户令牌
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/respcode.ResponseData'
+            - properties:
+                code:
+                  type: integer
+                data:
+                  items:
+                    $ref: '#/definitions/model.RespUser'
+                  type: array
+                msg:
+                  type: string
+              type: object
+      security:
+      - ApiKeyAuth: []
+      summary: 获取用户数据接口
+      tags:
+      - 用户相关api
+    post:
+      consumes:
+      - application/json
+      description: 请求后可以将post请求body中提供的用户新数据替换原来的用户数据
+      parameters:
+      - description: Bearer 用户令牌
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: 用户信息
+        in: body
+        name: 用户信息
+        required: true
+        schema:
+          $ref: '#/definitions/model.RespUser'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/respcode.ResponseData'
+            - properties:
+                code:
+                  type: integer
+                data:
+                  type: string
+                msg:
+                  type: string
+              type: object
+      security:
+      - ApiKeyAuth: []
+      summary: 更新用户数据接口
+      tags:
+      - 用户相关api
+  /api/v1/home/users/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: 请求后可以删除用户数据（直接从数据库删除）
+      parameters:
+      - description: Bearer 用户令牌
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: 用户id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/respcode.ResponseData'
+            - properties:
+                code:
+                  type: integer
+                data:
+                  type: string
+                msg:
+                  type: string
+              type: object
+      security:
+      - ApiKeyAuth: []
+      summary: 删除用户数据接口
+      tags:
+      - 用户相关api
+  /api/v1/home/users/query:
+    get:
+      consumes:
+      - application/json
+      description: 请求后可以获取指定的用户数据
+      parameters:
+      - description: Bearer 用户令牌
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: 属性
+        in: query
+        name: column
+        required: true
+        type: string
+      - description: 值
+        in: query
+        name: value
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/respcode.ResponseData'
+            - properties:
+                code:
+                  type: integer
+                data:
+                  items:
+                    $ref: '#/definitions/model.RespUser'
+                  type: array
+                msg:
+                  type: string
+              type: object
+      security:
+      - ApiKeyAuth: []
+      summary: 查询用户数据接口
+      tags:
+      - 用户相关api
   /api/v1/login:
     post:
       consumes:
@@ -422,7 +695,38 @@ paths:
       summary: 处理登录请求
       tags:
       - 登陆api
-  /api/v1/sigin:
+  /api/v1/signup:
+    get:
+      consumes:
+      - application/json
+      description: 申请一个注册码 重复请求上一个就会失效 重启后端服务也会失效
+      parameters:
+      - description: Bearer 用户令牌
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/respcode.ResponseData'
+            - properties:
+                code:
+                  type: integer
+                data:
+                  type: string
+                msg:
+                  type: string
+              type: object
+      security:
+      - ApiKeyAuth: []
+      summary: 申请一个注册码
+      tags:
+      - 注册api
     post:
       consumes:
       - application/json
@@ -455,7 +759,7 @@ paths:
       summary: 处理注册请求
       tags:
       - 注册api
-  /api/v2/iserver/services/data-vector/rest/data:
+  /api/v2/iserver/services/{service}/rest/{service}:
     post:
       consumes:
       - application/json
@@ -471,14 +775,14 @@ paths:
         name: 查询信息
         required: true
         schema:
-          $ref: '#/definitions/v2.IServerReq'
+          $ref: '#/definitions/model.IServerReq'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/v2.IServerResp'
+            $ref: '#/definitions/model.IServerResp'
       security:
       - ApiKeyAuth: []
       summary: 获取IServer数据接口

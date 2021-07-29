@@ -37,6 +37,11 @@ func Init() error {
 			erbac.BuildRBAC(global.RBACSetting.DefaultRoleFile,
 				global.RBACSetting.DefaultInherFile)
 
+		err = global.Auth.RBAC.SaveUserRBACWithSort(
+			global.RBACSetting.CustomerRoleFile, global.RBACSetting.CustomerInherFile)
+		if err != nil {
+			return err
+		}
 	} else {
 		err = errors.New("权限配置文件不存在")
 	}

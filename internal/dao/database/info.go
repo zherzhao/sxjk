@@ -50,6 +50,8 @@ func Info(unit, role, prefix, year string, count int, t interface{}) (string, er
 		}
 		statement = statement.SetTableName(fmt.Sprintf(
 			"(select * from %s WHERE `%s`='%s' )as res", prefix+year, sLevel, level))
+	} else {
+		statement = statement.SetTableName(prefix + year)
 	}
 
 	c := <-global.DBClients

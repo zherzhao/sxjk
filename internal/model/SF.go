@@ -1,123 +1,123 @@
 package model
 
 type F struct {
-	ID         string `json:"id"`
-	F路线编号      string `json:"路线编号"`
-	F路线名称      string `json:"路线名称"`
-	F桩号        string `json:"桩号"`
-	F服务设施类型    string `json:"服务设施类型"`
-	F服务设施名称    string `json:"服务设施名称"`
-	F初始运营时间    string `json:"初始运营时间"`
-	F布局形式      string `json:"布局形式"`
-	F经营模式      string `json:"经营模式"`
-	F占地面积      string `json:"占地面积(平方米)"`
-	F停车场面积     string `json:"停车场面积(平方米)"`
-	F停车位数量     string `json:"停车位数量(个)"`
-	F是否有厕所     string `json:"是否有厕所"`
-	F是否有加油设施   string `json:"是否有加油设施"`
-	F是否有加气设施   string `json:"是否有加气设施"`
-	F是否有车辆充电设施 string `json:"是否有车辆充电设施"`
-	F是否有餐饮服务设施 string `json:"是否有餐饮服务设施"`
-	F是否有超市     string `json:"是否有超市"`
-	F是否有住宿设施   string `json:"是否有住宿设施"`
-	F是否有汽车维修   string `json:"是否有汽车维修"`
-	F备注        string `json:"备注"`
+	ID         string `json:"id" eorm:"id"`
+	F路线编号      string `json:"路线编号" eorm:"路线编号"`
+	F路线名称      string `json:"路线名称" eorm:"路线名称"`
+	F桩号        string `json:"桩号" eorm:"桩号"`
+	F服务设施类型    string `json:"服务设施类型" eorm:"服务设施类型"`
+	F服务设施名称    string `json:"服务设施名称" eorm:"服务设施名称"`
+	F初始运营时间    string `json:"初始运营时间" eorm:"初始运营时间"`
+	F布局形式      string `json:"布局形式" eorm:"布局形式"`
+	F经营模式      string `json:"经营模式" eorm:"经营模式"`
+	F占地面积      string `json:"占地面积(平方米)" eorm:"占地面积(平方米)"`
+	F停车场面积     string `json:"停车场面积(平方米)" eorm:"停车场面积(平方米)"`
+	F停车位数量     string `json:"停车位数量(个)" eorm:"停车位数量(个)"`
+	F是否有厕所     string `json:"是否有厕所" eorm:"是否有厕所"`
+	F是否有加油设施   string `json:"是否有加油设施" eorm:"是否有加油设施"`
+	F是否有加气设施   string `json:"是否有加气设施" eorm:"是否有加气设施"`
+	F是否有车辆充电设施 string `json:"是否有车辆充电设施" eorm:"是否有车辆充电设施"`
+	F是否有餐饮服务设施 string `json:"是否有餐饮服务设施" eorm:"是否有餐饮服务设施"`
+	F是否有超市     string `json:"是否有超市" eorm:"是否有超市"`
+	F是否有住宿设施   string `json:"是否有住宿设施" eorm:"是否有住宿设施"`
+	F是否有汽车维修   string `json:"是否有汽车维修" eorm:"是否有汽车维修"`
+	F备注        string `json:"备注" eorm:"备注"`
 }
 
 type SM struct {
-	ID               string `json:"id"`
-	M序号              string `json:"序号"`
-	M收费门架编号          string `json:"收费门架编号"`
-	M门架名称            string `json:"门架名称"`
-	M门架类型            string `json:"门架类型"`
-	M门架种类            string `json:"门架种类"`
-	M门架标志            string `json:"门架标志"`
-	M省界入出口标识         string `json:"省界入出口标识"`
-	M收费单元编码组合        string `json:"收费单元编码组合"`
-	M车道数             string `json:"车道数"`
-	M纬度              string `json:"纬度"`
-	M经度              string `json:"经度"`
-	M桩号              string `json:"桩号"`
-	M使用状态            string `json:"使用状态"`
-	M起始日期            string `json:"起始日期"`
-	M终止日期            string `json:"终止日期"`
-	M门架HEX字符串        string `json:"门架HEX字符串"`
-	M反向门架HEX字符串      string `json:"反向门架HEX字符串"`
-	M代收门架编号          string `json:"代收门架编号"`
-	M门架的RSU厂商代码      string `json:"门架的RSU厂商代码"`
-	M门架的RSU型号        string `json:"门架的RSU型号"`
-	M门架的RSU编号        string `json:"门架的RSU编号"`
-	M门架的高清车牌识别设备厂商代码 string `json:"门架的高清车牌识别设备厂商代码"`
-	M门架的高清车牌识别设备型号   string `json:"门架的高清车牌识别设备型号"`
-	M门架的高清车牌识别设备编号   string `json:"门架的高清车牌识别设备编号"`
-	M门架的高清摄像机设备厂商代码  string `json:"门架的高清摄像机设备厂商代码"`
-	M门架的高清摄像机设备型号    string `json:"门架的高清摄像机设备型号"`
-	M门架的高清摄像机设备编号    string `json:"门架的高清摄像机设备编号"`
-	M门架控制机设备厂商代码     string `json:"门架控制机设备厂商代码"`
-	M门架控制机设备型号       string `json:"门架控制机设备型号"`
-	M门架控制机设备编号       string `json:"门架控制机设备编号"`
-	M门架控制机操作系统软件版本   string `json:"门架控制机操作系统软件版本"`
-	M门架服务器设备厂商代码     string `json:"门架服务器设备厂商代码"`
-	M门架服务器设备型号       string `json:"门架服务器设备型号"`
-	M门架服务器设备编号       string `json:"门架服务器设备编号"`
-	M门架服务器操作系统软件版本   string `json:"门架服务器操作系统软件版本"`
-	M门架服务器数据库系统软件版本  string `json:"门架服务器数据库系统软件版本"`
-	M门架的车辆检测器设备厂商代码  string `json:"门架的车辆检测器设备厂商代码"`
-	M门架的车辆检测器设备型号    string `json:"门架的车辆检测器设备型号"`
-	M门架的车辆检测器设备编号    string `json:"门架的车辆检测器设备编号"`
-	M门架的车辆气象检测设备厂商代码 string `json:"门架的车辆气象检测设备厂商代码"`
-	M门架的气象检测设备型号     string `json:"门架的气象检测设备型号"`
-	M门架的气象检测设备编号     string `json:"门架的气象检测设备编号"`
-	M门架的车型检测设备厂商代码   string `json:"门架的车型检测设备厂商代码"`
-	M门架的车型检测设备型号     string `json:"门架的车型检测设备型号"`
-	M门架的车型检测设备编号     string `json:"门架的车型检测设备编号"`
-	M门架的断面称重检测设备厂商代码 string `json:"门架的断面称重检测设备厂商代码"`
-	M门架的断面称重检测设备型号   string `json:"门架的断面称重检测设备型号"`
-	M门架的断面称重检测设备编号   string `json:"门架的断面称重检测设备编号"`
-	M门架的温控设备厂商代码     string `json:"门架的温控设备厂商代码"`
-	M门架的温控设备型号       string `json:"门架的温控设备型号"`
-	M门架的温控设备编号       string `json:"门架的温控设备编号"`
-	M门架的供电设备厂商代码     string `json:"门架的供电设备厂商代码"`
-	M门架的供电设备型号       string `json:"门架的供电设备型号"`
-	M门架的供电设备编号       string `json:"门架的供电设备编号"`
-	M门架的安全接入设备厂商代码   string `json:"门架的安全接入设备厂商代码"`
-	M门架的安全接入设备型号     string `json:"门架的安全接入设备型号"`
-	M门架的安全接入设备编号     string `json:"门架的安全接入设备编号"`
-	M线路类型            string `json:"线路类型"`
-	M网络所属运营商         string `json:"网络所属运营商"`
-	M数据汇聚点           string `json:"数据汇聚点"`
-	MIMEI号           string `json:"IMEI号"`
-	M接入设备ip          string `json:"接入设备ip"`
-	Msnmp协议版本号       string `json:"snmp协议版本号"`
-	Msnmp端口          string `json:"snmp端口"`
-	M团体名称            string `json:"团体名称"`
-	M用户名             string `json:"用户名"`
-	M安全级别            string `json:"安全级别"`
-	M认证协议            string `json:"认证协议"`
-	M认证密钥            string `json:"认证密钥"`
-	M加密算法            string `json:"加密算法"`
-	M加密密钥            string `json:"加密密钥"`
+	ID               string `json:"id" eorm:"id"`
+	M序号              string `json:"序号" eorm:"序号"`
+	M收费门架编号          string `json:"收费门架编号" eorm:"收费门架编号"`
+	M门架名称            string `json:"门架名称" eorm:"门架名称"`
+	M门架类型            string `json:"门架类型" eorm:"门架类型"`
+	M门架种类            string `json:"门架种类" eorm:"门架种类"`
+	M门架标志            string `json:"门架标志" eorm:"门架标志"`
+	M省界入出口标识         string `json:"省界入/出口标识" eorm:"省界入/出口标识"`
+	M收费单元编码组合        string `json:"收费单元编码组合" eorm:"收费单元编码组合"`
+	M车道数             string `json:"车道数" eorm:"车道数"`
+	M纬度              string `json:"纬度" eorm:"纬度"`
+	M经度              string `json:"经度" eorm:"经度"`
+	M桩号              string `json:"桩号" eorm:"桩号"`
+	M使用状态            string `json:"使用状态" eorm:"使用状态"`
+	M起始日期            string `json:"起始日期" eorm:"起始日期"`
+	M终止日期            string `json:"终止日期" eorm:"终止日期"`
+	M门架HEX字符串        string `json:"门架HEX字符串" eorm:"门架HEX字符串"`
+	M反向门架HEX字符串      string `json:"反向门架HEX字符串" eorm:"反向门架HEX字符串"`
+	M代收门架编号          string `json:"代收门架编号" eorm:"代收门架编号"`
+	M门架的RSU厂商代码      string `json:"门架的RSU厂商代码" eorm:"门架的RSU厂商代码"`
+	M门架的RSU型号        string `json:"门架的RSU型号" eorm:"门架的RSU型号"`
+	M门架的RSU编号        string `json:"门架的RSU编号" eorm:"门架的RSU编号"`
+	M门架的高清车牌识别设备厂商代码 string `json:"门架的高清车牌识别设备厂商代码" eorm:"门架的高清车牌识别设备厂商代码"`
+	M门架的高清车牌识别设备型号   string `json:"门架的高清车牌识别设备型号" eorm:"门架的高清车牌识别设备型号"`
+	M门架的高清车牌识别设备编号   string `json:"门架的高清车牌识别设备编号" eorm:"门架的高清车牌识别设备编号"`
+	M门架的高清摄像机设备厂商代码  string `json:"门架的高清摄像机设备厂商代码" eorm:"门架的高清摄像机设备厂商代码"`
+	M门架的高清摄像机设备型号    string `json:"门架的高清摄像机设备型号" eorm:"门架的高清摄像机设备型号"`
+	M门架的高清摄像机设备编号    string `json:"门架的高清摄像机设备编号" eorm:"门架的高清摄像机设备编号"`
+	M门架控制机设备厂商代码     string `json:"门架控制机设备厂商代码" eorm:"门架控制机设备厂商代码"`
+	M门架控制机设备型号       string `json:"门架控制机设备型号" eorm:"门架控制机设备型号"`
+	M门架控制机设备编号       string `json:"门架控制机设备编号" eorm:"门架控制机设备编号"`
+	M门架控制机操作系统软件版本   string `json:"门架控制机操作系统软件版本" eorm:"门架控制机操作系统软件版本"`
+	M门架服务器设备厂商代码     string `json:"门架服务器设备厂商代码" eorm:"门架服务器设备厂商代码"`
+	M门架服务器设备型号       string `json:"门架服务器设备型号" eorm:"门架服务器设备型号"`
+	M门架服务器设备编号       string `json:"门架服务器设备编号" eorm:"门架服务器设备编号"`
+	M门架服务器操作系统软件版本   string `json:"门架服务器操作系统软件版本" eorm:"门架服务器操作系统软件版本"`
+	M门架服务器数据库系统软件版本  string `json:"门架服务器数据库系统软件版本" eorm:"门架服务器数据库系统软件版本"`
+	M门架的车辆检测器设备厂商代码  string `json:"门架的车辆检测器设备厂商代码" eorm:"门架的车辆检测器设备厂商代码"`
+	M门架的车辆检测器设备型号    string `json:"门架的车辆检测器设备型号" eorm:"门架的车辆检测器设备型号"`
+	M门架的车辆检测器设备编号    string `json:"门架的车辆检测器设备编号" eorm:"门架的车辆检测器设备编号"`
+	M门架的车辆气象检测设备厂商代码 string `json:"门架的车辆气象检测设备厂商代码" eorm:"门架的车辆气象检测设备厂商代码"`
+	M门架的气象检测设备型号     string `json:"门架的气象检测设备型号" eorm:"门架的气象检测设备型号"`
+	M门架的气象检测设备编号     string `json:"门架的气象检测设备编号" eorm:"门架的气象检测设备编号"`
+	M门架的车型检测设备厂商代码   string `json:"门架的车型检测设备厂商代码" eorm:"门架的车型检测设备厂商代码"`
+	M门架的车型检测设备型号     string `json:"门架的车型检测设备型号" eorm:"门架的车型检测设备型号"`
+	M门架的车型检测设备编号     string `json:"门架的车型检测设备编号" eorm:"门架的车型检测设备编号"`
+	M门架的断面称重检测设备厂商代码 string `json:"门架的断面称重检测设备厂商代码" eorm:"门架的断面称重检测设备厂商代码"`
+	M门架的断面称重检测设备型号   string `json:"门架的断面称重检测设备型号" eorm:"门架的断面称重检测设备型号"`
+	M门架的断面称重检测设备编号   string `json:"门架的断面称重检测设备编号" eorm:"门架的断面称重检测设备编号"`
+	M门架的温控设备厂商代码     string `json:"门架的温控设备厂商代码" eorm:"门架的温控设备厂商代码"`
+	M门架的温控设备型号       string `json:"门架的温控设备型号" eorm:"门架的温控设备型号"`
+	M门架的温控设备编号       string `json:"门架的温控设备编号" eorm:"门架的温控设备编号"`
+	M门架的供电设备厂商代码     string `json:"门架的供电设备厂商代码" eorm:"门架的供电设备厂商代码"`
+	M门架的供电设备型号       string `json:"门架的供电设备型号" eorm:"门架的供电设备型号"`
+	M门架的供电设备编号       string `json:"门架的供电设备编号" eorm:"门架的供电设备编号"`
+	M门架的安全接入设备厂商代码   string `json:"门架的安全接入设备厂商代码" eorm:"门架的安全接入设备厂商代码"`
+	M门架的安全接入设备型号     string `json:"门架的安全接入设备型号" eorm:"门架的安全接入设备型号"`
+	M门架的安全接入设备编号     string `json:"门架的安全接入设备编号" eorm:"门架的安全接入设备编号"`
+	M线路类型            string `json:"线路类型" eorm:"线路类型"`
+	M网络所属运营商         string `json:"网络所属运营商" eorm:"网络所属运营商"`
+	M数据汇聚点           string `json:"数据汇聚点" eorm:"数据汇聚点"`
+	MIMEI号           string `json:"IMEI号" eorm:"IMEI号"`
+	M接入设备ip          string `json:"接入设备ip" eorm:"接入设备ip"`
+	Msnmp协议版本号       string `json:"snmp协议版本号" eorm:"snmp协议版本号"`
+	Msnmp端口          string `json:"snmp端口" eorm:"snmp端口"`
+	M团体名称            string `json:"团体名称" eorm:"团体名称"`
+	M用户名             string `json:"用户名" eorm:"用户名"`
+	M安全级别            string `json:"安全级别" eorm:"安全级别"`
+	M认证协议            string `json:"认证协议" eorm:"认证协议"`
+	M认证密钥            string `json:"认证密钥" eorm:"认证密钥"`
+	M加密算法            string `json:"加密算法" eorm:"加密算法"`
+	M加密密钥            string `json:"加密密钥" eorm:"加密密钥"`
 }
 
 type SZ struct {
-	ID         string `json:"id"`
-	S序号        string `json:"序号"`
-	S收费站编号     string `json:"收费站编号"`
-	S收费站名称     string `json:"收费站名称"`
-	S收费广场数量    string `json:"收费广场数量"`
-	S收费站HEX    string `json:"收费站HEX"`
-	S线路类型      string `json:"线路类型"`
-	S网络所属运营商   string `json:"网络所属运营商"`
-	S数据汇聚点     string `json:"数据汇聚点"`
-	SIMEI号     string `json:"IMEI号"`
-	S接入设备ip    string `json:"接入设备ip"`
-	Ssnmp协议版本号 string `json:"snmp协议版本号"`
-	Ssnmp端口    string `json:"snmp端口"`
-	S团体名称      string `json:"团体名称"`
-	S用户名       string `json:"用户名"`
-	S安全级别      string `json:"安全级别"`
-	S认证协议      string `json:"认证协议"`
-	S认证密钥      string `json:"认证密钥"`
-	S加密算法      string `json:"加密算法"`
-	S加密密钥      string `json:"加密密钥"`
+	ID         string `json:"id" eorm:"id"`
+	S序号        string `json:"序号" eorm:"序号"`
+	S收费站编号     string `json:"收费站编号" eorm:"收费站编号"`
+	S收费站名称     string `json:"收费站名称" eorm:"收费站名称"`
+	S收费广场数量    string `json:"收费广场数量" eorm:"收费广场数量"`
+	S收费站HEX    string `json:"收费站HEX" eorm:"收费站HEX"`
+	S线路类型      string `json:"线路类型" eorm:"线路类型"`
+	S网络所属运营商   string `json:"网络所属运营商" eorm:"网络所属运营商"`
+	S数据汇聚点     string `json:"数据汇聚点" eorm:"数据汇聚点"`
+	SIMEI号     string `json:"IMEI号" eorm:"IMEI号"`
+	S接入设备ip    string `json:"接入设备ip" eorm:"接入设备ip"`
+	Ssnmp协议版本号 string `json:"snmp协议版本号" eorm:"snmp协议版本号"`
+	Ssnmp端口    string `json:"snmp端口" eorm:"snmp端口"`
+	S团体名称      string `json:"团体名称" eorm:"团体名称"`
+	S用户名       string `json:"用户名" eorm:"用户名"`
+	S安全级别      string `json:"安全级别" eorm:"安全级别"`
+	S认证协议      string `json:"认证协议" eorm:"认证协议"`
+	S认证密钥      string `json:"认证密钥" eorm:"认证密钥"`
+	S加密算法      string `json:"加密算法" eorm:"加密算法"`
+	S加密密钥      string `json:"加密密钥" eorm:"加密密钥"`
 }

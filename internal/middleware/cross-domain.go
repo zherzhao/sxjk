@@ -8,6 +8,9 @@ import (
 
 func Cors() gin.HandlerFunc {
 	return func(context *gin.Context) {
+		if len(context.Request.URL.Path) < 7 {
+			return
+		}
 		v := context.Request.URL.Path[5:7]
 		if v == "v1" {
 			origin := context.Request.Header.Get("Origin")

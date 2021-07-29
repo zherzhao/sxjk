@@ -21,6 +21,7 @@ func SignUp(p *model.ParamSignUp) error {
 		UserID:   userID,
 		Username: p.UserName,
 		Password: p.Password,
+		Role:     "user",
 	}
 
 	// 存入数据库

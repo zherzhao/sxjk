@@ -6,6 +6,7 @@ const (
 	CodeSuccess RespCode = 1000 + iota
 
 	CodeInvalidParam
+	CodeInvalidVerifyCode
 
 	CodeUserExist
 	CodeUserPermissionDenied
@@ -24,6 +25,7 @@ const (
 var codeMsgMap = map[RespCode]string{
 	CodeSuccess:              "success",
 	CodeInvalidParam:         "请求参数错误",
+	CodeInvalidVerifyCode:    "无效的注册码",
 	CodeUserExist:            "用户名已经存在",
 	CodeUserNotExist:         "该用户不存在",
 	CodeUserPermissionDenied: "用户没有权限",

@@ -216,12 +216,12 @@ github.com/hashicorp/memberlist v0.2.4/go.mod h1:MS2lj3INKhZjWNqd3N0m3J+Jxf3DAOn
 github.com/hashicorp/serf v0.8.2/go.mod h1:6hOLApaqBFA1NXqRQAsxw9QxuDEvNxSQRwA/JwenrHc=
 github.com/ianlancetaylor/demangle v0.0.0-20181102032728-5e5cf60278f6/go.mod h1:aSSvb/t6k1mPoxDqO4vJh6VOCGPwU4O0C2/Eqndh1Sc=
 github.com/ianlancetaylor/demangle v0.0.0-20200824232613-28f6c0f3b639/go.mod h1:aSSvb/t6k1mPoxDqO4vJh6VOCGPwU4O0C2/Eqndh1Sc=
-github.com/impact-eintr/WebKits v1.0.0 h1:P6V5vaoDfAG1vacmPctaMtn6l3E4nASfBskyQYFd5jM=
-github.com/impact-eintr/WebKits v1.0.0/go.mod h1:AUk/xwjjrHrFZcYCQMwO+WIkB3IHoV7P+BIIN6XPPZM=
+github.com/impact-eintr/WebKits v1.0.1 h1:E7ibtJ7MTBn9z1Tr0kZfi7wZdaDWNiP3aOeWZMY9pS8=
+github.com/impact-eintr/WebKits v1.0.1/go.mod h1:AUk/xwjjrHrFZcYCQMwO+WIkB3IHoV7P+BIIN6XPPZM=
 github.com/impact-eintr/ecache v0.0.2 h1:B1xRIZ4GQlRyFL2ZGFst530kT8r9j2R3UHdGJgSbdGc=
 github.com/impact-eintr/ecache v0.0.2/go.mod h1:zL3bITZDB/yCw4TBHn0wb/r9JjpFbciWNy1/El8PU68=
-github.com/impact-eintr/eorm v0.0.0-20210621131339-db8925b23140 h1:n4zIu3ZpIUJpkoW1uSbWK2IfknLgXRqJ+hNAZ2dSTy4=
-github.com/impact-eintr/eorm v0.0.0-20210621131339-db8925b23140/go.mod h1:fU4ZCri+Ly/chDTfbnN4sHWHW+hOhqXk6Gv80bzReYA=
+github.com/impact-eintr/eorm v0.0.4 h1:6CJbLErQ4jClVEWsmDtxcqvu8lZKT94uy+om2U57eJo=
+github.com/impact-eintr/eorm v0.0.4/go.mod h1:fU4ZCri+Ly/chDTfbnN4sHWHW+hOhqXk6Gv80bzReYA=
 github.com/json-iterator/go v1.1.5/go.mod h1:+SdeFBvtyEkXs7REEP0seUULqWtbJapLOCVDaaPEHmU=
 github.com/json-iterator/go v1.1.6/go.mod h1:+SdeFBvtyEkXs7REEP0seUULqWtbJapLOCVDaaPEHmU=
 github.com/json-iterator/go v1.1.9/go.mod h1:KdQUCv79m/52Kvf8AW2vK1V8akMuk1QjK/uOdHXbAo4=
