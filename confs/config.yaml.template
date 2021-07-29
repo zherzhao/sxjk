@@ -1,7 +1,7 @@
 server:
   name: webconsole
   version: v1.0.0
-  host: 59.49.106.69
+  host: 59.49.106.69:8090
   port: 9426
   mode: dev
   start_time: 2021-04-16
@@ -15,17 +15,10 @@ log:
   max_age: 30
   max_backups: 7
 
-cache:
-  cacheType: mem
-  port: 9425
-  ttl: 5
-  cachedir: /home/eintr/Share/rocksdb
-
 database:
-  #host: 220.194.140.188:3306
   host: 127.0.0.1:3306
   user: root
-    #password: ShanXiJiaoKeDataBase
+  #password: ShanXiJiaoKeDataBase
   password: 123456
   dbname: sxjk
   max_open_conns: 20
