@@ -3,8 +3,6 @@ package v1
 import (
 	"errors"
 	"fmt"
-	"math/rand"
-	"strings"
 	"time"
 	"webconsole/global"
 	"webconsole/internal/dao/database"
@@ -32,10 +30,11 @@ const (
 // @Success 200 {object} respcode.ResponseData{code=int,msg=string,data=string}
 // @Router /api/v1/signup [post]
 func SignUpHandler(c *gin.Context) {
+	var err error
 	// 1. 获取参数 参数校验
 	p := new(model.ParamSignUp)
 
-	if err := c.ShouldBindJSON(&p); err != nil {
+	if err = c.ShouldBindJSON(&p); err != nil {
 		zap.L().Error("SignUp with invalid param", zap.Error(err))
 		errs, ok := err.(validator.ValidationErrors)
 		if !ok {
@@ -46,14 +45,16 @@ func SignUpHandler(c *gin.Context) {
 		respcode.ResponseErrorWithMsg(c, respcode.CodeInvalidParam, errs.Translate(global.Trans))
 		return
 	}
-	// 2. 验证注册码
-	if p.VerifyCode != global.VerifyCode.Code {
-		respcode.ResponseError(c, respcode.CodeInvalidVerifyCode)
-		return
+	// 2. 验证注册码 以及没有用户时的情况
+	if err = service.Verify(p); err != nil {
+		if err != database.ErrorNoUser {
+			respcode.ResponseError(c, respcode.CodeInvalidVerifyCode)
+			return
+		}
 	}
 
 	// 3. 业务处理
-	if err := service.SignUp(p); err != nil {
+	if err := service.SignUp(p, err == database.ErrorNoUser); err != nil {
 		zap.L().Error("注册失败", zap.Error(err))
 		if errors.Is(err, database.ErrorUserExist) {
 			respcode.ResponseError(c, respcode.CodeUserExist)
@@ -69,7 +70,7 @@ func SignUpHandler(c *gin.Context) {
 
 }
 
-// SignUpCode 注册码申请接口
+// SignUpVerifyHandler 注册码申请接口
 // @Summary 申请一个注册码
 // @Description 申请一个注册码 重复请求上一个就会失效 重启后端服务也会失效
 // @Tags 注册api
@@ -79,23 +80,9 @@ func SignUpHandler(c *gin.Context) {
 // @Security ApiKeyAuth
 // @Success 200 {object} respcode.ResponseData{code=int,msg=string,data=string}
 // @Router /api/v1/signup [get]
-func SignUpCode(c *gin.Context) {
-	code := genValidateCode(6)
+func SignUpVerifyHandler(c *gin.Context) {
+	code := service.GetVerify(6, 60*10*time.Second)
 	respcode.ResponseSuccess(c, code)
-	global.VerifyCode.Ch <- code
-	global.VerifyCode.T.Reset(60 * 10 * time.Second)
-}
-
-func genValidateCode(width int) string {
-	numeric := [10]byte{0, 1, 2, 3, 4, 5, 6, 7, 8, 9}
-	r := len(numeric)
-	rand.Seed(time.Now().UnixNano())
-
-	var sb strings.Builder
-	for i := 0; i < width; i++ {
-		fmt.Fprintf(&sb, "%d", numeric[rand.Intn(r)])
-	}
-	return sb.String()
 }
 
 // LoginHandler 登录接口

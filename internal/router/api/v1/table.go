@@ -9,8 +9,8 @@ import (
 	"webconsole/internal/model"
 	"webconsole/pkg/respcode"
 
-	"github.com/360EntSecGroup-Skylar/excelize/v2"
 	"github.com/gin-gonic/gin"
+	"github.com/xuri/excelize/v2"
 )
 
 func ParseTable(c *gin.Context) {

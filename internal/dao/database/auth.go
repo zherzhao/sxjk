@@ -5,7 +5,6 @@ import (
 	"crypto/md5"
 	"database/sql"
 	"encoding/hex"
-	"errors"
 	"log"
 	"webconsole/global"
 	"webconsole/internal/model"
@@ -16,13 +15,6 @@ import (
 
 // 加密salt
 const salt string = `impact-eintr`
-
-// 错误码
-var (
-	ErrorUserExist       = errors.New("用户已经存在")
-	ErrorUserNotExist    = errors.New("用户不存在")
-	ErrorInvalidPassword = errors.New("用户名或密码错误")
-)
 
 // 检查注册时用户是否已经存在
 func CheckUserExist(username string) error {
@@ -57,7 +49,6 @@ func InsertUser(user *model.User) (err error) {
 
 	_, err = c.Insert(context.Background(), statement)
 	if err != nil {
-		log.Println(err)
 		return err
 	}
 
@@ -93,7 +84,6 @@ func UserLogin(user *model.User) (err error) {
 
 	if err != nil {
 		// 查询失败
-		log.Println(err)
 		return err
 	}
 

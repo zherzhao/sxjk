@@ -35,7 +35,10 @@ func NewRouter() (r *gin.Engine, err error) {
 
 	// 注册路由
 	apiv1.POST("/signup", middleware.Translations(), v1.SignUpHandler)
-	apiv1.GET("/signup", middleware.UserRBAC("application"), v1.SignUpCode)
+	apiv1.GET("/signup", middleware.Translations(),
+		middleware.JWTAuthMiddleware(),
+		middleware.UserRBAC("application"),
+		v1.SignUpVerifyHandler)
 
 	// 登录路由
 	apiv1.POST("/login", v1.LoginHandler)
@@ -45,32 +48,34 @@ func NewRouter() (r *gin.Engine, err error) {
 	cacheGroup := apiv1.Group("/cache")
 	{
 		cacheGroup.Use(middleware.JWTAuthMiddleware())
-		// 操作缓存
-		cacheGroup.GET("/hit/*key", v1.CacheCheck,
-			func(c *gin.Context) {
-				c.Request.URL.Path = "/api/v1/data/info" + c.Param("key") // 将请求的URL修改
-				cacheKey[c.Param("key")] = struct{}{}
-				r.HandleContext(c) // 继续之后的操作
-				c.Abort()
-			})
-		cacheGroup.DELETE("/hit/*key", v1.CacheDelete)
+		// 获取缓存
+		cacheGroup.GET("/hit/*key", v1.CacheCheckHandler(r, cacheKey))
+		// 清除缓存
+		cacheGroup.DELETE("/hit/*key", v1.CacheDeleteHandler)
 	}
 
 	// 用户家目录路由
 	homeGroup := apiv1.Group("/home")
 	{
-		homeGroup.Use(middleware.JWTAuthMiddleware())
+		homeGroup.Use(middleware.JWTAuthMiddleware(), middleware.Translations())
+		// 获取导航栏数据
 		homeGroup.GET("/menus", v1.MenusHandler)
-		homeGroup.POST("/roles", middleware.RoleRBAC("edit-role"), v1.UpdateRoles,
-			middleware.ClearCache(r, cacheKey))
-		homeGroup.GET("/roles", middleware.RoleRBAC("check-role"), v1.GetRoles)
-		homeGroup.HEAD("/roles", middleware.RoleRBAC("default-role"), v1.DefaultRoles)
 
-		homeGroup.GET("/users", middleware.UserRBAC("check-user"), v1.GetUsers)
-		homeGroup.GET("/users/query",
-			middleware.UserRBAC("query-user"), middleware.QueryParse, v1.QueryUsers)
-		homeGroup.POST("/users", middleware.UserRBAC("edit-user"), v1.UpdateUsers)
-		homeGroup.DELETE("/users/:id", middleware.UserRBAC("del-user"), v1.DeleteUsers)
+		// 权限
+		homeGroup.POST("/roles", middleware.RoleRBAC("edit-role"),
+			v1.UpdateRolesHandler, v1.CacheClearHandler(r, cacheKey))
+		homeGroup.GET("/roles", middleware.RoleRBAC("check-role"), v1.GetRoles)
+		homeGroup.HEAD("/roles", middleware.RoleRBAC("default-role"),
+			v1.DefaultRolesHandler)
+
+		// 用户
+		homeGroup.GET("/users", middleware.UserRBAC("check-user"), v1.GetUsersHandler)
+		homeGroup.GET("/users/query", middleware.UserRBAC("query-user"),
+			middleware.QueryParse, v1.QueryUsersHandler)
+		homeGroup.POST("/users", middleware.UserRBAC("edit-user"),
+			v1.UpdateUsersHandler)
+		homeGroup.DELETE("/users/:id", middleware.UserRBAC("del-user"),
+			v1.DeleteUsersHandler)
 	}
 
 	// 数据路由

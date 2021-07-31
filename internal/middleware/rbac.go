@@ -76,6 +76,14 @@ func IServerRBAC(c *gin.Context) {
 				unit := c.GetString("userUnit")
 				extra := fmt.Sprintf("交控单位名称 like '%s' and ", "%25"+unit+"%25")
 				test.QueryParameter.AttributeFilter = extra + attr
+
+			} else if strings.HasPrefix(attr, "桥梁名称") ||
+				strings.HasPrefix(attr, "收费站名称") ||
+				strings.HasPrefix(attr, "门架名称") {
+				unit := c.GetString("userUnit")
+				extra := fmt.Sprintf("所在地级市 like '%s' and ", "%25"+unit+"%25")
+				test.QueryParameter.AttributeFilter = extra + attr
+
 			} else {
 				log.Println("小心sql注入！")
 			}

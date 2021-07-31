@@ -3,7 +3,6 @@ module webconsole
 go 1.16
 
 require (
-	github.com/360EntSecGroup-Skylar/excelize/v2 v2.4.0
 	github.com/alecthomas/template v0.0.0-20190718012654-fb15b899a751
 	github.com/bwmarrin/snowflake v0.3.0
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
@@ -22,6 +21,7 @@ require (
 	github.com/swaggo/gin-swagger v1.3.0
 	github.com/swaggo/swag v1.7.0
 	github.com/ugorji/go v1.2.6 // indirect
+	github.com/xuri/excelize/v2 v2.4.1-0.20210728160357-7dbf88f221f2
 	go.uber.org/zap v1.17.0
 	golang.org/x/crypto v0.0.0-20210711020723-a769d52b0f97 // indirect
 	golang.org/x/sys v0.0.0-20210630005230-0f9fa26af87c // indirect

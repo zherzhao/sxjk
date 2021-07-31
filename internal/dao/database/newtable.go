@@ -3,6 +3,7 @@ package database
 import (
 	"context"
 	"fmt"
+	"log"
 	"reflect"
 	"webconsole/global"
 	"webconsole/internal/model"
@@ -25,10 +26,14 @@ func InsertTableHandler(tableName, year string, level int,
 	menu.Year = year
 
 	for _, row := range (*data)[1:] {
+		log.Println(len(row))
 		rType := reflect.TypeOf(inStructPtr).Elem()
 		rVal := reflect.ValueOf(inStructPtr).Elem()
 		for i := 0; i < rType.NumField(); i++ {
 			f := rVal.Field(i)
+			for len(row) < rType.NumField() {
+				row = append(row, "")
+			}
 			if i == 0 {
 				v := fmt.Sprintf("%d", count)
 				f.Set(reflect.ValueOf(v))

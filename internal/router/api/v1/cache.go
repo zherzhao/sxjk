@@ -8,7 +8,7 @@ import (
 	"github.com/impact-eintr/WebKits/encoding"
 )
 
-// CacheCheck 检查缓存命中接口
+// CacheCheckHandler 检查缓存命中接口
 // @Summary 检查缓存命中接口
 // @Description 检查缓存中是否有请求的值 有就返回没有将请求转发
 // @Tags 缓存相关接口
@@ -21,24 +21,27 @@ import (
 // @Security ApiKeyAuth
 // @Success 200 {object} respcode.ResponseData{code=int,msg=string,data=string}
 // @Router /api/v1/cache/hit/{infotype}/{year}/{level} [get]
-func CacheCheck(c *gin.Context) {
-	key := c.GetString("userUnit") + c.Param("key")
-	if key == "" {
-		respcode.ResponseError(c, respcode.CodeInvalidParam)
-		return
-	}
+func CacheCheckHandler(r *gin.Engine, m map[string]struct{}) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		key := c.GetString("userUnit") + c.Param("key")
+		if key == "" {
+			respcode.ResponseError(c, respcode.CodeInvalidParam)
+			return
+		}
 
-	b := webcache.CacheCheck(key)
-	if len(b) > 0 {
-		respcode.ResponseSuccess(c, encoding.Bytes2str(b))
-		c.Abort()
-	} else {
-		c.Next()
+		b := webcache.CacheCheck(key)
+		if len(b) > 0 {
+			respcode.ResponseSuccess(c, encoding.Bytes2str(b))
+		} else {
+			c.Request.URL.Path = "/api/v1/data/info" + c.Param("key") // 将请求的URL修改
+			m[c.Param("key")] = struct{}{}
+			r.HandleContext(c) // 继续之后的操作
+			c.Abort()
+		}
 	}
-
 }
 
-func CacheDelete(c *gin.Context) {
+func CacheDeleteHandler(c *gin.Context) {
 	key := c.GetString("userUnit") + c.Param("key")
 	if key == "" {
 		respcode.ResponseError(c, respcode.CodeInvalidParam)
@@ -46,4 +49,15 @@ func CacheDelete(c *gin.Context) {
 	}
 	webcache.CacheDelete(key)
 
+}
+
+func CacheClearHandler(r *gin.Engine, m map[string]struct{}) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		for v := range m {
+			c.Request.URL.Path = "/api/v1/cache/hit" + v // 将请求的URL修改
+			c.Request.Method = "DELETE"
+			r.HandleContext(c)
+		}
+		c.Abort()
+	}
 }

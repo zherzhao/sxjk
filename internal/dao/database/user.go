@@ -3,19 +3,36 @@ package database
 import (
 	"context"
 	"database/sql"
-	"fmt"
-	"log"
-	"strconv"
 	"webconsole/global"
 	"webconsole/internal/model"
 
 	"github.com/impact-eintr/eorm"
 )
 
-func GetUsersHandler() (users []model.RespUser, err error) {
+func NoUser() error {
+	users := []model.User{}
 	statement := eorm.NewStatement()
 	statement = statement.SetTableName("user").
-		Select("user_id, username, username, role, unit")
+		Select("user_id, username ,username, role, unit")
+
+	c := <-global.DBClients
+	defer func() {
+		global.DBClients <- c
+	}()
+
+	err := c.FindAll(context.Background(), statement, &users)
+	if err == nil && len(users) == 0 {
+		return ErrorNoUser
+	}
+
+	return err
+
+}
+
+func GetUsers() (users []model.UserResp, err error) {
+	statement := eorm.NewStatement()
+	statement = statement.SetTableName("user").
+		Select("user_id, username, role, unit")
 
 	c := <-global.DBClients
 	defer func() {
@@ -23,17 +40,8 @@ func GetUsersHandler() (users []model.RespUser, err error) {
 	}()
 
 	err = c.FindAll(context.Background(), statement, &users)
-	if err == sql.ErrNoRows {
-		return nil, ErrorUserNotExist
-	}
-
 	if err != nil {
-		// 查询失败
-		log.Println(err)
-		return
-	}
-	for idx := range users {
-		users[idx].UserIDStr = fmt.Sprintf("%d", users[idx].UserID)
+		return nil, err
 	}
 	return
 
@@ -46,17 +54,16 @@ var userMap = map[string]string{
 	"角色":   "role",
 }
 
-func QueryUsersHandler(column, value string) (users []model.RespUser, err error) {
+func QueryUsers(column string, v interface{}) (users []model.UserResp, err error) {
 	statement := eorm.NewStatement()
 	statement = statement.SetTableName("user")
 	switch column {
-	case "user_id_str":
-		id, _ := strconv.ParseInt(value, 10, 64)
-		statement = statement.AndEqual("user_id", id)
+	case "user_id":
+		statement = statement.AndEqual(column, v.(int64))
 	default:
-		statement = statement.AndLike(column, value)
+		statement = statement.AndLike(column, v.(string))
 	}
-	statement = statement.Select("user_id, username, username, role, unit")
+	statement = statement.Select("user_id, username, role, unit")
 
 	c := <-global.DBClients
 	defer func() {
@@ -64,17 +71,8 @@ func QueryUsersHandler(column, value string) (users []model.RespUser, err error)
 	}()
 
 	err = c.FindAll(context.Background(), statement, &users)
-	if err == sql.ErrNoRows {
-		return nil, ErrorUserNotExist
-	}
-
 	if err != nil {
-		// 查询失败
-		log.Println(err)
 		return
-	}
-	for idx := range users {
-		users[idx].UserIDStr = fmt.Sprintf("%d", users[idx].UserID)
 	}
 	return
 
@@ -100,14 +98,13 @@ func UserPassword(id int64) (string, error) {
 
 	// 查询失败
 	if err != nil {
-		log.Println(err)
 		return "", err
 	}
 	return tmp.Password, nil
 
 }
 
-func UpdateUsersHandler(users *model.User) (err error) {
+func UpdateUsers(users *model.User) (err error) {
 	statement := eorm.NewStatement()
 	statement = statement.SetTableName("user").
 		AndEqual("user_id", users.UserID).UpdateStruct(users)
@@ -118,12 +115,7 @@ func UpdateUsersHandler(users *model.User) (err error) {
 	}()
 
 	_, err = c.Update(context.Background(), statement)
-	if err == sql.ErrNoRows {
-		return ErrorUserNotExist
-	}
-
 	if err != nil {
-		log.Println(err)
 		return
 	}
 	return
@@ -141,12 +133,7 @@ func DeleteUsersHandler(users *model.User) (err error) {
 	}()
 
 	_, err = c.Delete(context.Background(), statement)
-	if err == sql.ErrNoRows {
-		return ErrorUserNotExist
-	}
-
 	if err != nil {
-		log.Println(err)
 		return
 	}
 	return

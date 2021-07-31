@@ -26,25 +26,25 @@ func init() {
 	// 加载配置文件
 	if err := global.Init(); err != nil {
 		fmt.Println("init failed, err: ", err)
-		return
+		panic(err)
 	}
 
 	err := global.Conf.ReadSection("server", &global.ServerSetting)
 	if err != nil {
 		fmt.Println("init failed, err: ", err)
-		return
+		panic(err)
 	}
 
 	// 初始化日志
 	err = global.Conf.ReadSection("log", &global.LoggerSetting)
 	if err != nil {
 		fmt.Println("init logger failed, err: ", err)
-		return
+		panic(err)
 	}
 
 	if err := logger.Init(); err != nil {
 		fmt.Println("init logger failed, err: ", err)
-		return
+		panic(err)
 	}
 
 	zap.L().Debug("logger init success...")
@@ -52,7 +52,7 @@ func init() {
 	// 初始化ID生成器
 	if err := sf.Init(global.ServerSetting.StartTime, global.ServerSetting.MachineID); err != nil {
 		fmt.Println("init logger failed, err: ", err)
-		return
+		panic(err)
 	}
 
 	zap.L().Debug("ID init success...")
@@ -61,13 +61,13 @@ func init() {
 	err = global.Conf.ReadSection("database", &global.DatabaseSetting)
 	if err != nil {
 		fmt.Println("init database failed, err: ", err)
-		return
+		panic(err)
 	}
 
 	// 初始化sql连接
 	if err := database.Init(); err != nil {
 		fmt.Println("init database failed, err: ", err)
-		return
+		panic(err)
 	}
 
 	zap.L().Debug("database init success...")
@@ -77,13 +77,14 @@ func init() {
 	err = global.Conf.ReadSection("rbac", &global.RBACSetting)
 	if err != nil {
 		fmt.Println("init RBAC failed, err: ", err)
+		panic(err)
 	}
 
 	if err := rbac.Init(); err != nil {
 		fmt.Println("init RBAC failed, err: ", err)
-		return
+		panic(err)
 	}
-	zap.L().Debug("database init success...")
+	zap.L().Debug("RBAC init success...")
 
 }
 

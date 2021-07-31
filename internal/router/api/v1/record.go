@@ -3,6 +3,7 @@ package v1
 import (
 	"errors"
 	"fmt"
+	"log"
 	"webconsole/internal/dao/database"
 	"webconsole/internal/dao/webcache"
 	"webconsole/internal/model"
@@ -31,6 +32,7 @@ func GetInfo(c *gin.Context) {
 	userRole := c.GetString("userRole")
 	unit := c.GetString("userUnit")
 
+	log.Println("test")
 	var info string
 	var err error
 

@@ -1,7 +1,6 @@
 package middleware
 
 import (
-	"errors"
 	"strconv"
 	"webconsole/pkg/respcode"
 
@@ -32,8 +31,7 @@ func PathParse(c *gin.Context) {
 		c.Set("count", count)
 		c.Next()
 	} else {
-		respcode.ResponseErrorWithMsg(c, respcode.CodeServerBusy,
-			errors.New("路径非法").Error())
+		respcode.ResponseError(c, respcode.CodeInvalidPath)
 		c.Abort()
 	}
 }
@@ -44,8 +42,7 @@ func QueryParse(c *gin.Context) {
 	value := c.Query("value")
 
 	if column == "" || value == "" {
-		respcode.ResponseErrorWithMsg(c, respcode.CodeServerBusy,
-			errors.New("缺失查询参数").Error())
+		respcode.ResponseError(c, respcode.CodeInvalidPath)
 		c.Abort()
 	} else {
 		c.Set("column", column)

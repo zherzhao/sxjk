@@ -1,18 +1,17 @@
 package v1
 
 import (
-	"encoding/json"
-	"io/ioutil"
-	"log"
-	"os"
 	"webconsole/global"
+	"webconsole/internal/dao/rbac"
+	"webconsole/internal/service"
 	"webconsole/pkg/respcode"
 
 	"github.com/gin-gonic/gin"
-	"github.com/impact-eintr/WebKits/erbac"
+	validator "github.com/go-playground/validator/v10"
+	"go.uber.org/zap"
 )
 
-// UpdateRoles 更新权限数据接口
+// UpdateRolesHandler 更新权限数据接口
 // @Summary 更新权限数据接口
 // @Description 请求后可以跟新权限数据 构造一个新的权限json 作为 body
 // @Tags 权限相关api
@@ -22,56 +21,41 @@ import (
 // @Security ApiKeyAuth
 // @Success 200 {object} respcode.ResponseData{code=int,msg=string,data=map[string][]string}
 // @Router /api/v1/home/roles [post]
-func UpdateRoles(c *gin.Context) {
+func UpdateRolesHandler(c *gin.Context) {
 	json := make(map[string][]string) //注意该结构接受的内容
-	c.BindJSON(&json)
-	tmpRBAC := erbac.NewRBAC()
-	tmpPermissions := make(erbac.Permissions)
-
-	// Build roles and add them to eRBAC instance
-	for rid, pids := range json {
-		role := erbac.NewStdRole(rid)
-		for _, pid := range pids {
-			_, ok := tmpPermissions[pid]
-			if !ok {
-				tmpPermissions[pid] = erbac.NewStdPermission(pid)
-			}
-			role.Assign(tmpPermissions[pid])
+	if err := c.BindJSON(&json); err != nil {
+		zap.L().Error("序列化失败", zap.Error(err))
+		errs, ok := err.(validator.ValidationErrors)
+		if !ok {
+			respcode.ResponseError(c, respcode.CodeInvalidParam)
+		} else {
+			respcode.ResponseErrorWithMsg(c, respcode.CodeInvalidParam, errs.Translate(global.Trans))
 		}
-		tmpRBAC.Add(role)
-	}
-	// Load inheritance information
-	var jsonInher map[string][]string
-	if err := erbac.LoadJson(
-		global.RBACSetting.DefaultInherFile, &jsonInher); err != nil {
+		c.Abort()
+		return
 	}
 
-	// Assign the inheritance relationship
-	for rid, parents := range jsonInher {
-		if err := tmpRBAC.SetParents(rid, parents); err != nil {
-			respcode.ResponseError(c, respcode.CodeInvalidInher)
-		}
-	}
-
-	global.Auth.Lock()
-	global.Auth.RBAC = tmpRBAC
-	global.Auth.Permissions = tmpPermissions
-
-	// 保存权限文件
-	err := tmpRBAC.SaveUserRBACWithSort(
-		global.RBACSetting.CustomerRoleFile, global.RBACSetting.CustomerInherFile)
+	err := service.UpdateRoles(json)
 	if err != nil {
-		log.Fatalln(err)
+		if err == rbac.ErrorInvalidInher {
+			zap.L().Error("出现环继承", zap.Error(err))
+			respcode.ResponseError(c, respcode.CodeInvalidInher)
+			c.Abort()
+			return
+		} else {
+			zap.L().Error("未知错误", zap.Error(err))
+			errs, ok := err.(validator.ValidationErrors)
+			if !ok {
+				respcode.ResponseError(c, respcode.CodeServerBusy)
+			} else {
+				respcode.ResponseErrorWithMsg(c, respcode.CodeServerBusy, errs.Translate(global.Trans))
+			}
+			c.Abort()
+			return
+		}
 	}
+	respcode.ResponseSuccess(c, nil)
 
-	global.Auth.Unlock()
-
-}
-
-type test struct {
-	Root    []string `json:"root"`
-	Manager []string `json:"manager"`
-	User    []string `json:"user"`
 }
 
 // GetRoles 获取权限数据接口
@@ -85,35 +69,23 @@ type test struct {
 // @Success 200 {object} respcode.ResponseData{code=int,msg=string,data=map[string][]string}
 // @Router /api/v1/home/roles [get]
 func GetRoles(c *gin.Context) {
-	global.Auth.RLock()
-	f, err := os.Open(global.RBACSetting.CustomerRoleFile)
+	r, err := service.GetRoles()
 	if err != nil {
-		log.Println(err)
-		respcode.ResponseError(c, respcode.CodeServerBusy)
-		return
-	}
-	b, err := ioutil.ReadAll(f)
-	if err != nil {
-		log.Println(err)
-		respcode.ResponseError(c, respcode.CodeServerBusy)
-		return
-	}
-
-	t := new(test)
-	err = json.Unmarshal(b, t)
-	if err != nil {
-		log.Println(err)
+		if err == rbac.ErrorRBACNotFound {
+			zap.L().Error("未找到用户自定义权限文件", zap.Error(err))
+			respcode.ResponseError(c, respcode.CodeServerBusy)
+			return
+		}
+		zap.L().Error("未知错误", zap.Error(err))
 		respcode.ResponseError(c, respcode.CodeServerBusy)
 		return
 	}
 
-	global.Auth.RUnlock()
-
-	respcode.ResponseSuccess(c, t)
+	respcode.ResponseSuccess(c, r)
 
 }
 
-// DefaultRoles 恢复默认权限接口
+// DefaultRolesHandler 恢复默认权限接口
 // @Summary 恢复默认权限接口
 // @Description 请求后可以拿到用户数据
 // @Tags 权限相关api
@@ -123,23 +95,9 @@ func GetRoles(c *gin.Context) {
 // @Security ApiKeyAuth
 // @Success 200 {object} respcode.ResponseData{code=int,msg=string,data=string}
 // @Router /api/v1/home/roles [head]
-func DefaultRoles(c *gin.Context) {
-	var err error
-	global.Auth.Lock()
-	defer global.Auth.Unlock()
-
-	global.Auth.RBAC, global.Auth.Permissions, err = erbac.BuildRBAC(
-		global.RBACSetting.DefaultRoleFile, global.RBACSetting.DefaultInherFile)
-	if err != nil {
-		log.Println(err)
-		respcode.ResponseError(c, respcode.CodeServerBusy)
-		return
-	}
-
-	err = global.Auth.RBAC.SaveUserRBACWithSort(
-		global.RBACSetting.CustomerRoleFile, global.RBACSetting.CustomerInherFile)
-	if err != nil {
-		log.Println(err)
+func DefaultRolesHandler(c *gin.Context) {
+	if err := service.DefaultRoles(); err != nil {
+		zap.L().Error("未知错误", zap.Error(err))
 		respcode.ResponseError(c, respcode.CodeServerBusy)
 		return
 	}
