@@ -97,7 +97,6 @@ func SignUpVerifyHandler(c *gin.Context) {
 // @Router /api/v1/login [post]
 func LoginHandler(c *gin.Context) {
 	// 获取请求参数以及参数校验
-
 	p := new(model.ParamLogin)
 
 	if err := c.ShouldBindJSON(&p); err != nil {
@@ -107,33 +106,30 @@ func LoginHandler(c *gin.Context) {
 			respcode.ResponseError(c, respcode.CodeInvalidParam)
 			return
 		}
-
 		respcode.ResponseErrorWithMsg(c, respcode.CodeInvalidParam, errs.Translate(global.Trans))
 		return
 	}
 
 	// 2. 业务处理
-	userID, userRole, aToken, err := service.Login(p)
+	userID, userRole, userUnit, aToken, err := service.Login(p)
 	if err != nil {
 		zap.L().Error("登录失败", zap.Error(err))
 		if errors.Is(err, database.ErrorUserNotExist) {
 			respcode.ResponseError(c, respcode.CodeUserNotExist)
-
 		} else if errors.Is(err, database.ErrorInvalidPassword) {
 			respcode.ResponseError(c, respcode.CodeInvalidPassword)
-
 		} else {
 			respcode.ResponseError(c, respcode.CodeServerBusy)
-
 		}
 		return
 	}
 
 	data := map[string]string{
-		"token":    aToken,
-		"userrole": userRole,
-		"userid":   fmt.Sprintf("%d", userID),
-		"username": p.UserName}
+		"token": aToken,
+		"role":  userRole,
+		"id":    fmt.Sprintf("%d", userID),
+		"name":  p.UserName,
+		"unit":  userUnit}
 
 	// 3. 返回响应
 	respcode.ResponseSuccess(c, data)

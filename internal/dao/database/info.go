@@ -1,9 +1,9 @@
 package database
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
-	"fmt"
 	"reflect"
 	"webconsole/global"
 	"webconsole/internal/model"
@@ -14,45 +14,40 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 )
 
-func Info(unit, role, prefix, year string, count int, t interface{}) (string, error) {
+func Info(unit, role, prefix, year string, t interface{}) (string, error) {
 	var res interface{}
-	var flag bool = true
+	var flag, flag2 bool = false, false
 	var condition string
 
 	switch reflect.TypeOf(t).String() {
 	case "model.L21":
 		res = &[]model.L21{}
 		condition = "所在行政区划代码"
+		flag = true
 	case "model.L24":
 		res = &[]model.L24{}
 		condition = "所在政区代码"
+		flag = true
 	case "model.L25":
 		res = &[]model.L25{}
 		condition = "政区代码"
+		flag = true
 	case "model.F":
 		res = &[]model.F{}
-		flag = false
 	case "model.SM":
 		res = &[]model.SM{}
-		flag = false
+		condition = "所在行政区划代码"
+		flag = true
 	case "model.SZ":
 		res = &[]model.SZ{}
-		flag = false
+		condition = "所在地级市"
+		flag2 = true
 	default:
 		return "", errors.New("无法找到对应数据模型")
 	}
 
 	statement := eorm.NewStatement()
-	if sLevel, ok := prefixMap[prefix]; ok {
-		level, err := model.Level(count)
-		if err != nil {
-			return "", err
-		}
-		statement = statement.SetTableName(fmt.Sprintf(
-			"(select * from %s WHERE `%s`='%s' )as res", prefix+year, sLevel, level))
-	} else {
-		statement = statement.SetTableName(prefix + year)
-	}
+	statement = statement.SetTableName(prefix + year)
 
 	c := <-global.DBClients
 	defer func() {
@@ -64,12 +59,16 @@ func Info(unit, role, prefix, year string, count int, t interface{}) (string, er
 			statement = statement.OrEqual(condition, v)
 		}
 	}
-	statement = statement.AndGreaterThan("ID", "2").Select("*")
+	if flag2 {
+		statement = statement.AndEqual(condition, unit+"市")
+	}
 
-	err := c.FindAll(nil, statement, res)
+	statement = statement.Select("*")
+
+	err := c.FindAll(context.Background(), statement, res)
 	if err != nil {
 		zap.L().Error("sql exec failed: ", zap.String("", err.Error()))
-		return "", err
+		return "", ErrorNotFound
 	}
 
 	data, err := json.Marshal(res)

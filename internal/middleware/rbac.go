@@ -18,7 +18,7 @@ func RecordRBAC(c *gin.Context) {
 	role := c.GetString("userRole")
 	infotype := c.GetString("infotype")
 
-	permission := fmt.Sprintf(infotype+"-record-%d", c.GetInt("count"))
+	permission := infotype + "-record"
 
 	if global.Auth.RBAC.IsGranted(role, global.Auth.Permissions[permission], nil) {
 		c.Next()

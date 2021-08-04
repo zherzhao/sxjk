@@ -142,7 +142,7 @@ type Node2 struct {
 func DataMenusHandler(ctx *gin.Context) {
 	statement := eorm.NewStatement()
 	statement = statement.SetTableName("tableManager").
-		Select("tableName,year,levelCount")
+		Select("tableName,year")
 
 	menus := []model.Menus{}
 
@@ -156,41 +156,43 @@ func DataMenusHandler(ctx *gin.Context) {
 		zap.L().Error("sql exec failed: ", zap.String("", err.Error()))
 	}
 
-	nodeMap := make(map[string][]Node2)
+	M := make(map[string][]string, len(menus))
+	for _, v := range menus {
+		M[v.TableName[:len(v.TableName)-5]] =
+			append(M[v.TableName[:len(v.TableName)-5]], v.Year)
+	}
+
+	nodeMap := make(map[*Node2][]Node2)
 	for _, v := range menus {
 		node := Node2{}
 		node.Id, node.Path, node.AuthName = model.Menu(&v)
+		if _, ok := M[v.TableName[:len(v.TableName)-5]]; !ok {
+			continue
+		}
 		node.Children = append(node.Children, func() (childNodes []Node2) {
-			for i := 0; i < v.Levels; i++ {
+			m := M[v.TableName[:len(v.TableName)-5]]
+			for i := 0; i < len(m); i++ {
 				childnode := Node2{}
 				childnode.Id = node.Id + strconv.Itoa(i)
-				if v.Levels == 1 {
-					childnode.AuthName = node.AuthName
-				} else {
-					childnode.AuthName, _ = model.Level(i)
-				}
+				childnode.AuthName = m[i]
 				childnode.Path = model.Leveltag(node.Path) + childnode.Id
 				childnode.Query = strconv.Itoa(i)
 				childNodes = append(childNodes, childnode)
 			}
 			return childNodes
 		}()...)
-
-		nodeMap[v.Year] = append(nodeMap[v.Year], node)
+		nodeMap[&node] = append(nodeMap[&node], node)
+		delete(M, v.TableName[:len(v.TableName)-5])
 	}
 
 	lists := []Node2{}
-	for k, v := range nodeMap {
-		node := Node2{}
-		node.Id = k
-		node.AuthName = k
-		node.Path = k
-		sort.Slice(v, func(i, j int) bool {
-			return v[i].Id < v[j].Id
-		})
-		node.Children = append(node.Children, v...)
+	for k := range nodeMap {
+		node := *k
 		lists = append(lists, node)
 	}
+	sort.Slice(lists, func(i, j int) bool {
+		return lists[i].Id < lists[j].Id
+	})
 
 	respcode.ResponseSuccess(ctx, lists)
 

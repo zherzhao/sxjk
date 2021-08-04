@@ -1,6 +1,7 @@
 package database
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -21,9 +22,8 @@ var (
 	}
 )
 
-func Query(prefix, year, unit string, count int, column, value string, t interface{}) (string, error) {
-	var condition, sLevel, level string
-	var ok bool
+func Query(prefix, year, unit string, query map[string]string, t interface{}) (string, error) {
+	var condition string
 	var err error
 	var res interface{}
 
@@ -48,29 +48,27 @@ func Query(prefix, year, unit string, count int, column, value string, t interfa
 	}
 
 	statement := eorm.NewStatement()
-	if sLevel, ok = prefixMap[prefix]; !ok || unit == "" {
+	if unit == "交科" || condition == "" {
 		statement = statement.SetTableName(prefix + year)
-		switch column {
-		case "id":
-			statement = statement.AndEqual(column, value).Select("*")
-		default:
-			statement = statement.AndLike(column, "%"+value+"%").Select("*")
+		for k, v := range query {
+			statement = statement.AndLike(k, "%"+v+"%")
 		}
+		statement = statement.Select("*")
 	} else {
-		level, err = model.Level(count)
-		if err != nil {
-			return "", err
+		// 构建多级查询
+		sql := "(select * from " + prefix + year + " WHERE "
+		count := 1
+
+		for k, v := range query {
+			if count != len(query) {
+				sql += fmt.Sprintf("`%s` LIKE '%s' AND ", k, "%"+v+"%")
+			} else {
+				sql += fmt.Sprintf("`%s` LIKE '%s'", k, "%"+v+"%")
+			}
+			count++
 		}
-		switch column {
-		case "id":
-			statement = statement.SetTableName(fmt.Sprintf(
-				"(select * from %s WHERE `%s`='%s' AND `%s` = '%s')as res",
-				prefix+year, sLevel, level, column, value))
-		default:
-			statement = statement.SetTableName(fmt.Sprintf(
-				"(select * from %s WHERE `%s`='%s' AND `%s` LIKE '%s')as res",
-				prefix+year, sLevel, level, column, "%"+value+"%"))
-		}
+		sql += ") AS res "
+		statement = statement.SetTableName(sql)
 		for _, v := range global.AreaMap[unit] {
 			statement = statement.OrEqual(condition, v)
 		}
@@ -83,10 +81,14 @@ func Query(prefix, year, unit string, count int, column, value string, t interfa
 		global.DBClients <- c
 	}()
 
-	err = c.FindAll(nil, statement, res)
+	err = c.FindAll(context.Background(), statement, res)
 	if err != nil {
 		zap.L().Error("sql exec failed: ", zap.String("", err.Error()))
 		return "", err
+	}
+
+	if size(res) == 0 {
+		return "", ErrorNotFound
 	}
 
 	data, err := json.Marshal(res)
@@ -96,4 +98,12 @@ func Query(prefix, year, unit string, count int, column, value string, t interfa
 	}
 	return string(data), nil
 
+}
+
+func size(a interface{}) int {
+	if reflect.TypeOf(a).Elem().Kind() != reflect.Slice {
+		return -1
+	}
+	ins := reflect.ValueOf(a).Elem()
+	return ins.Len()
 }

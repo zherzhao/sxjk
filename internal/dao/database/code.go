@@ -10,4 +10,5 @@ var (
 	ErrorNoUser          = errors.New("数据库无用户")
 	ErrorVerify          = errors.New("验证失败")
 	ErrorInvalidUnit     = errors.New("非法单位")
+	ErrorNotFound        = errors.New("没有相关数据")
 )

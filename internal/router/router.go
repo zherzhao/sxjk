@@ -84,23 +84,21 @@ func NewRouter() (r *gin.Engine, err error) {
 		dataGroup.Use(middleware.JWTAuthMiddleware())
 		// 数据导航栏路由
 		dataGroup.GET("/menus", v1.DataMenusHandler)
-
 		// 数据(记录)操作路由
 		infoGroup := dataGroup.Group("/info")
 		{
 			// 获取记录
-			infoGroup.GET("/:infotype/:year/:count", middleware.PathParse,
+			infoGroup.GET("/:infotype/:year", middleware.PathParse,
 				middleware.RecordRBAC, v1.GetInfo)
 			// 查询记录
-			infoGroup.GET("/:infotype/:year/:count/query", middleware.PathParse,
-				middleware.QueryParse, middleware.RecordRBAC,
-				v1.QueryInfo)
+			infoGroup.POST("/:infotype/:year/query", middleware.PathParse,
+				middleware.RecordRBAC, v1.QueryInfo)
 			// 修改记录
-			infoGroup.POST("/:infotype/:year/:count",
+			infoGroup.POST("/:infotype/:year",
 				middleware.PathParse, middleware.RecordRBAC,
 				v1.UpdateInfo, middleware.ClearCache(r, cacheKey))
 			// 删除记录
-			infoGroup.DELETE("/:infotype/:year/:count/:id",
+			infoGroup.DELETE("/:infotype/:year/:id",
 				middleware.PathParse, v1.DeleteInfo,
 				middleware.ClearCache(r, cacheKey))
 		}
@@ -114,7 +112,6 @@ func NewRouter() (r *gin.Engine, err error) {
 			// 删除表
 			tableGroup.DELETE("/:tabletype/:year", middleware.TableRBAC("del-table"),
 				v1.DeleteTable)
-
 		}
 	}
 

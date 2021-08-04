@@ -44,27 +44,27 @@ func ParseTable(c *gin.Context) {
 	case "road":
 		inStructPtr = new(model.L21)
 		tableName = "l21_" + year
-		err = database.InsertTableHandler(tableName, year, 6, inStructPtr, &rows)
+		err = database.InsertTableHandler(tableName, year, inStructPtr, &rows)
 	case "bridge":
 		inStructPtr = new(model.L24)
 		tableName = "l24_" + year
-		err = database.InsertTableHandler(tableName, year, 5, inStructPtr, &rows)
+		err = database.InsertTableHandler(tableName, year, inStructPtr, &rows)
 	case "tunnel":
 		inStructPtr = new(model.L25)
 		tableName = "l25_" + year
-		err = database.InsertTableHandler(tableName, year, 6, inStructPtr, &rows)
+		err = database.InsertTableHandler(tableName, year, inStructPtr, &rows)
 	case "service":
 		inStructPtr = new(model.F)
 		tableName = "F_" + year
-		err = database.InsertTableHandler(tableName, year, 1, inStructPtr, &rows)
+		err = database.InsertTableHandler(tableName, year, inStructPtr, &rows)
 	case "portal":
 		inStructPtr = new(model.SM)
 		tableName = "SM_" + year
-		err = database.InsertTableHandler(tableName, year, 1, inStructPtr, &rows)
+		err = database.InsertTableHandler(tableName, year, inStructPtr, &rows)
 	case "toll":
 		inStructPtr = new(model.SZ)
 		tableName = "SZ_" + year
-		err = database.InsertTableHandler(tableName, year, 1, inStructPtr, &rows)
+		err = database.InsertTableHandler(tableName, year, inStructPtr, &rows)
 	default:
 		err = errors.New("未知类型")
 	}

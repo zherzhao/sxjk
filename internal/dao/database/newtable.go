@@ -3,7 +3,6 @@ package database
 import (
 	"context"
 	"fmt"
-	"log"
 	"reflect"
 	"webconsole/global"
 	"webconsole/internal/model"
@@ -11,8 +10,7 @@ import (
 	"github.com/impact-eintr/eorm"
 )
 
-func InsertTableHandler(tableName, year string, level int,
-	inStructPtr interface{}, data *[][]string) (err error) {
+func InsertTableHandler(tableName, year string, inStructPtr interface{}, data *[][]string) (err error) {
 	var count int = 1
 
 	cli := <-global.DBClients
@@ -21,12 +19,10 @@ func InsertTableHandler(tableName, year string, level int,
 	}()
 
 	menu := new(model.Menus)
-	menu.Levels = level
 	menu.TableName = tableName
 	menu.Year = year
 
 	for _, row := range (*data)[1:] {
-		log.Println(len(row))
 		rType := reflect.TypeOf(inStructPtr).Elem()
 		rVal := reflect.ValueOf(inStructPtr).Elem()
 		for i := 0; i < rType.NumField(); i++ {

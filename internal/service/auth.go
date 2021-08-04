@@ -64,7 +64,7 @@ func SignUp(p *model.ParamSignUp, noUser bool) error {
 }
 
 // 处理用户登录以及JWT的发放
-func Login(p *model.ParamLogin) (userid int64, userRole, aToken string, err error) {
+func Login(p *model.ParamLogin) (int64, string, string, string, error) {
 	// 构造一个User实例
 	user := &model.User{
 		Username: p.UserName,
@@ -72,13 +72,13 @@ func Login(p *model.ParamLogin) (userid int64, userRole, aToken string, err erro
 	}
 
 	// 数据库验证
-	if err = database.UserLogin(user); err != nil {
-		return
+	if err := database.UserLogin(user); err != nil {
+		return 0, "", "", "", nil
 	}
 
 	// 验证通过后发放token
-	aToken, err = jwt.GenToken(user.UserID, user.Username, user.Role, user.Unit)
-	return user.UserID, user.Role, aToken, err
+	aToken, err := jwt.GenToken(user.UserID, user.Username, user.Role, user.Unit)
+	return user.UserID, user.Role, user.Unit, aToken, err
 
 }
 

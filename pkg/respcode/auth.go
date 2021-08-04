@@ -22,6 +22,7 @@ const (
 	CodeServerBusy
 
 	CodeNotFound
+	CodeNotFoundData
 )
 
 var codeMsgMap = map[RespCode]string{
@@ -41,7 +42,8 @@ var codeMsgMap = map[RespCode]string{
 
 	CodeServerBusy: "服务器繁忙，通知后端查看日志",
 
-	CodeNotFound: "路由不存在",
+	CodeNotFound:     "路由不存在",
+	CodeNotFoundData: "没有相关数据",
 }
 
 func (rescode RespCode) Msg() string {
