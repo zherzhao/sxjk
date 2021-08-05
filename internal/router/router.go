@@ -120,9 +120,9 @@ func NewRouter() (r *gin.Engine, err error) {
 
 	iserver := apiv2.Group("/iserver")
 	{
-		iserver.Any("/services/:dataname/rest/data/*result",
+		iserver.POST("/services/:dataname/rest/data/*result",
 			middleware.IServerRBAC,
-			v2.IServerHandler)
+			v2.IServerPostHandler)
 	}
 
 	r.NoRoute(func(c *gin.Context) {
