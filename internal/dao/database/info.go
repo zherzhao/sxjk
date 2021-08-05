@@ -59,7 +59,7 @@ func Info(unit, role, prefix, year string, t interface{}) (string, error) {
 			statement = statement.OrEqual(condition, v)
 		}
 	}
-	if flag2 {
+	if flag2 && unit != "交科" {
 		statement = statement.AndEqual(condition, unit+"市")
 	}
 
