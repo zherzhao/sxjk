@@ -9,7 +9,6 @@ import (
 
 	"go.uber.org/zap"
 
-	"log"
 	"net/http"
 	"os"
 	"os/signal"
@@ -107,7 +106,8 @@ func main() {
 	go func() {
 		if err := server.ListenAndServe(); err != nil &&
 			err != http.ErrServerClosed {
-			log.Fatalf("listen: %s\n", err)
+			zap.L().Error("Listen: ", zap.Error(err))
+			panic(err)
 		}
 	}()
 
@@ -123,9 +123,9 @@ func main() {
 	defer global.DB.Close()
 
 	if err := server.Shutdown(ctx); err != nil {
-		log.Fatalln("Shutdown", err)
+		zap.L().Error("Shutdown", zap.Error(err))
 	}
 
-	log.Println("Server exit")
+	zap.L().Info("Server exit")
 
 }

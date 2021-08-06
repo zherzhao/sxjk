@@ -1,8 +1,9 @@
 package global
 
 import (
-	"fmt"
 	"time"
+
+	"go.uber.org/zap"
 )
 
 type code struct {
@@ -25,7 +26,7 @@ func init() {
 			case VerifyCode.Code = <-VerifyCode.Ch:
 			case <-VerifyCode.T.C:
 				VerifyCode.Code = ""
-				fmt.Println("timed out")
+				zap.L().Warn("验证码过期")
 			}
 		}
 	}()

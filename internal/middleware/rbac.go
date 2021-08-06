@@ -5,13 +5,13 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
-	"log"
 	"strings"
 	"webconsole/global"
 	"webconsole/internal/model"
 	"webconsole/pkg/respcode"
 
 	"github.com/gin-gonic/gin"
+	"go.uber.org/zap"
 )
 
 func RecordRBAC(c *gin.Context) {
@@ -42,15 +42,13 @@ func QueryRBAC(c *gin.Context) {
 
 func IServerRBAC(c *gin.Context) {
 	role := c.GetString("userRole")
-	permission := []string{"query-data", "query-datas", "manage-iserver"}
+	permission := []string{"query-data", "query-datas"}
 
-	if global.Auth.RBAC.IsGranted(role, global.Auth.Permissions[permission[2]], nil) {
+	if global.Auth.RBAC.IsGranted(role, global.Auth.Permissions[permission[1]], nil) {
 		c.Next()
-	} else if global.Auth.RBAC.IsGranted(role, global.Auth.Permissions[permission[1]], nil) {
-		c.Next()
+
 	} else if global.Auth.RBAC.IsGranted(role, global.Auth.Permissions[permission[0]], nil) {
 		if c.Request.Method == "POST" {
-
 			test := new(model.IServerReq)
 			b, err := ioutil.ReadAll(c.Request.Body)
 			if err != nil {
@@ -79,13 +77,21 @@ func IServerRBAC(c *gin.Context) {
 
 			} else if strings.HasPrefix(attr, "桥梁名称") ||
 				strings.HasPrefix(attr, "收费站名称") ||
+				strings.HasPrefix(attr, "隧道名称") ||
 				strings.HasPrefix(attr, "门架名称") {
+
 				unit := c.GetString("userUnit")
 				extra := fmt.Sprintf("所在地级市 like '%s' and ", "%25"+unit+"%25")
 				test.QueryParameter.AttributeFilter = extra + attr
 
+			} else if strings.HasPrefix(attr, "名称") {
+				zap.L().Warn("没有权限")
+				respcode.ResponseError(c, respcode.CodeUserPermissionDenied)
+				c.Abort() // 这里应该处理成 返回没有结果
+				return
 			} else {
-				log.Println("小心sql注入！")
+				zap.L().Warn("小心sql注入")
+
 			}
 			count = 0
 			tmp, _ = json.Marshal(test)
@@ -104,9 +110,11 @@ func IServerRBAC(c *gin.Context) {
 			c.Request.Body = ioutil.NopCloser(bytes.NewReader([]byte(tmp)))
 		}
 		c.Next()
+
 	} else {
 		respcode.ResponseError(c, respcode.CodeUserPermissionDenied)
 		c.Abort()
+
 	}
 }
 

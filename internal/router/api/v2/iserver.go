@@ -13,6 +13,7 @@ import (
 	"webconsole/internal/model"
 
 	"github.com/gin-gonic/gin"
+	"go.uber.org/zap"
 )
 
 // IServerHandler 获取IServer数据接口
@@ -42,7 +43,7 @@ func IServerPostHandler(ctx *gin.Context) {
 		},
 		// 自定义ModifyResponse
 		ModifyResponse: func(resp *http.Response) error {
-			if resp.Request.Method != "POST" {
+			if ctx.GetString("userUnit") == "交科" || resp.Request.Method != "POST" {
 				return nil
 			}
 
@@ -63,7 +64,8 @@ func IServerPostHandler(ctx *gin.Context) {
 				json.Unmarshal(data, test)
 				for i, v := range test.Features {
 					for k, name := range v.FieldNames {
-						if name == "PTX" || name == "PTY" {
+						if name == "PTX" || name == "PTY" ||
+							name == "经度" || name == "纬度" {
 							test.Features[i].FieldNames = test.Features[i].FieldNames[:k-1]
 							test.Features[i].FieldValues = test.Features[i].FieldValues[:k-1]
 						}
@@ -74,18 +76,18 @@ func IServerPostHandler(ctx *gin.Context) {
 				var b bytes.Buffer
 				gz := gzip.NewWriter(&b)
 				if _, err := gz.Write(oldData); err != nil {
-					panic(err)
+					zap.L().Error("压缩错误", zap.Error(err))
 				}
 				if err := gz.Flush(); err != nil {
-					panic(err)
+					zap.L().Error("压缩错误", zap.Error(err))
 				}
 				if err := gz.Close(); err != nil {
-					panic(err)
+					zap.L().Error("压缩错误", zap.Error(err))
 				}
 
 				newData = b.Bytes()
 			} else {
-				newData = []byte("[ERROR] " + string(oldData))
+				newData, _ = ioutil.ReadAll(resp.Body)
 			}
 			// 修改返回内容及ContentLength
 			resp.Body = ioutil.NopCloser(bytes.NewBuffer(newData))
