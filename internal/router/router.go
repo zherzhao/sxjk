@@ -1,6 +1,7 @@
 package router
 
 import (
+	"sync"
 	_ "webconsole/docs"
 	"webconsole/global"
 	"webconsole/internal/middleware"
@@ -34,8 +35,8 @@ func NewRouter() (r *gin.Engine, err error) {
 	apiv1 := r.Group("/api/v1")
 
 	// 注册路由
-	apiv1.POST("/signup", middleware.Translations(), v1.SignUpHandler)
-	apiv1.GET("/signup", middleware.Translations(),
+	apiv1.POST("/signup", v1.SignUpHandler)
+	apiv1.GET("/signup",
 		middleware.JWTAuthMiddleware(),
 		middleware.UserRBAC("application"),
 		v1.SignUpVerifyHandler)
@@ -43,7 +44,8 @@ func NewRouter() (r *gin.Engine, err error) {
 	// 登录路由
 	apiv1.POST("/login", v1.LoginHandler)
 
-	cacheKey := make(map[string]struct{})
+	//cacheKey := make(map[string]struct{})
+	cacheKey := sync.Map{}
 	// 缓存路由
 	cacheGroup := apiv1.Group("/cache")
 	{
@@ -57,7 +59,7 @@ func NewRouter() (r *gin.Engine, err error) {
 	// 用户家目录路由
 	homeGroup := apiv1.Group("/home")
 	{
-		homeGroup.Use(middleware.JWTAuthMiddleware(), middleware.Translations())
+		homeGroup.Use(middleware.JWTAuthMiddleware())
 		// 获取导航栏数据
 		homeGroup.GET("/menus", v1.MenusHandler)
 

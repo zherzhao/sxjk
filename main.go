@@ -17,6 +17,7 @@ import (
 	"webconsole/pkg/logger"
 	"webconsole/pkg/rbac"
 	sf "webconsole/pkg/snowflake"
+	"webconsole/pkg/trans"
 
 	_ "github.com/go-sql-driver/mysql"
 )
@@ -55,6 +56,14 @@ func init() {
 	}
 
 	zap.L().Debug("ID init success...")
+
+	// 初始化翻译器设置
+	if err := trans.Init(); err != nil {
+		fmt.Println("init trans failed, err: ", err)
+		panic(err)
+
+	}
+	zap.L().Debug("Trans init success...")
 
 	// 初始化sql设置
 	err = global.Conf.ReadSection("database", &global.DatabaseSetting)

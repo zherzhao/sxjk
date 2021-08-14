@@ -3,7 +3,6 @@ package v1
 import (
 	"sort"
 	"strconv"
-	"sync"
 	"webconsole/global"
 	"webconsole/internal/model"
 	"webconsole/pkg/respcode"
@@ -30,8 +29,6 @@ const (
 	Map
 	Data
 )
-
-var L sync.RWMutex
 
 var idMap = map[NodeId]string{
 	User:     "用户管理",
@@ -120,10 +117,7 @@ var rootMenu = []Node{
 // @Success 200 {object} respcode.ResponseData{msg=string,data=string}
 // @Router /api/v1/home/menus [get]
 func MenusHandler(c *gin.Context) {
-	L.RLock()
 	respcode.ResponseSuccess(c, rootMenu)
-	L.RUnlock()
-
 }
 
 type Node2 struct {

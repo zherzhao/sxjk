@@ -73,7 +73,7 @@ func Login(p *model.ParamLogin) (int64, string, string, string, error) {
 
 	// 数据库验证
 	if err := database.UserLogin(user); err != nil {
-		return 0, "", "", "", nil
+		return 0, "", "", "", err
 	}
 
 	// 验证通过后发放token

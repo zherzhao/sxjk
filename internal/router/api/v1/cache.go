@@ -1,6 +1,7 @@
 package v1
 
 import (
+	"sync"
 	"webconsole/internal/dao/webcache"
 	"webconsole/pkg/respcode"
 
@@ -21,7 +22,7 @@ import (
 // @Security ApiKeyAuth
 // @Success 200 {object} respcode.ResponseData{code=int,msg=string,data=string}
 // @Router /api/v1/cache/hit/{infotype}/{year}/{level} [get]
-func CacheCheckHandler(r *gin.Engine, m map[string]struct{}) gin.HandlerFunc {
+func CacheCheckHandler(r *gin.Engine, m sync.Map) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		key := c.GetString("userUnit") + c.Param("key")
 		if key == "" {
@@ -34,7 +35,7 @@ func CacheCheckHandler(r *gin.Engine, m map[string]struct{}) gin.HandlerFunc {
 			respcode.ResponseSuccess(c, encoding.Bytes2str(b))
 		} else {
 			c.Request.URL.Path = "/api/v1/data/info" + c.Param("key") // 将请求的URL修改
-			m[c.Param("key")] = struct{}{}
+			m.Store(c.Param("key"), struct{}{})
 			r.HandleContext(c) // 继续之后的操作
 			c.Abort()
 		}
@@ -51,13 +52,14 @@ func CacheDeleteHandler(c *gin.Context) {
 
 }
 
-func CacheClearHandler(r *gin.Engine, m map[string]struct{}) gin.HandlerFunc {
+func CacheClearHandler(r *gin.Engine, m sync.Map) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		for v := range m {
-			c.Request.URL.Path = "/api/v1/cache/hit" + v // 将请求的URL修改
+		m.Range(func(k, v interface{}) bool {
+			c.Request.URL.Path = "/api/v1/cache/hit" + v.(string) // 将请求的URL修改
 			c.Request.Method = "DELETE"
 			r.HandleContext(c)
-		}
+			return true
+		})
 		c.Abort()
 	}
 }
