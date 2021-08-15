@@ -60,23 +60,22 @@ func IServerRBAC(p string) gin.HandlerFunc {
 						return
 					}
 
-					reg, err := regexp.Compile(`'([a-zA-Z]+?)':`)
-					index := reg.FindAllIndex(b, 7)
+					regexp, err := regexp.Compile(`'(.*?)':`)
+					index := regexp.FindAllIndex(b, 7)
 					for _, r := range index {
-						log.Println(string(b[r[0]:r[1]]))
 						b[r[0]] = 34
 						b[r[1]-2] = 34
 					}
+					log.Println(string(b))
 
-					json.Unmarshal(b, search)
-					log.Println(search)
+					err := json.Unmarshal(b, search)
+					log.Println(search, err)
 
 					attr := search.QueryParameter.AttributeFilter
 					if strings.HasPrefix(attr, "路线名称") {
 						unit := c.GetString("userUnit")
 						extra := fmt.Sprintf("交控单位名称 like '%s' and ", "%25"+unit+"%25")
 						search.QueryParameter.AttributeFilter = extra + attr
-						log.Println(extra + attr)
 
 					} else if strings.HasPrefix(attr, "桥梁名称") ||
 						strings.HasPrefix(attr, "收费站名称") ||
@@ -95,19 +94,8 @@ func IServerRBAC(p string) gin.HandlerFunc {
 						zap.L().Warn("小心sql注入")
 
 					}
-					b, _ = json.Marshal(search)
-
-					reg, err = regexp.Compile(`"([a-zA-Z]+?)":`)
-					index = reg.FindAllIndex(b, 7)
-					for _, r := range index {
-						log.Println(string(b[r[0]:r[1]]))
-						b[r[0]] = 39
-						b[r[1]-2] = 39
-					}
-					log.Println(string(b))
-
-					c.Request.Header.Set("Content-Length", fmt.Sprintf("%d", len(string(b))))
-					c.Request.Body = ioutil.NopCloser(bytes.NewReader(b))
+					//c.Request.Header.Set("Content-Length", fmt.Sprintf("%d", len(tmp)))
+					//c.Request.Body = ioutil.NopCloser(bytes.NewReader([]byte(tmp)))
 
 				} else if p == "query" {
 					query := new(model.IServerQueryReq)
@@ -115,16 +103,20 @@ func IServerRBAC(p string) gin.HandlerFunc {
 					if err != nil {
 						return
 					}
-					reg, err := regexp.Compile(`'([a-zA-Z]+?)':`)
-					index := reg.FindAllIndex(b, 7)
-					for _, r := range index {
-						log.Println(string(b[r[0]:r[1]]))
-						b[r[0]] = 34
-						b[r[1]-2] = 34
+					tmp := make([]byte, len(b))
+					count := 0
+					for i, v := range b {
+						if v == 39 && count < 8 {
+							tmp[i] = 34
+							count++
+							continue
+						}
+						tmp[i] = v
 					}
-
-					json.Unmarshal(b, query)
-
+					err = json.Unmarshal(tmp, query)
+					if err != nil {
+						return
+					}
 					attr := query.QueryParameter.AttributeFilter
 					if strings.HasPrefix(attr, "路线名称") {
 						unit := c.GetString("userUnit")
@@ -148,16 +140,21 @@ func IServerRBAC(p string) gin.HandlerFunc {
 						zap.L().Warn("小心sql注入")
 
 					}
-					reg, err = regexp.Compile(`"([a-zA-Z]+?)":`)
-					index = reg.FindAllIndex(b, 7)
-					for _, r := range index {
-						log.Println(string(b[r[0]:r[1]]))
-						b[r[0]] = 39
-						b[r[1]-2] = 39
+					count = 0
+					tmp, _ = json.Marshal(query)
+					for i, v := range tmp {
+						if v == 34 && count < 12 {
+							if count%4 == 0 || count%4 == 1 || count == 10 || count == 11 {
+								tmp[i] = 39
+								count++
+								continue
+							}
+							count++
+						}
+						tmp[i] = v
 					}
-
-					c.Request.Header.Set("Content-Length", fmt.Sprintf("%d", len(string(b))))
-					c.Request.Body = ioutil.NopCloser(bytes.NewReader(b))
+					c.Request.Header.Set("Content-Length", fmt.Sprintf("%d", len(tmp)))
+					c.Request.Body = ioutil.NopCloser(bytes.NewReader([]byte(tmp)))
 
 				}
 			}

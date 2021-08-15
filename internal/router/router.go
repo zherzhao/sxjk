@@ -120,12 +120,12 @@ func NewRouter() (r *gin.Engine, err error) {
 	apiv2 := r.Group("/api/v2")
 	apiv2.Use(middleware.JWTAuthMiddleware())
 
-	iserver := apiv2.Group("/iserver")
-	{
-		iserver.POST("/services/:dataname/rest/data/*result",
-			middleware.IServerRBAC,
-			v2.IServerPostHandler)
-	}
+	apiv2.POST("/query/iserver/services/:dataname/rest/data/*result",
+		middleware.IServerRBAC("query"),
+		v2.IServerQueryHandler)
+	apiv2.POST("/search/iserver/services/:dataname/rest/data/*result",
+		middleware.IServerRBAC("search"),
+		v2.IServerSearchHandler)
 
 	r.NoRoute(func(c *gin.Context) {
 		respcode.ResponseNotFound(c)
