@@ -76,7 +76,6 @@ func IServerRBAC(p string) gin.HandlerFunc {
 						unit := c.GetString("userUnit")
 						extra := fmt.Sprintf("交控单位名称 like '%s' and ", "%25"+unit+"%25")
 						search.QueryParameter.AttributeFilter = extra + attr
-						log.Println(extra + attr)
 
 					} else if strings.HasPrefix(attr, "桥梁名称") ||
 						strings.HasPrefix(attr, "收费站名称") ||
@@ -100,11 +99,9 @@ func IServerRBAC(p string) gin.HandlerFunc {
 					reg, err = regexp.Compile(`"([a-zA-Z]+?)":`)
 					index = reg.FindAllIndex(b, 7)
 					for _, r := range index {
-						log.Println(string(b[r[0]:r[1]]))
 						b[r[0]] = 39
 						b[r[1]-2] = 39
 					}
-					log.Println(string(b))
 
 					c.Request.Header.Set("Content-Length", fmt.Sprintf("%d", len(string(b))))
 					c.Request.Body = ioutil.NopCloser(bytes.NewReader(b))
@@ -118,7 +115,6 @@ func IServerRBAC(p string) gin.HandlerFunc {
 					reg, err := regexp.Compile(`'([a-zA-Z]+?)':`)
 					index := reg.FindAllIndex(b, 7)
 					for _, r := range index {
-						log.Println(string(b[r[0]:r[1]]))
 						b[r[0]] = 34
 						b[r[1]-2] = 34
 					}
@@ -148,13 +144,15 @@ func IServerRBAC(p string) gin.HandlerFunc {
 						zap.L().Warn("小心sql注入")
 
 					}
+					b, _ = json.Marshal(query)
+
 					reg, err = regexp.Compile(`"([a-zA-Z]+?)":`)
 					index = reg.FindAllIndex(b, 7)
 					for _, r := range index {
-						log.Println(string(b[r[0]:r[1]]))
 						b[r[0]] = 39
 						b[r[1]-2] = 39
 					}
+					log.Println(string(b))
 
 					c.Request.Header.Set("Content-Length", fmt.Sprintf("%d", len(string(b))))
 					c.Request.Body = ioutil.NopCloser(bytes.NewReader(b))

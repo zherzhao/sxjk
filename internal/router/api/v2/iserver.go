@@ -49,17 +49,26 @@ func IServerQueryHandler(ctx *gin.Context) {
 
 			var oldData, newData []byte
 
-			gr, err := gzip.NewReader(resp.Body)
-			if err != nil {
-				return err
-			}
-			defer gr.Close()
-			data, err := ioutil.ReadAll(gr)
-			if err != nil {
-				return err
-			}
-
 			if resp.StatusCode < 443 {
+				var data = []byte{}
+				var err error
+				if resp.Header.Get("Content-Encoding") == "" {
+					data, err = ioutil.ReadAll(resp.Body)
+					if err != nil {
+						return err
+					}
+				} else if resp.Header.Get("Content-Encoding") == "gzip" {
+					gr, err := gzip.NewReader(resp.Body)
+					if err != nil {
+						return err
+					}
+					defer gr.Close()
+					data, err = ioutil.ReadAll(gr)
+					if err != nil {
+						return err
+					}
+				}
+
 				test := new(model.IServerFeatures)
 				json.Unmarshal(data, test)
 				for i, v := range test.Features {
@@ -73,19 +82,25 @@ func IServerQueryHandler(ctx *gin.Context) {
 				}
 
 				oldData, _ = json.Marshal(test)
-				var b bytes.Buffer
-				gz := gzip.NewWriter(&b)
-				if _, err := gz.Write(oldData); err != nil {
-					zap.L().Error("压缩错误", zap.Error(err))
-				}
-				if err := gz.Flush(); err != nil {
-					zap.L().Error("压缩错误", zap.Error(err))
-				}
-				if err := gz.Close(); err != nil {
-					zap.L().Error("压缩错误", zap.Error(err))
-				}
 
-				newData = b.Bytes()
+				if resp.Header.Get("Content-Encoding") == "" {
+					newData = oldData
+
+				} else if resp.Header.Get("Content-Encoding") == "gzip" {
+					var b bytes.Buffer
+					gz := gzip.NewWriter(&b)
+					if _, err := gz.Write(oldData); err != nil {
+						zap.L().Error("压缩错误", zap.Error(err))
+					}
+					if err := gz.Flush(); err != nil {
+						zap.L().Error("压缩错误", zap.Error(err))
+					}
+					if err := gz.Close(); err != nil {
+						zap.L().Error("压缩错误", zap.Error(err))
+					}
+					newData = b.Bytes()
+
+				}
 			} else {
 				newData, _ = ioutil.ReadAll(resp.Body)
 			}
