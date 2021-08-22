@@ -2,26 +2,31 @@ package rbac
 
 import (
 	"errors"
+	"log"
 	"os"
+	"path"
+	"path/filepath"
+	"sync"
 	"webconsole/global"
 
 	"github.com/impact-eintr/WebKits/erbac"
 )
 
-func exists(path string) bool {
-	_, err := os.Stat(path) //os.Stat获取文件信息
-	if err != nil {
-		if os.IsExist(err) {
-			return true
-		}
-		return false
-	}
-	return true
-}
+var RootDir string
+var once = new(sync.Once)
 
 func Init() error {
 
+	log.Println(RootDir, global.RBACSetting)
 	var err error
+	once.Do(func() {
+		inferRootDir()
+		global.RBACSetting.CustomerInherFile = path.Join(RootDir, global.RBACSetting.CustomerInherFile)
+		global.RBACSetting.CustomerRoleFile = path.Join(RootDir, global.RBACSetting.CustomerRoleFile)
+		global.RBACSetting.DefaultRoleFile = path.Join(RootDir, global.RBACSetting.DefaultRoleFile)
+		global.RBACSetting.DefaultInherFile = path.Join(RootDir, global.RBACSetting.DefaultInherFile)
+		log.Println(global.RBACSetting.DefaultInherFile)
+	})
 
 	if exists(global.RBACSetting.CustomerInherFile) &&
 		exists(global.RBACSetting.CustomerRoleFile) {
@@ -47,4 +52,38 @@ func Init() error {
 	}
 	return err
 
+}
+
+func inferRootDir() {
+	cwd, err := os.Getwd()
+	if err != nil {
+		panic(err)
+	}
+
+	var infer func(d string) string
+	infer = func(d string) string {
+		// 确保当前目录下有配置文件
+		if pathExists(d + "/confs") {
+			return d
+		}
+		return infer(filepath.Dir(d))
+	}
+
+	RootDir = infer(cwd)
+}
+
+func pathExists(filename string) bool {
+	_, err := os.Stat(filename)
+	return err == nil || os.IsExist(err)
+}
+
+func exists(path string) bool {
+	_, err := os.Stat(path) //os.Stat获取文件信息
+	if err != nil {
+		if os.IsExist(err) {
+			return true
+		}
+		return false
+	}
+	return true
 }
