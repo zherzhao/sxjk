@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"log"
 	"syscall"
 	"time"
 	"webconsole/global"
@@ -83,6 +84,7 @@ func init() {
 	// 初始化RBAC
 
 	err = global.Conf.ReadSection("rbac", &global.RBACSetting)
+	log.Println(err)
 	if err != nil {
 		fmt.Println("init RBAC failed, err: ", err)
 		panic(err)

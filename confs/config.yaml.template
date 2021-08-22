@@ -24,7 +24,7 @@ max_open_conns: 20
 max_idel_conns: 20
 
 rbac:
-defaultroleFile: 
-defaultinherFile:
-customerroleFile:
-customerinherFile:
+  defaultroleFile: confs/roles.json
+  defaultinherFile: confs/inher.json
+  customerroleFile: confs/customerRoles.json
+  customerinherFile: confs/customerInher.json
